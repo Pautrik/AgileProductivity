@@ -1,8 +1,9 @@
 package org.effectively.dataObjects;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Note{
-    ArrayList<Task> Task = new ArrayList<>();
+    List<Task> Task = new ArrayList<>();
 
 }
