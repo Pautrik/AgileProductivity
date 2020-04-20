@@ -1,7 +1,6 @@
 package org.effectively;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.tools.javac.util.Pair;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +23,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
 
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
-        return new Pair(paramvalue[0],paramvalue[1]);
+        return new Pair<>(paramvalue[0],paramvalue[1]);
     }
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
