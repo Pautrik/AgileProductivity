@@ -1,7 +1,6 @@
 package org.effectively;
 
 import com.google.gson.Gson;
-import com.sun.tools.javac.util.Pair;
 import org.effectively.dataObjects.Day;
 import org.effectively.dataObjects.Task;
 
@@ -15,9 +14,10 @@ public class DatabaseHandler {
 
     public static String requestData(Pair<String, String> param){
 
-        if(param.fst.equals("week")) {
-            //remove last request
-            data.clear();
+        //remove last request
+        data.clear();
+
+        if(param.getFirst().equals("week")) {
 
             //initiate dummy data (replace with call to database)
             List<Task> tasks = new ArrayList<>();
