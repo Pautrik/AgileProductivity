@@ -1,0 +1,17 @@
+.week-box {
+    height: 100%;
+    width: 100%;
+    background-color: green;
+    display: flex;
+    flex-direction: column;
+}
+
+.week-header {
+    background-color: white;
+    flex: 0;
+}
+
+.days {
+    display: flex;
+    flex: 1;
+}
