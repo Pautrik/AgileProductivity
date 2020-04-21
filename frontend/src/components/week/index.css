@@ -1,9 +1,14 @@
-.week-box {
+.week-view{
+    display: flex;
+    height: 100%;
+}
+
+.week {
     height: 100%;
     width: 100%;
-    background-color: green;
     display: flex;
     flex-direction: column;
+    flex: 14;
 }
 
 .week-header {
@@ -14,4 +19,13 @@
 .days {
     display: flex;
     flex: 1;
+}
+
+.note-container{
+    display: flex;
+    flex: 3;
+    background-color: bisque;
+    flex-direction: column;
+    
+    
 }
