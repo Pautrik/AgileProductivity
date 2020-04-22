@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.effectively.dataObjects.Day;
 import org.effectively.dataObjects.Task;
 
+import javax.naming.AuthenticationException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ public class DatabaseHandler {
     private static final String user = "pi";
     private static String password = "";
     private static Gson gson = new Gson();
+
     //Dummy data
     private static List<Day> data = new ArrayList<>();
 
@@ -26,7 +28,9 @@ public class DatabaseHandler {
 
         if(param.getFirst().equals("week")) {
 
-            //initiate dummy data (replace with call to database)
+            //TODO replace dummy data with call to database
+
+            //initiate dummy data
             List<Task> tasks = new ArrayList<>();
             tasks.add(new Task("do that", 1));
             Day day = new Day("20200304", tasks);
@@ -39,6 +43,12 @@ public class DatabaseHandler {
             //
         }
 
+        if(param.getFirst().equals("timeline")) {
+            //TODO add java classes for timeline to dataObjects
+            //TODO send dummy reply
+        }
+
+
         List<String> jsonArray = new ArrayList<>();
         for (Object object : data){
             String json = gson.toJson(object);
@@ -47,16 +57,15 @@ public class DatabaseHandler {
         return jsonArray.toString();
     }
 
-    public static Connection connect(){
+    public static Connection connectToDatabase() throws AuthenticationException{
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, props);
-            System.out.println("Connected to the PostgreSQL server successfully");
         } catch (SQLException e){
-            System.out.println(e.getMessage());
+            throw new AuthenticationException();
         }
 
         return conn;
