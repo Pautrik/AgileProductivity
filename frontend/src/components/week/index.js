@@ -2,83 +2,7 @@ import React from "react";
 import Day from "../day";
 import "./index.css";
 
-const weekData = JSON.parse(`{
-	"days":[
-		{
-			"date": "20200416",
-			"tasks": [
-				{
-					"text": "Do this 1.0",
-					"state": 1
-				},
-				{
-					"text": "Do this 1.1",
-					"state": 1
-				},
-				{
-					"text": "Do this 1.2",
-					"state": 1
-				}
-
-			]
-		},
-		{
-
-			"date": "20200417",
-			"tasks": [
-				{
-					"text": "Do this 2",
-					"state": 1
-				}
-			]
-		},
-		{
-			"date": "20200418",
-			"tasks": [
-				{
-					"text": "Do this 3",
-					"state": 1
-				}
-			]
-		},
-		{
-			"date": "20200419",
-			"tasks": [
-				{
-					"text": "Do this 4",
-					"state": 1
-				}
-			]
-		},
-		{
-			"date": "20200420",
-			"tasks": [
-				{
-					"text": "Do this 5",
-					"state": 1
-				}
-			]
-		},
-		{
-			"date": "20200421",
-			"tasks": [
-				{
-					"text": "Do this 6",
-					"state": 1
-				}
-			]
-		},
-		{
-			"date": "20200422",
-			"tasks": [
-				{
-					"text": "Do this 7",
-					"state": 1
-				}
-			]
-		}	
-	]
-}`);
+const weekEndpoint = "/week.json";
 
 const weekDays = [
   "Monday",
@@ -91,6 +15,28 @@ const weekDays = [
 ];
 
 class Week extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+        days: [
+          { tasks: [] },
+          { tasks: [] },
+          { tasks: [] },
+          { tasks: [] },
+          { tasks: [] },
+          { tasks: [] },
+          { tasks: [] },
+        ],
+    }
+  }
+
+  componentDidMount() {
+    fetch(weekEndpoint, { mode: "cors" })
+      .then(res => res.json())
+      .then(data => this.setState(data));
+  }
+
   render() {
     return (
       <div className="week-view">
@@ -100,7 +46,7 @@ class Week extends React.Component {
           </div>
           <div className="days">
             {weekDays.map((x, i) => (
-              <Day dayName={x} tasks={weekData.days[i].tasks} />
+              <Day dayName={x} tasks={this.state.days[i].tasks} />
             ))}
           </div>
         </div>

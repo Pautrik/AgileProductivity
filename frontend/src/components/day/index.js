@@ -9,7 +9,6 @@ class Day extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className="day-box">
         <h2>{this.props.dayName}</h2>
