@@ -9,11 +9,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class DatabaseHandler {
-    private static final String url = "url: pautrik.ddns.net";
+    private static final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo";
     private static final String user = "pi";
-    private static final String password = "effectively";
+    private static String password = "";
     private static Gson gson = new Gson();
     //Dummy data
     private static List<Day> data = new ArrayList<>();
@@ -47,14 +48,21 @@ public class DatabaseHandler {
     }
 
     public static Connection connect(){
+        Properties props = new Properties();
+        props.setProperty("user", user);
+        props.setProperty("password", password);
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(url, user, password);
+            conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully");
         } catch (SQLException e){
             System.out.println(e.getMessage());
         }
 
         return conn;
+    }
+
+    public static void setPassword(String newPassword){
+        password = newPassword;
     }
 }
