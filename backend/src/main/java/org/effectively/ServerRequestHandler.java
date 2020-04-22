@@ -2,23 +2,23 @@ package org.effectively;
 
 import com.sun.net.httpserver.HttpExchange;
 
+import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
 
-    public ServerRequestHandler(){
-        DatabaseHandler.connect();
+    public ServerRequestHandler() throws AuthenticationException {
+        DatabaseHandler.connectToDatabase();
     }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         Pair<String, String> requestParamValue = null;
         if("GET".equals(httpExchange.getRequestMethod())) {
+            requestParamValue = handleGetRequest(httpExchange);
 
-            requestParamValue = handleGetRequest(httpExchange); //uncomment when starting to work on custom requests
-
-        }/*else if("POST".equals(httpExchange)) { //uncomment when starting to work on adding items to database
+        }/*else if("POST".equals(httpExchange)) { //TODO implement adding new items to database
             requestParamValue = handlePostRequest(httpExchange);
         }*/
 
@@ -26,6 +26,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
     }
     private Pair handleGetRequest(HttpExchange httpExchange) {
 
+        //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
         return new Pair<>(paramvalue[0],paramvalue[1]);
