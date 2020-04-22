@@ -4,10 +4,16 @@ import com.google.gson.Gson;
 import org.effectively.dataObjects.Day;
 import org.effectively.dataObjects.Task;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler {
+    private static final String url = "url: pautrik.ddns.net";
+    private static final String user = "pi";
+    private static final String password = "effectively";
     private static Gson gson = new Gson();
     //Dummy data
     private static List<Day> data = new ArrayList<>();
@@ -38,5 +44,17 @@ public class DatabaseHandler {
             jsonArray.add(json);
         }
         return jsonArray.toString();
+    }
+
+    public static Connection connect(){
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected to the PostgreSQL server successfully");
+        } catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+        return conn;
     }
 }

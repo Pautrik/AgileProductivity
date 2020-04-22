@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
+
+    public ServerRequestHandler(){
+        DatabaseHandler.connect();
+    }
+
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         Pair<String, String> requestParamValue = null;
