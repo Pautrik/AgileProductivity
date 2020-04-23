@@ -10,4 +10,12 @@ public class Day {
         this.date = date;
         this.tasks = tasks;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+    }
 }
