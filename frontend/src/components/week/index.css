@@ -1,31 +1,32 @@
-.week-view{
-    display: flex;
-    height: 100%;
+.week-view {
+  display: flex;
+  height: 100%;
 }
 
 .week {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex: 14;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 14;
 }
 
 .week-header {
-    background-color: white;
-    flex: 0;
+  display: flex;
+  background-color: white;
+  flex: 0;
+  justify-content: space-around;
+  align-items: center;
 }
 
 .days {
-    display: flex;
-    flex: 1;
+  display: flex;
+  flex: 1;
 }
 
-.note-container{
-    display: flex;
-    flex: 3;
-    background-color: bisque;
-    flex-direction: column;
-    
-    
+.note-container {
+  display: flex;
+  flex: 3;
+  background-color: bisque;
+  flex-direction: column;
 }

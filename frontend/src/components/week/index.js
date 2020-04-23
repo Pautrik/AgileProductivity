@@ -1,7 +1,9 @@
 import React from "react";
 import Day from "../day";
 import "./index.css";
-
+import Button from "../button";
+import Rullgardin from "../rullgardin";
+import NumberSelector from "../numberSelector";
 const weekEndpoint = "/week.json";
 
 const weekDays = [
@@ -15,26 +17,25 @@ const weekDays = [
 ];
 
 class Week extends React.Component {
-  
   constructor(props) {
     super(props);
     this.state = {
-        days: [
-          { tasks: [] },
-          { tasks: [] },
-          { tasks: [] },
-          { tasks: [] },
-          { tasks: [] },
-          { tasks: [] },
-          { tasks: [] },
-        ],
-    }
+      days: [
+        { tasks: [] },
+        { tasks: [] },
+        { tasks: [] },
+        { tasks: [] },
+        { tasks: [] },
+        { tasks: [] },
+        { tasks: [] },
+      ],
+    };
   }
 
   componentDidMount() {
     fetch(weekEndpoint, { mode: "cors" })
-      .then(res => res.json())
-      .then(data => this.setState(data));
+      .then((res) => res.json())
+      .then((data) => this.setState(data));
   }
 
   render() {
@@ -42,7 +43,10 @@ class Week extends React.Component {
       <div className="week-view">
         <div className="week">
           <div className="week-header">
+            <Rullgardin onChange={console.log} items={["week1", "week2"]} />
             <h1>January 2020</h1>
+            <NumberSelector />
+            <Button>Current week</Button>
           </div>
           <div className="days">
             {weekDays.map((x, i) => (

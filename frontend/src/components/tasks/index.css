@@ -1,3 +1,5 @@
 .task {
-  background-color: brown;
+  background-color: hsl(210, 69%, 73%);
+  border: solid black 2px;
+  border-radius: 25px;
 }
