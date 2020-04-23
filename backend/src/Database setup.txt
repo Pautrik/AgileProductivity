@@ -1,1 +1,12 @@
-This is the SQL code for setting up the tables:
+CREATE TABLE Tasks (
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	assignedDate VARCHAR(8) NOT NULL,
+	PRIMARY KEY (position, assignedDate)
+);
+
+CREATE TABLE Notes (
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	PRIMARY KEY (position)
+);
