@@ -70,7 +70,7 @@ public class DatabaseHandler {
 
         return conn;
     }
-
+    //Använd systemvariabler istället
     public static void setPassword(String newPassword){
         password = newPassword;
     }
