@@ -1,0 +1,25 @@
+.numberSelector2 {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.numberSelectorBox {
+  background-color: hsl(205, 69%, 73%);
+  padding: 3px;
+  margin: 5px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: rgba(129, 117, 117, 0.705);
+  border-radius: 3px;
+}
+
+.buttonBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttonStyle {
+  background-color: hsl(205, 69%, 73%);
+  border-radius: 5px;
+}
