@@ -110,6 +110,19 @@ public class DatabaseHandler {
         return returnData;
     }
 
+    private static String getNote(String note){
+
+        try{
+
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Notes");
+
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     public static Connection connectToDatabase() throws AuthenticationException{
         Properties props = new Properties();
         props.setProperty("user", user);
