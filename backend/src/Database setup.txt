@@ -1,12 +1,17 @@
 CREATE TABLE Tasks (
+	ID SERIAL PRIMARY KEY,
 	position INT NOT NULL,
 	description TEXT NOT NULL,
 	assignedDate VARCHAR(8) NOT NULL,
-	PRIMARY KEY (position, assignedDate)
+	state INT NOT NULL,
+	UNIQUE(position,assignedDate),
+	CHECK (state>0 AND state<4)
 );
 
 CREATE TABLE Notes (
+	ID SERIAL PRIMARY KEY,
 	position INT NOT NULL,
 	description TEXT NOT NULL,
-	PRIMARY KEY (position)
+	UNIQUE(position)
 );
+
