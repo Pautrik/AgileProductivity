@@ -34,7 +34,7 @@ public class DatabaseHandler {
             //TODO replace dummy data with call to database
 
             //date from param.getSecond() needs to be on format yyyyMMdd
-            reply = getWeek(param.getSecond());
+            reply = getWeekByNumber(param.getSecond());
 
             /*//initiate dummy data
             List<Task> tasks = new ArrayList<>();
@@ -67,8 +67,48 @@ public class DatabaseHandler {
         }
         return jsonArray.toString();
     }
+    private static List<Object> getWeekByNumber(String YearAndWeek){
+        List<Day> week = new ArrayList<>();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyww", Locale.UK);
 
-    private static List<Object> getWeek(String date){
+            Calendar c = GregorianCalendar.getInstance();
+            c.set(GregorianCalendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
+            c.set(GregorianCalendar.DAY_OF_WEEK, GregorianCalendar.MONDAY);
+            //c.set(Calendar.HOUR_OF_DAY, 12);
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd", Locale.UK);
+            for (int i = 0; i<7; i++){
+                week.add(new Day(sdf2.format(c.getTime()), new ArrayList<>()));
+                System.out.println(c.getTime());
+                c.add(GregorianCalendar.DATE, 1);  // number of days to add
+            }
+
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Tasks WHERE assignedDate BETWEEN ? and ?");
+            stmt.setString(1, week.get(0).getDate());
+            stmt.setString(2, week.get(6).getDate());
+            ResultSet task = stmt.executeQuery();
+
+            while(task.next()){
+                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2));//using position right now
+                for (int i = 0; i<7; i++){
+                    Day thisDay = week.get(i);
+                    if (thisDay.getDate().equals(task.getString(4))){
+                        thisDay.addTask(newTask);
+                    }
+                }
+            }
+        }
+        catch(SQLException s){
+            s.printStackTrace();
+        }
+        List<Object> returnData = new ArrayList<>();
+        Collections.addAll(returnData,week);
+
+        return returnData;
+    }
+
+    private static List<Object> getWeekByDate(String date){
         List<Day> week = new ArrayList<>();
 
         try{
