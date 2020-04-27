@@ -89,16 +89,14 @@ public class DatabaseHandler {
             ResultSet task = stmt.executeQuery();
 
             while(task.next()){
-                Task newTask = new Task(task.getString(2),task.getInt(1));//using position right now
+                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2));//using position right now
                 for (int i = 0; i<7; i++){
                     Day thisDay = week.get(i);
-                    if (thisDay.getDate().equals(task.getString(3))){
+                    if (thisDay.getDate().equals(task.getString(4))){
                         thisDay.addTask(newTask);
                     }
                 }
             }
-
-
         }
         catch(SQLException | ParseException s){
             s.printStackTrace();
