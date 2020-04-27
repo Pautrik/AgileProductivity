@@ -4,6 +4,7 @@ import "./index.css";
 import Button from "../button";
 import Rullgardin from "../rullgardin";
 import NumberSelector from "../numberSelector";
+import Arrow from "../arrow";
 const weekEndpoint = "/week.json";
 
 const weekDays = [
@@ -52,6 +53,8 @@ class Week extends React.Component {
             {weekDays.map((x, i) => (
               <Day dayName={x} tasks={this.state.days[i].tasks} />
             ))}
+            <button className="previous-week"><Arrow direction="left"/></button>
+            <button className="next-week"><Arrow direction="right"/></button>
           </div>
         </div>
         <div className="note-container">
