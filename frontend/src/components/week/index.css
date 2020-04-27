@@ -13,7 +13,7 @@
 
 .week-header {
   display: flex;
-  background-color: white;
+  background-color:  hsl(197, 79%, 85%);
   flex: 0;
   justify-content: space-around;
   align-items: center;

@@ -1,6 +1,5 @@
 import "./index.css";
 import React from "react";
-import Button from "../button";
 
 class Task extends React.Component {
   render() {

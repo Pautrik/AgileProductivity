@@ -14,6 +14,7 @@
   margin-top: 5px;
   margin-right: 5px;
   border-style: hidden;
+  visibility: hidden;
 }
 .done-button {
   background-color: hsl(205, 74%, 53%);
@@ -23,4 +24,8 @@
   margin-bottom: 5px;
   margin-right: 5px;
   border-style: hidden;
+  visibility: hidden;
+}
+.task:hover .done-button, .task:hover .x-button {
+  visibility: visible;
 }
