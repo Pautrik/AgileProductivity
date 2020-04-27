@@ -30,7 +30,7 @@ public class DatabaseHandler {
 
         List <Object> reply = new ArrayList<>();
 
-        if(param.getFirst().equals("week")) {
+        if(param.getFirst().equals("weekGet")) {
             //TODO replace dummy data with call to database
 
             //date from param.getSecond() needs to be on format yyyyMMdd
@@ -48,7 +48,9 @@ public class DatabaseHandler {
             data.add(day2);
             //*/
         }
-
+        else if(param.getFirst().equals("weekPost")){
+            addTask(param.getSecond());
+        }
         else if(param.getFirst().equals("timeline")) {
             //TODO add java classes for timeline to dataObjects
             //TODO send dummy reply
@@ -72,16 +74,16 @@ public class DatabaseHandler {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyww", Locale.UK);
 
-            Calendar c = GregorianCalendar.getInstance();
-            c.set(GregorianCalendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
-            c.set(GregorianCalendar.DAY_OF_WEEK, GregorianCalendar.MONDAY);
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
+            c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
             //c.set(Calendar.HOUR_OF_DAY, 12);
 
             SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd", Locale.UK);
             for (int i = 0; i<7; i++){
                 week.add(new Day(sdf2.format(c.getTime()), new ArrayList<>()));
                 System.out.println(c.getTime());
-                c.add(GregorianCalendar.DATE, 1);  // number of days to add
+                c.add(Calendar.DATE, 1);  // number of days to add
             }
 
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Tasks WHERE assignedDate BETWEEN ? and ?");
@@ -90,7 +92,7 @@ public class DatabaseHandler {
             ResultSet task = stmt.executeQuery();
 
             while(task.next()){
-                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2));//using position right now
+                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2),task.getString(4));//using position right now
                 for (int i = 0; i<7; i++){
                     Day thisDay = week.get(i);
                     if (thisDay.getDate().equals(task.getString(4))){
@@ -129,7 +131,7 @@ public class DatabaseHandler {
             ResultSet task = stmt.executeQuery();
 
             while(task.next()){
-                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2));//using position right now
+                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2),task.getString(4));//using position right now
                 for (int i = 0; i<7; i++){
                     Day thisDay = week.get(i);
                     if (thisDay.getDate().equals(task.getString(4))){
@@ -147,7 +149,28 @@ public class DatabaseHandler {
 
         return returnData;
     }
+    private static  void addTask(String task) {
+        Task newTask = gson.fromJson(task,Task.class);
+        System.out.println(newTask.getText());
+        System.out.println("hej");
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement("INSERT INTO TASKS VALUES(DEFAULT,?,?,?,?");
 
+        stmt.setInt(1,newTask.getPosition());
+        stmt.setString(2,newTask.getText());
+        stmt.setString(3,newTask.getDate());
+        stmt.setInt(4, newTask.getState());
+
+        stmt.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+
+
+    }
     private static String getNote(String note){
 
         try{

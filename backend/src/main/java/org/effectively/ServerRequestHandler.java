@@ -18,9 +18,9 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         if("GET".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handleGetRequest(httpExchange);
 
-        }/*else if("POST".equals(httpExchange)) { //TODO implement adding new items to database
+        }else if("POST".equals(httpExchange)) { //TODO implement adding new items to database
             requestParamValue = handlePostRequest(httpExchange);
-        }*/
+        }
 
         handleResponse(httpExchange,requestParamValue);
     }
@@ -29,7 +29,14 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
-        return new Pair<>(paramvalue[0],paramvalue[1]);
+        return new Pair<>(paramvalue[0]+"Get",paramvalue[1]);
+    }
+    private Pair handlePostRequest (HttpExchange httpExchange) {
+
+        String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
+        System.out.println(paramvalue.length);
+        String body = httpExchange.getRequestBody().toString();
+        return new Pair<>(paramvalue[0]+"Post",body);
     }
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
