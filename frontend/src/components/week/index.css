@@ -22,6 +22,27 @@
 .days {
   display: flex;
   flex: 1;
+  position: relative;
+}
+
+.previous-week, .next-week {
+    position: absolute;
+    top: 50%;
+    visibility: hidden;
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px grey;
+}
+
+.days:hover .previous-week, .days:hover .next-week {
+    visibility: visible;
+}
+
+.previous-week {
+    left: 10px;
+}
+
+.next-week {
+    right: 10px;
 }
 
 .note-container {
