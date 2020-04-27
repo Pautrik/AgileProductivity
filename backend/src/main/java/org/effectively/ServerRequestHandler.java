@@ -3,8 +3,9 @@ package org.effectively;
 import com.sun.net.httpserver.HttpExchange;
 
 import javax.naming.AuthenticationException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
 
@@ -18,7 +19,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         if("GET".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handleGetRequest(httpExchange);
 
-        }else if("POST".equals(httpExchange)) { //TODO implement adding new items to database
+        }else if("POST".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handlePostRequest(httpExchange);
         }
 
@@ -33,9 +34,20 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
     }
     private Pair handlePostRequest (HttpExchange httpExchange) {
 
+        //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
-        System.out.println(paramvalue.length);
-        String body = httpExchange.getRequestBody().toString();
+        String body = null;
+        try{
+            InputStream bodyAsStream= httpExchange.getRequestBody();
+            body = new BufferedReader(new InputStreamReader(bodyAsStream))
+                    .lines().collect(Collectors.joining("\n"));
+            bodyAsStream.close();
+        }
+        catch (IOException i){
+            i.printStackTrace();
+        }
+
+
         return new Pair<>(paramvalue[0]+"Post",body);
     }
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {

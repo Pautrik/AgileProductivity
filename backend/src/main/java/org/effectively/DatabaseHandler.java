@@ -20,13 +20,7 @@ public class DatabaseHandler {
     private static Connection conn;
 
 
-    //Dummy data
-    //private static List<Day> data = new ArrayList<>();
-
     public static String requestData(Pair<String, String> param){
-
-        //remove last request
-        //data.clear();
 
         List <Object> reply = new ArrayList<>();
 
@@ -35,20 +29,10 @@ public class DatabaseHandler {
 
             //date from param.getSecond() needs to be on format yyyyMMdd
             reply = getWeekByNumber(param.getSecond());
-
-            /*//initiate dummy data
-            List<Task> tasks = new ArrayList<>();
-            tasks.add(new Task("do that", 1));
-            Day day = new Day("20200304", tasks);
-            data.add(day);
-
-            List<Task> tasks2 = new ArrayList<>();
-            tasks2.add(new Task("do this", 2));
-            Day day2 = new Day("20200305", tasks2);
-            data.add(day2);
-            //*/
         }
         else if(param.getFirst().equals("weekPost")){
+
+            //date from param.getSecond() needs to be on format yyyyww
             addTask(param.getSecond());
         }
         else if(param.getFirst().equals("timeline")) {
@@ -72,18 +56,17 @@ public class DatabaseHandler {
     private static List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyww", Locale.UK);
+            //SimpleDateFormat sdf = new SimpleDateFormat("yyyyww", Locale.UK);
 
             Calendar c = Calendar.getInstance();
             c.set(Calendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
             c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-            //c.set(Calendar.HOUR_OF_DAY, 12);
 
-            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd", Locale.UK);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.UK);
             for (int i = 0; i<7; i++){
-                week.add(new Day(sdf2.format(c.getTime()), new ArrayList<>()));
+                week.add(new Day(sdf.format(c.getTime()), new ArrayList<>()));
                 System.out.println(c.getTime());
-                c.add(Calendar.DATE, 1);  // number of days to add
+                c.add(Calendar.DATE, 1);
             }
 
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Tasks WHERE assignedDate BETWEEN ? and ?");
@@ -110,7 +93,7 @@ public class DatabaseHandler {
         return returnData;
     }
 
-    private static List<Object> getWeekByDate(String date){
+    /*private static List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
         List<Day> week = new ArrayList<>();
 
         try{
@@ -148,40 +131,25 @@ public class DatabaseHandler {
         Collections.addAll(returnData,week);
 
         return returnData;
-    }
+    }*/
+
     private static  void addTask(String task) {
         Task newTask = gson.fromJson(task,Task.class);
-        System.out.println(newTask.getText());
-        System.out.println("hej");
+
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement("INSERT INTO TASKS VALUES(DEFAULT,?,?,?,?");
+            stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
+            stmt.setInt(1,newTask.getPosition());
+            stmt.setString(2,newTask.getText());
+            stmt.setString(3,newTask.getDate());
+            stmt.setInt(4, newTask.getState());
 
-        stmt.setInt(1,newTask.getPosition());
-        stmt.setString(2,newTask.getText());
-        stmt.setString(3,newTask.getDate());
-        stmt.setInt(4, newTask.getState());
+            stmt.executeUpdate();
 
-        stmt.executeUpdate();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException s) {
+            s.printStackTrace();
         }
 
-
-
-    }
-    private static String getNote(String note){
-
-        try{
-
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Notes");
-
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-        }
-        return "";
     }
 
     public static Connection connectToDatabase() throws AuthenticationException{
