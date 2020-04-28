@@ -36,8 +36,22 @@ class Week extends React.Component {
 
   componentDidMount() {
     fetch(weekEndpoint, { mode: "cors" })
-      .then((res) => res.json())
-      .then((data) => this.setState(data));
+      .then((res) => {
+        if (!res.ok) {
+          alert("Failed to fetch content");
+          return;
+        }
+        res.json()
+          .then((data) => this.setState(data))
+          .catch(err => {
+            alert("Failed to parse server response");
+            console.error(err);
+          });
+      })
+      .catch(err => {
+        alert("Failed to reach server");
+        console.error(err);
+      });
   }
 
   weekNum() {
