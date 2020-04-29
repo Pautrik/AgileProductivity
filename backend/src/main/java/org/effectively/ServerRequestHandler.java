@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 
 import javax.naming.AuthenticationException;
 import java.io.*;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
