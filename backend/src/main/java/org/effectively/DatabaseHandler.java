@@ -56,8 +56,6 @@ public class DatabaseHandler {
     private static List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
-            //SimpleDateFormat sdf = new SimpleDateFormat("yyyyww", Locale.UK);
-
             Calendar c = Calendar.getInstance();
             c.set(Calendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
             c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
@@ -65,7 +63,6 @@ public class DatabaseHandler {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.UK);
             for (int i = 0; i<7; i++){
                 week.add(new Day(sdf.format(c.getTime()), new ArrayList<>()));
-                System.out.println(c.getTime());
                 c.add(Calendar.DATE, 1);
             }
 
@@ -148,6 +145,7 @@ public class DatabaseHandler {
 
         } catch (SQLException s) {
             s.printStackTrace();
+            //TODO handle cases where task is already in database
         }
 
     }
