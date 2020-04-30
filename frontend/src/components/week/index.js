@@ -4,7 +4,9 @@ import "./index.css";
 import Button from "../button";
 import Arrow from "../arrow";
 import NumberSelector2 from "../numberSelector2";
+import { httpRequestJson } from "../../helpers/requests";
 const weekEndpoint = "/week.json";
+const notesEndpoint = "/notes.json";
 
 const weekDays = [
   "Monday",
@@ -30,26 +32,24 @@ class Week extends React.Component {
         { tasks: [] },
       ],
 
+      notes: [],
+
       chosenWeek: this.weekNum(),
     };
   }
 
   componentDidMount() {
-    fetch(weekEndpoint, { mode: "cors" })
-      .then((res) => {
-        if (!res.ok) {
-          alert("Failed to fetch content");
-          return;
-        }
-        res.json()
-          .then((data) => this.setState(data))
-          .catch(err => {
-            alert("Failed to parse server response");
-            console.error(err);
-          });
-      })
+    httpRequestJson(weekEndpoint)
+      .then(data => this.setState(data))
       .catch(err => {
-        alert("Failed to reach server");
+        alert(err.message);
+        console.error(err);
+      });
+
+      httpRequestJson(notesEndpoint)
+      .then(data => this.setState(data))
+      .catch(err => {
+        alert(err.message);
         console.error(err);
       });
   }
@@ -115,7 +115,7 @@ class Week extends React.Component {
           </div>
         </div>
         <div className="note-container">
-          <Day dayName="Notes" tasks={[]} />
+          <Day dayName="Notes" tasks={this.state.notes} />
         </div>
       </div>
     );
