@@ -1,15 +1,17 @@
 package org.effectively;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.effectively.dataObjects.DatabaseHandler;
 
 import javax.naming.AuthenticationException;
 import java.io.*;
 import java.util.stream.Collectors;
 
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
+    DatabaseHandler handler;
 
-    public ServerRequestHandler() throws AuthenticationException {
-        DatabaseHandler.connectToDatabase();
+    public ServerRequestHandler(String DBpassword) throws AuthenticationException {
+       handler = new DatabaseHandler(DBpassword);
     }
 
     @Override
@@ -27,7 +29,6 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         handleResponse(httpExchange,requestParamValue);
     }
 
-
     private Pair handleGetRequest(HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
@@ -42,6 +43,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
 
         return new Pair<>(paramvalue[0]+"Delete",paramvalue[1]);
     }
+
     private Pair handlePostRequest (HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
@@ -56,15 +58,14 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         catch (IOException i){
             i.printStackTrace();
         }
-
-
         return new Pair<>(paramvalue[0]+"Post",body);
     }
+
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
 
         //Request the wanted data from DatabaseHandler
-        String jsonResponse = DatabaseHandler.requestData(requestParamValue);
+        String jsonResponse = handler.requestData(requestParamValue);
 
         httpExchange.sendResponseHeaders(200, jsonResponse.length());
         outputStream.write(jsonResponse.getBytes());
