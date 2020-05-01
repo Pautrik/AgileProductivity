@@ -32,15 +32,14 @@ public class Main {
         while(!connected && server != null){
             try{
                 if (args.length == 1 && argumentCorrect){
-                    DatabaseHandler.setPassword(args[0]);
+                    server.createContext("/", new ServerRequestHandler(args[0]));
                 }
                 else{
                     logger.info("Enter database password: ");
                     Scanner scanner = new Scanner(System. in);
                     String inputString = scanner.nextLine();
-                    DatabaseHandler.setPassword(inputString);
+                    server.createContext("/", new ServerRequestHandler(inputString));
                 }
-                server.createContext("/", new ServerRequestHandler());
                 server.start();
                 logger.info("Server started on port " + port);
                 connected = true;

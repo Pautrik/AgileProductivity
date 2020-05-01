@@ -3,7 +3,7 @@ package org.effectively.dataObjects;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Task {
+class Task {
     @SerializedName("id")
     @Expose
     Integer id;

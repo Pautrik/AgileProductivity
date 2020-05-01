@@ -2,7 +2,7 @@ package org.effectively.dataObjects;
 
 import java.util.List;
 
-public class Day {
+class Day {
     String date;
     List<Task> tasks;
 

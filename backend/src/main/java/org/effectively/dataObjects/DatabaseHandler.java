@@ -1,6 +1,7 @@
-package org.effectively;
+package org.effectively.dataObjects;
 
 import com.google.gson.Gson;
+import org.effectively.Pair;
 import org.effectively.dataObjects.Day;
 import org.effectively.dataObjects.Task;
 
@@ -13,19 +14,21 @@ import java.util.*;
 import java.util.Date;
 
 public class DatabaseHandler {
-    private static final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo";
-    private static final String user = "pi";
-    private static String password = "";
-    private static Gson gson = new Gson();
-    private static Connection conn;
+    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo";
+    private final String user = "pi";
+    private final Gson gson = new Gson();
+    private Connection conn;
+
+    public DatabaseHandler(String DBpassword) throws AuthenticationException{
+        connectToDatabase(DBpassword);
+    }
 
 
-    public static String requestData(Pair<String, String> param){
+    public String requestData(Pair<String, String> param){
 
         List <Object> reply = new ArrayList<>();
 
         if(param.getFirst().equals("weekGet")) {
-            //TODO replace dummy data with call to database
 
             //date from param.getSecond() needs to be on format yyyyMMdd
             reply = getWeekByNumber(param.getSecond());
@@ -37,7 +40,7 @@ public class DatabaseHandler {
         }
         else if(param.getFirst().equals("weekDelete")){
 
-            //date from param.getSecond() needs to be on format yyyyww
+            //date from param.getSecond() needs to be on format id
             removeTask(param.getSecond());
         }
         else if(param.getFirst().equals("timeline")) {
@@ -58,10 +61,11 @@ public class DatabaseHandler {
         }
         return jsonArray.toString();
     }
-    private static List<Object> getWeekByNumber(String YearAndWeek){
+    private List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
             Calendar c = Calendar.getInstance();
+            c.set(Calendar.YEAR, Integer.valueOf(YearAndWeek.substring(0,4)));
             c.set(Calendar.WEEK_OF_YEAR, Integer.valueOf(YearAndWeek.substring(4)));
             c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
@@ -95,7 +99,7 @@ public class DatabaseHandler {
         return returnData;
     }
 
-    /*private static List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
+    /*private List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
         List<Day> week = new ArrayList<>();
 
         try{
@@ -135,7 +139,7 @@ public class DatabaseHandler {
         return returnData;
     }*/
 
-    private static void addTask(String task) {
+    private void addTask(String task) {
         Task newTask = gson.fromJson(task,Task.class);
 
         PreparedStatement stmt = null;
@@ -155,7 +159,7 @@ public class DatabaseHandler {
 
     }
 
-    private static void removeTask(String task){
+    private void removeTask(String task){
 
         PreparedStatement stmt = null;
         try {
@@ -169,20 +173,14 @@ public class DatabaseHandler {
         }
     }
 
-    public static Connection connectToDatabase() throws AuthenticationException{
+    private void connectToDatabase(String DBpassword) throws AuthenticationException{
         Properties props = new Properties();
         props.setProperty("user", user);
-        props.setProperty("password", password);
+        props.setProperty("password", DBpassword);
         try {
             conn = DriverManager.getConnection(url, props);
         } catch (SQLException e){
             throw new AuthenticationException();
         }
-
-        return conn;
-    }
-    //Använd systemvariabler istället
-    public static void setPassword(String newPassword){
-        password = newPassword;
     }
 }
