@@ -20,16 +20,27 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
 
         }else if("POST".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handlePostRequest(httpExchange);
+        }else if("DELETE".equals(httpExchange.getRequestMethod())){
+            requestParamValue = handleDeleteRequest(httpExchange);
         }
 
         handleResponse(httpExchange,requestParamValue);
     }
+
+
     private Pair handleGetRequest(HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
         return new Pair<>(paramvalue[0]+"Get",paramvalue[1]);
+    }
+    private Pair handleDeleteRequest(HttpExchange httpExchange) {
+
+        //TODO make sure there are no "=" in key or value before splitting
+        String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
+
+        return new Pair<>(paramvalue[0]+"Delete",paramvalue[1]);
     }
     private Pair handlePostRequest (HttpExchange httpExchange) {
 

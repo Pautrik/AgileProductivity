@@ -35,6 +35,11 @@ public class DatabaseHandler {
             //date from param.getSecond() needs to be on format yyyyww
             addTask(param.getSecond());
         }
+        else if(param.getFirst().equals("weekDelete")){
+
+            //date from param.getSecond() needs to be on format yyyyww
+            removeTask(param.getSecond());
+        }
         else if(param.getFirst().equals("timeline")) {
             //TODO add java classes for timeline to dataObjects
             //TODO send dummy reply
@@ -130,7 +135,7 @@ public class DatabaseHandler {
         return returnData;
     }*/
 
-    private static  void addTask(String task) {
+    private static void addTask(String task) {
         Task newTask = gson.fromJson(task,Task.class);
 
         PreparedStatement stmt = null;
@@ -148,6 +153,20 @@ public class DatabaseHandler {
             //TODO handle cases where task is already in database
         }
 
+    }
+
+    private static void removeTask(String task){
+
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
+            stmt.setInt(1,Integer.parseInt(task));
+
+            stmt.executeUpdate();
+
+        } catch (SQLException s) {
+            s.printStackTrace();
+        }
     }
 
     public static Connection connectToDatabase() throws AuthenticationException{
