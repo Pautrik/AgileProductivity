@@ -53,3 +53,16 @@ What is my contribution towards the team’s deliveries?
   I suggested an overspanning technical architecture and how we could divide
   work between the different areas of work. I also helped the people who doesn't
   have previous experience with git, how to use it.
+
+Week6:
+What do I want to learn or understand better?
+  Setting up UI testing (react-testing-library) as that is needed to get up the code coverage KPI on the frontend.
+How can I help someone else, or the entire team, to learn something new?
+  Same as previous weeks.
+What is my contribution towards the team’s use of Scrum?
+  Same as previous weeks.
+  
+What is my contribution towards the team’s deliveries?
+  Implemented fetching and rendering of content from the backend.
+  Improved the frontends error handeling.
+  Helped team members with merging and how to create and review pull requests.
