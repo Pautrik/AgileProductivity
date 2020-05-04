@@ -46,8 +46,9 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("timelineGet")) {
 
             String [] valueParameters = param.getSecond().split("&"); //TODO make sure valueParameters has the correct length
+            String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
 
-            reply = getTimeLine(valueParameters[0], valueParameters[1], valueParameters[2]);
+            reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
         }
         else if(param.getFirst().equals("timelinePost")) {
 
@@ -203,25 +204,29 @@ public class DatabaseHandler {
         }
     }
 
-    private List<Object> getTimeLine(String projectname, String startDate, String endDate){ //TODO allow multiple project names in query, allow to query by active or inactive
+    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){ //TODO allow multiple project names in query, allow to query by active or inactive
+        PreparedStatement stmt;
         List<TimelineTask> timeline = new ArrayList<>();
+        int startDateValue = Integer.valueOf(startDate);
+        int endDateValue = Integer.valueOf(endDate);
+
         try{
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+            for (String projectname : projectnames){
+                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
 
-            int startDateValue = Integer.valueOf(startDate);
-            int endDateValue = Integer.valueOf(endDate);
+                stmt.setInt(1, startDateValue);
+                stmt.setInt(2, endDateValue);
+                stmt.setInt(3, startDateValue);
+                stmt.setInt(4, endDateValue);
+                stmt.setString(5, projectname);
+                ResultSet task = stmt.executeQuery();
 
-            stmt.setInt(1, startDateValue);
-            stmt.setInt(2, endDateValue);
-            stmt.setInt(3, startDateValue);
-            stmt.setInt(4, endDateValue);
-            stmt.setString(5, projectname);
-            ResultSet task = stmt.executeQuery();
-
-            while(task.next()){
-                TimelineTask newTask = new TimelineTask(task.getInt(1),task.getString(3),task.getInt(6), task.getInt(2),task.getString(4),task.getString(5),task.getString(7));
-                timeline.add(newTask);
+                while(task.next()){
+                    TimelineTask newTask = new TimelineTask(task.getInt(1),task.getString(3),task.getInt(6), task.getInt(2),task.getString(4),task.getString(5),task.getString(7));
+                    timeline.add(newTask);
+                }
             }
+
         }
         catch(SQLException s){
             s.printStackTrace();
