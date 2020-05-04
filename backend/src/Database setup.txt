@@ -18,15 +18,15 @@ CREATE TABLE Notes (
 
 
 -- A function that computes the next available position
-CREATE FUNCTION next() RETURNS INT AS $$
-  SELECT COALESCE(MAX(position),0)+1 FROM Tasks
+CREATE FUNCTION next(date VARCHAR(8)) RETURNS INT AS $$
+  SELECT COALESCE(MAX(position),0)+1 FROM Tasks WHERE assignedDate=date
 $$ LANGUAGE SQL;
 
 
 -- A function to adjust positions after someone is removed from the list
 CREATE OR REPLACE FUNCTION compact() RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE Tasks SET position = position-1 WHERE position>=OLD.position;
+  UPDATE Tasks SET position = position-1 WHERE position>=OLD.position AND assignedDate=OLD.assignedDate;
   RETURN NULL;
 END
 $$ LANGUAGE plpgsql;
