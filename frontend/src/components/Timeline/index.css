@@ -1,0 +1,20 @@
+.Timeline {
+    width: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+}
+.Timeline-header {
+    width: 100vw;
+    height: 10vh;
+    display: flex;
+    background-color:  hsl(197, 79%, 85%);
+    flex: 0;
+    justify-content: space-around;
+    align-items: center;
+}
+.Projects-container {
+    display: flex;
+
+}
