@@ -8,6 +8,7 @@ CREATE TABLE Tasks (
 	CHECK (state>0 AND state<4)
 );
 
+
 CREATE TABLE Notes (
 	ID SERIAL PRIMARY KEY,
 	position INT NOT NULL,
@@ -15,3 +16,21 @@ CREATE TABLE Notes (
 	UNIQUE(position)
 );
 
+
+-- A function that computes the next available position
+CREATE FUNCTION next() RETURNS INT AS $$
+  SELECT COALESCE(MAX(position),0)+1 FROM Tasks
+$$ LANGUAGE SQL;
+
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION compact() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Tasks SET position = position-1 WHERE position>=OLD.position;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER compact AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compact();
