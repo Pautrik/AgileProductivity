@@ -43,14 +43,24 @@ public class DatabaseHandler {
             //date from param.getSecond() needs to be on format id
             removeTask(param.getSecond());
         }
-        else if(param.getFirst().equals("timeline")) {
-            //TODO add java classes for timeline to dataObjects
-            //TODO send dummy reply
+        else if(param.getFirst().equals("timelineGet")) {
+
+            String [] valueParameters = param.getSecond().split("&"); //TODO make sure valueParameters has the correct length
+
+            reply = getTimeLine(valueParameters[0], valueParameters[1], valueParameters[2]);
+        }
+        else if(param.getFirst().equals("timelinePost")) {
+
+            //TODO implement endpoint
+        }
+        else if(param.getFirst().equals("timelineDelete")) {
+
+            //TODO implement endpoint
         }
 
+
         else if(param.getFirst().equals("notes")) {
-            //TODO add java classes for timeline to dataObjects
-            //TODO send dummy reply
+
         }
 
 
@@ -93,10 +103,8 @@ public class DatabaseHandler {
         catch(SQLException s){
             s.printStackTrace();
         }
-        List<Object> returnData = new ArrayList<>();
-        Collections.addAll(returnData,week);
 
-        return returnData;
+        return asObjectArray(week);
     }
 
     /*private List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
@@ -171,6 +179,39 @@ public class DatabaseHandler {
         } catch (SQLException s) {
             s.printStackTrace();
         }
+    }
+
+    private List<Object> getTimeLine(String projectname, String startDate, String endDate){ //TODO allow multiple project names in query, allow to query by active or inactive
+        List<TimelineTask> timeline = new ArrayList<>();
+        try{
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+
+            int startDateValue = Integer.valueOf(startDate);
+            int endDateValue = Integer.valueOf(endDate);
+
+            stmt.setInt(1, startDateValue);
+            stmt.setInt(2, endDateValue);
+            stmt.setInt(3, startDateValue);
+            stmt.setInt(4, endDateValue);
+            stmt.setString(5, projectname);
+            ResultSet task = stmt.executeQuery();
+
+            while(task.next()){
+                TimelineTask newTask = new TimelineTask(task.getInt(1),task.getString(3),task.getInt(6), task.getInt(2),task.getString(4),task.getString(5),task.getString(7));
+                timeline.add(newTask);
+            }
+        }
+        catch(SQLException s){
+            s.printStackTrace();
+        }
+
+        return asObjectArray(timeline);
+    }
+
+    private List<Object> asObjectArray(Collection<?> collection){
+        List<Object> returnData = new ArrayList<>();
+        Collections.addAll(returnData,collection);
+        return returnData;
     }
 
     private void connectToDatabase(String DBpassword) throws AuthenticationException{

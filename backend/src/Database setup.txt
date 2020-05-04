@@ -8,6 +8,19 @@ CREATE TABLE Tasks (
 	CHECK (state>0 AND state<4)
 );
 
+CREATE TABLE TimelineTasks (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	startDate VARCHAR(8) NOT NULL,
+    endDate VARCHAR(8) NOT NULL,
+	state INT NOT NULL,
+	project TEXT NOT NULL,
+	FOREIGN KEY (project) REFERENCES Projects (name),
+	UNIQUE(position,startDate),
+	CHECK (state>0 AND state<4)
+);
+
 
 CREATE TABLE Notes (
 	ID SERIAL PRIMARY KEY,
@@ -16,6 +29,10 @@ CREATE TABLE Notes (
 	UNIQUE(position)
 );
 
+CREATE TABLE Projects (
+	name TEXT PRIMARY KEY,
+	active BOOLEAN NOT NULL
+);
 
 -- A function that computes the next available position
 CREATE FUNCTION next(date VARCHAR(8)) RETURNS INT AS $$
