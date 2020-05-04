@@ -41,7 +41,7 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("weekDelete")){
 
             //date from param.getSecond() needs to be on format id
-            removeTask(param.getSecond());
+            removeTask(param.getSecond(),"week");
         }
         else if(param.getFirst().equals("timelineGet")) {
 
@@ -53,11 +53,11 @@ public class DatabaseHandler {
 
             addTask(param.getSecond(),"timeline");
 
-            //TODO implement endpoint
         }
         else if(param.getFirst().equals("timelineDelete")) {
 
-            //TODO implement endpoint
+            removeTask(param.getSecond(),"timeline");
+
         }
 
 
@@ -182,15 +182,22 @@ public class DatabaseHandler {
 
     }
 
-    private void removeTask(String task){
+    private void removeTask(String task, String viewname){
+        PreparedStatement stmt;
 
-        PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
-            stmt.setInt(1,Integer.parseInt(task));
+            if (viewname.equals("week")){
+                stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
+                stmt.setInt(1,Integer.parseInt(task));
 
-            stmt.executeUpdate();
+                stmt.executeUpdate();
+            }
+            else if (viewname.equals("timeline")){
+                stmt = conn.prepareStatement("DELETE FROM TimelineTasks WHERE ID=?");
+                stmt.setInt(1,Integer.parseInt(task));
 
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
             s.printStackTrace();
         }
