@@ -14,7 +14,7 @@ class TimelineTask extends Task {
         return endDate;
     }
 
-    public Project getProject() {
-        return project;
+    public String getProjectName() {
+        return project.getName();
     }
 }

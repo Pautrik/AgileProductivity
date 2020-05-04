@@ -36,7 +36,7 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("weekPost")){
 
             //date from param.getSecond() needs to be on format yyyyww
-            addTask(param.getSecond());
+            addTask(param.getSecond(), "week");
         }
         else if(param.getFirst().equals("weekDelete")){
 
@@ -50,6 +50,8 @@ public class DatabaseHandler {
             reply = getTimeLine(valueParameters[0], valueParameters[1], valueParameters[2]);
         }
         else if(param.getFirst().equals("timelinePost")) {
+
+            addTask(param.getSecond(),"timeline");
 
             //TODO implement endpoint
         }
@@ -147,22 +149,35 @@ public class DatabaseHandler {
         return returnData;
     }*/
 
-    private void addTask(String task) {
-        Task newTask = gson.fromJson(task,Task.class);
+    private void addTask(String task, String viewname) {
+        PreparedStatement stmt;
 
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
-            stmt.setInt(1,newTask.getPosition());
-            stmt.setString(2,newTask.getText());
-            stmt.setString(3,newTask.getDate());
-            stmt.setInt(4, newTask.getState());
+        try{
+            if (viewname.equals("week")) {
+                Task newTask = gson.fromJson(task, Task.class);
+                stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
+                stmt.setInt(1, newTask.getPosition());
+                stmt.setString(2, newTask.getText());
+                stmt.setString(3, newTask.getDate());
+                stmt.setInt(4, newTask.getState());
 
-            stmt.executeUpdate();
+                stmt.executeUpdate();
+            }
+            else if (viewname.equals("timeline")){
+                TimelineTask newTask = gson.fromJson(task,TimelineTask.class);
+                stmt = conn.prepareStatement("INSERT INTO TimelineTasks VALUES(DEFAULT,?,?,?,?,?,?)");
+                stmt.setInt(1,newTask.getPosition());
+                stmt.setString(2,newTask.getText());
+                stmt.setString(3,newTask.getDate());
+                stmt.setString(4,newTask.getEndDate());
+                stmt.setInt(5, newTask.getState());
+                stmt.setString(6, newTask.getProjectName());
 
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
-            s.printStackTrace();
-            //TODO handle cases where task is already in database
+                s.printStackTrace();
+                //TODO handle cases where task is already in database
         }
 
     }
@@ -209,9 +224,7 @@ public class DatabaseHandler {
     }
 
     private List<Object> asObjectArray(Collection<?> collection){
-        List<Object> returnData = new ArrayList<>();
-        Collections.addAll(returnData,collection);
-        return returnData;
+        return new ArrayList<>(collection);
     }
 
     private void connectToDatabase(String DBpassword) throws AuthenticationException{
