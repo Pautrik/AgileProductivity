@@ -70,3 +70,23 @@ I have helped with the backend deliveries, mostly with some sql setup code
 and som server coding. But the candidate project
 is taking much time from the project for me.
 
+Week 4:
+
+What do I want to learn or understand better?
+  I want to learn about trigger hadeling since it will be very useful in the coming sprints.
+  I also want to become more comfortable with git to be able to work more remote. Especially 
+  now that we have started with mergerequests.
+  
+how can I help someone else, or the entire team, to learn something new?
+  I can help with konwledge about databases when setting up tables and connecting to the DB
+  remote. Also helping with the structure of working in MS Teams.
+  
+what is my contribution towards the team’s use of Scrum?
+  Managing the continous meetings so that everyone can attend. Although this week the attendace have 
+  been quite bad. We can try to solve this be setting the same times each week. I have edited some
+  acceptence criterias to work better with our user stories.
+  
+what is my contribution towards the team’s deliveries?
+  Together with the rest of the backend group I added functionallity to add Tasks to the database 
+  and also code to be able to fetch tasks from a specific week by sending week and year from frontend. 
+
