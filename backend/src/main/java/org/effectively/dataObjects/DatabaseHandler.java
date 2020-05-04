@@ -144,11 +144,10 @@ public class DatabaseHandler {
 
         PreparedStatement stmt = null;
         try {
-            stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
+            stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,next())");
             stmt.setInt(1,newTask.getPosition());
             stmt.setString(2,newTask.getText());
             stmt.setString(3,newTask.getDate());
-            stmt.setInt(4, newTask.getState());
 
             stmt.executeUpdate();
 
