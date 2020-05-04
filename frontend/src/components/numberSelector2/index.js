@@ -1,5 +1,6 @@
 import React from "react";
 import "./index.css";
+import Arrow from "../arrow";
 
 class NumberSelector2 extends React.Component {
   constructor(props) {
@@ -10,13 +11,13 @@ class NumberSelector2 extends React.Component {
     return (
       <div className="numberSelector2">
         <span>Week</span>
-        <div className="numberSelectorBox">{this.props.value}</div>
+        <div className={"numberSelectorBox"}>{this.props.value}</div>
         <div className="buttonBox">
           <button onClick={this.props.handleClickUp} className="buttonStyle">
-            Next
+            <Arrow direction="up" />
           </button>
           <button onClick={this.props.handleClickDown} className="buttonStyle">
-            Previous
+            <Arrow direction="down" />
           </button>
         </div>
       </div>
