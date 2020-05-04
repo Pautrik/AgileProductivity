@@ -34,3 +34,5 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER compact AFTER DELETE ON Tasks
   FOR EACH ROW EXECUTE FUNCTION compact();
+
+
