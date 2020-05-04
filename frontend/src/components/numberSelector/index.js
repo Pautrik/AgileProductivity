@@ -7,7 +7,15 @@ class NumberSelector extends React.Component {
     this.state = {};
   }
   render() {
-    return <input type="number" />;
+    return (
+      <input
+        className="numberSelector"
+        type="number"
+        value={this.props.value}
+        onInput={this.props.handleInput}
+        defaultValue={this.props.default}
+      />
+    );
   }
 }
 
