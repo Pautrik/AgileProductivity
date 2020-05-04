@@ -87,17 +87,26 @@ class Week extends React.Component {
     });
   };
 
+  currentWeekDisplay() {
+    if (this.state.chosenWeek === this.weekNum()) {
+      return "showCurrentWeek";
+    }
+    return "notCurrentWeek";
+  }
+
   render() {
     return (
       <div className="week-view">
         <div className="week">
           <div className="week-header">
             <span>
-              <NumberSelector2
-                handleClickUp={this.clickUp}
-                handleClickDown={this.clickDown}
-                value={this.state.chosenWeek}
-              />
+              <div className={this.currentWeekDisplay()}>
+                <NumberSelector2
+                  handleClickUp={this.clickUp}
+                  handleClickDown={this.clickDown}
+                  value={this.state.chosenWeek}
+                />
+              </div>
             </span>
             <h1>January 2020</h1>
             <Button handleClick={this.CurrentWeek}>Current week</Button>
@@ -106,10 +115,10 @@ class Week extends React.Component {
             {weekDays.map((x, i) => (
               <Day dayName={x} tasks={this.state.days[i].tasks} />
             ))}
-            <button className="previous-week">
+            <button onClick={this.clickDown} className="previous-week">
               <Arrow direction="left" />
             </button>
-            <button className="next-week">
+            <button onClick={this.clickUp} className="next-week">
               <Arrow direction="right" />
             </button>
           </div>
