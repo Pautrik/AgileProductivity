@@ -5,7 +5,8 @@ import Button from "../button";
 import Arrow from "../arrow";
 import NumberSelector2 from "../numberSelector2";
 import { httpRequestJson } from "../../helpers/requests";
-const weekEndpoint = "/week.json";
+const weekEndpoint = (year, week) => `http://localhost:8000?week=${year}${week}`;
+// const weekEndpoint = _ => "/week.json";
 const notesEndpoint = "/notes.json";
 
 const weekDays = [
@@ -36,18 +37,25 @@ class Week extends React.Component {
 
       chosenWeek: this.weekNum(),
     };
+
+    this.postTask = this.postTask.bind(this);
   }
 
   componentDidMount() {
-    httpRequestJson(weekEndpoint)
+    // httpRequestJson(weekEndpoint)
+    this.fetchWeekToState(2020, this.state.chosenWeek);
+
+    /* httpRequestJson(notesEndpoint)
       .then(data => this.setState(data))
       .catch(err => {
         alert(err.message);
         console.error(err);
-      });
+      }); */
+  }
 
-      httpRequestJson(notesEndpoint)
-      .then(data => this.setState(data))
+  fetchWeekToState(year, week) {
+    httpRequestJson(weekEndpoint(year,week))
+      .then(data => this.setState({ days: data[0] }))
       .catch(err => {
         alert(err.message);
         console.error(err);
@@ -76,14 +84,18 @@ class Week extends React.Component {
   };
 
   clickUp = () => {
+    const newWeek = this.state.chosenWeek + 1;
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.state.chosenWeek + 1,
+      chosenWeek: newWeek,
     });
   };
 
   clickDown = () => {
+    const newWeek = this.state.chosenWeek - 1;
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.state.chosenWeek - 1,
+      chosenWeek: newWeek,
     });
   };
 
@@ -92,6 +104,17 @@ class Week extends React.Component {
       return "showCurrentWeek";
     }
     return "notCurrentWeek";
+  }
+
+  postTask(bodyPayload) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyPayload),
+    }
+
+    httpRequestJson(`http://localhost:8000?week=${bodyPayload.date}`, requestOptions)
+      .catch(() => alert("Failed to create post"));
   }
 
   render() {
@@ -112,9 +135,29 @@ class Week extends React.Component {
             <Button handleClick={this.CurrentWeek}>Current week</Button>
           </div>
           <div className="days">
-            {weekDays.map((x, i) => (
-              <Day dayName={x} tasks={this.state.days[i].tasks} />
-            ))}
+            {weekDays.map((x, i) => {
+              const { tasks, date } = this.state.days[i];
+              return (<Day
+                dayName={x}
+                tasks={tasks}
+                addTask={text => {
+                  const newTask = {
+                    text,
+                    date,
+                    state: 1,
+                    position: tasks.length
+                  };
+                  this.postTask(newTask);
+                  
+                  // Ensures no modification of the state object without setState
+                  const daysCopy = [...this.state.days];
+                  daysCopy[i] = { ...daysCopy[i] };
+                  daysCopy[i].tasks = [...daysCopy[i].tasks];
+                  daysCopy[i].tasks.push(newTask);
+
+                  this.setState({ days: daysCopy});
+                }} />)
+            })}
             <button onClick={this.clickDown} className="previous-week">
               <Arrow direction="left" />
             </button>
