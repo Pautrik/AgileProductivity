@@ -32,13 +32,15 @@ public class Main {
         while(!connected && server != null){
             try{
                 if (args.length == 1 && argumentCorrect){
-                    server.createContext("/", new ServerRequestHandler(args[0]));
+                    server.createContext("/week", new ServerRequestHandler(args[0],"week"));
+                    server.createContext("/timeline", new ServerRequestHandler(args[0],"timeline"));
                 }
                 else{
                     logger.info("Enter database password: ");
                     Scanner scanner = new Scanner(System. in);
                     String inputString = scanner.nextLine();
-                    server.createContext("/", new ServerRequestHandler(inputString));
+                    server.createContext("/week", new ServerRequestHandler(inputString,"week"));
+                    server.createContext("/timeline", new ServerRequestHandler(inputString,"timeline"));
                 }
                 server.start();
                 logger.info("Server started on port " + port);

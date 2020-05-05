@@ -18,15 +18,17 @@ public class DatabaseHandler {
     private final String user = "pi";
     private final Gson gson = new Gson();
     private Connection conn;
+    private String context;
 
-    public DatabaseHandler(String DBpassword) throws AuthenticationException{
+    public DatabaseHandler(String DBpassword, String context) throws AuthenticationException{
         connectToDatabase(DBpassword);
+        this.context= context;
     }
 
 
     /**
      *
-     * @param param, a Pair of key and value
+     * @param param, a Pair of key (requesttype) and value
      * @return If GET-request a reply in the form of an JSONarray of objects
      *         If POST-request an empty array
      *         If DELETE-request and empty array
@@ -35,35 +37,24 @@ public class DatabaseHandler {
 
         List <Object> reply = new ArrayList<>();
 
-        if(param.getFirst().equals("weekGet")) {
-            reply = getWeekByNumber(param.getSecond());
-        }
-        else if(param.getFirst().equals("weekPost")){
-            addTask(param.getSecond(), "week");
-        }
-        else if(param.getFirst().equals("weekDelete")){
-            removeTask(param.getSecond(),"week");
-        }
-        else if(param.getFirst().equals("timelineGet")) {
-
-            String [] valueParameters = param.getSecond().split("&");
-
-            if (valueParameters.length >= 3){
-                String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
-                reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
+        if(param.getFirst().equals("Get")) {
+            if (context.equals("week")){
+                reply = getWeekByNumber(param.getSecond());
             }
+            else if (context.equals("timeline")){
+                String [] valueParameters = param.getSecond().split("&");
 
+                if (valueParameters.length >= 3){
+                    String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
+                    reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
+                }
+            }
         }
-        else if(param.getFirst().equals("timelinePost")) {
-            addTask(param.getSecond(),"timeline");
+        else if(param.getFirst().equals("Post")){
+            addTask(param.getSecond(), context);
         }
-        else if(param.getFirst().equals("timelineDelete")) {
-            removeTask(param.getSecond(),"timeline");
-        }
-
-
-        else if(param.getFirst().equals("notes")) {
-
+        else if(param.getFirst().equals("Delete")){
+            removeTask(param.getSecond(),context);
         }
 
 
