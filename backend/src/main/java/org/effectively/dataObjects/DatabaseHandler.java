@@ -24,41 +24,41 @@ public class DatabaseHandler {
     }
 
 
-    public String requestData(Pair<String, String> param){
+    /**
+     *
+     * @param param, a Pair of key and value
+     * @return If GET-request a reply in the form of an JSONarray of objects
+     *         If POST-request an empty array
+     *         If DELETE-request and empty array
+     */
+    public String requestData(Pair<String, String> param){ //TODO send error reply if request could not be handled?
 
         List <Object> reply = new ArrayList<>();
 
         if(param.getFirst().equals("weekGet")) {
-
-            //date from param.getSecond() needs to be on format yyyyMMdd
             reply = getWeekByNumber(param.getSecond());
         }
         else if(param.getFirst().equals("weekPost")){
-
-            //date from param.getSecond() needs to be on format yyyyww
             addTask(param.getSecond(), "week");
         }
         else if(param.getFirst().equals("weekDelete")){
-
-            //date from param.getSecond() needs to be on format id
             removeTask(param.getSecond(),"week");
         }
         else if(param.getFirst().equals("timelineGet")) {
 
-            String [] valueParameters = param.getSecond().split("&"); //TODO make sure valueParameters has the correct length
-            String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
+            String [] valueParameters = param.getSecond().split("&");
 
-            reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
+            if (valueParameters.length >= 3){
+                String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
+                reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
+            }
+
         }
         else if(param.getFirst().equals("timelinePost")) {
-
             addTask(param.getSecond(),"timeline");
-
         }
         else if(param.getFirst().equals("timelineDelete")) {
-
             removeTask(param.getSecond(),"timeline");
-
         }
 
 
@@ -74,6 +74,12 @@ public class DatabaseHandler {
         }
         return jsonArray.toString();
     }
+
+    /**
+     *
+     * @param YearAndWeek, the year and week on format yyyyww
+     * @return A list of 7 Day objects in the given year and week
+     */
     private List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
@@ -150,6 +156,12 @@ public class DatabaseHandler {
         return returnData;
     }*/
 
+    /**
+     *
+     * @param task, the JSON of a Task
+     * @param viewname, the name of the view from which the task is to be removed
+     */
+
     private void addTask(String task, String viewname) {
         PreparedStatement stmt;
 
@@ -183,6 +195,12 @@ public class DatabaseHandler {
 
     }
 
+    /**
+     *
+     * @param task, the id of task to be removed
+     * @param viewname, the name of the view from which the task is to be removed
+     */
+
     private void removeTask(String task, String viewname){
         PreparedStatement stmt;
 
@@ -204,7 +222,15 @@ public class DatabaseHandler {
         }
     }
 
-    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){ //TODO allow multiple project names in query, allow to query by active or inactive
+
+    /**
+     *
+     * @param projectnames, TimelineTasks needs to be in these projects to be returned
+     * @param startDate, earliest start date of returned TimelineTask
+     * @param endDate, latest end date of returned TimelineTask
+     * @return An Object list of TimelineTasks included in projectnames in the span startdate-enddate
+     */
+    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){ //TODO allow to query by active or inactive
         PreparedStatement stmt;
         List<TimelineTask> timeline = new ArrayList<>();
         int startDateValue = Integer.valueOf(startDate);
@@ -239,6 +265,11 @@ public class DatabaseHandler {
         return new ArrayList<>(collection);
     }
 
+    /**
+     *
+     * @param DBpassword, the password to the database
+     * @throws AuthenticationException, if password is incorrect
+     */
     private void connectToDatabase(String DBpassword) throws AuthenticationException{
         Properties props = new Properties();
         props.setProperty("user", user);
