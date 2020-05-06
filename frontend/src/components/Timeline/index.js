@@ -1,11 +1,36 @@
 import React from "react";
+import Day from "../day";
 import "./index.css";
+import { httpRequestJson } from "../../helpers/requests";
+const weekEndpoint = "/week.json";
 
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
+
+        this.state = {
+            days: [
+              { tasks: [] },
+              { tasks: [] },
+              { tasks: [] },
+              { tasks: [] },
+              { tasks: [] },
+              { tasks: [] },
+              { tasks: [] },
+            ],
+          };
     }
+
+    componentDidMount() {
+        httpRequestJson(weekEndpoint)
+          .then(data => this.setState(data))
+          .catch(err => {
+            alert(err.message);
+            console.error(err);
+          });
+    
+      }
 
     render(){
         return(
@@ -14,8 +39,15 @@ class Timeline extends React.Component{
                 <div className="Timeline-header">
                     <h1>Timeline</h1>
                 </div>
-                <div>
-                    
+                <div classname="day-holder">
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
+                    <Day dayName={"1"} tasks={[]} />
                 </div>
             </div>
         );
