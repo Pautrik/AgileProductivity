@@ -255,6 +255,13 @@ public class DatabaseHandler {
         return asObjectArray(timeline);
     }
 
+    /**
+     *
+     * @param status, the status of projects wanted in return (should be "active" or "inactive")
+     * @return Returns an object list of Projects where the status matches. If the param status was not active or inactive
+     *         all projects no matter their status are returned.
+     */
+
     private List<Object> getProjects(String status){
         PreparedStatement stmt;
         List<Project> projects = new ArrayList<>();
