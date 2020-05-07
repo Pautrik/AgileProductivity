@@ -35,6 +35,7 @@ public class Main {
                     server.createContext("/week", new ServerRequestHandler(args[0],"week"));
                     server.createContext("/timeline", new ServerRequestHandler(args[0],"timeline"));
                     server.createContext("/note", new ServerRequestHandler(args[0],"note"));
+                    server.createContext("/projects", new ServerRequestHandler(args[0],"projects"));
                 }
                 else{
                     logger.info("Enter database password: ");
@@ -43,6 +44,7 @@ public class Main {
                     server.createContext("/week", new ServerRequestHandler(inputString,"week"));
                     server.createContext("/timeline", new ServerRequestHandler(inputString,"timeline"));
                     server.createContext("/note", new ServerRequestHandler(inputString,"note"));
+                    server.createContext("/projects", new ServerRequestHandler(inputString,"projects"));
                 }
                 server.start();
                 logger.info("Server started on port " + port);

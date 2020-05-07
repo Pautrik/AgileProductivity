@@ -45,9 +45,6 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
     }
 
     private Pair handlePostRequest (HttpExchange httpExchange) {
-
-        //TODO make sure there are no "=" in key or value before splitting
-
         String body = null;
         try{
             InputStream bodyAsStream= httpExchange.getRequestBody();

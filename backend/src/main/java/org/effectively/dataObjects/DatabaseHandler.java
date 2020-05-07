@@ -49,8 +49,11 @@ public class DatabaseHandler {
                     reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
                 }
             }
-            else if (context.equals("note")){
+            else if (context.equals("note")) {
                 reply = getNotes();
+            }
+            else if (context.equals("projects")){
+                reply = getProjects(param.getSecond());
             }
         }
         else if(param.getFirst().equals("Post")){
@@ -292,6 +295,46 @@ public class DatabaseHandler {
         }
 
         return asObjectArray(timeline);
+    }
+
+    /**
+     *
+     * @param status, the status of projects wanted in return (should be "active" or "inactive")
+     * @return Returns an object list of Projects where the status matches. If the param status was not active or inactive
+     *         all projects no matter their status are returned.
+     */
+
+    private List<Object> getProjects(String status){
+        PreparedStatement stmt;
+        List<Project> projects = new ArrayList<>();
+        Boolean active = null;
+
+        if (status.equals("active")){
+            active = true;
+        }
+        else if (status.equals("inactive")){
+            active = false;
+        }
+
+        try{
+            if (active != null){
+                stmt = conn.prepareStatement("SELECT * FROM Projects WHERE active=?");
+                stmt.setBoolean(1,active);
+            }
+            else{
+                stmt = conn.prepareStatement("SELECT * FROM Projects");
+            }
+            ResultSet project = stmt.executeQuery();
+
+            while(project.next()){
+                Project newproject = new Project(project.getString(1), project.getBoolean(2));
+                projects.add(newproject);
+            }
+        }
+        catch(SQLException s){
+            s.printStackTrace();
+        }
+        return asObjectArray(projects);
     }
 
     private List<Object> asObjectArray(Collection<?> collection){
