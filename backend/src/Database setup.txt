@@ -1,0 +1,55 @@
+CREATE TABLE Tasks (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	assignedDate VARCHAR(8) NOT NULL,
+	state INT NOT NULL,
+	UNIQUE(position,assignedDate),
+	CHECK (state>0 AND state<4)
+);
+
+CREATE TABLE TimelineTasks (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	startDate VARCHAR(8) NOT NULL,
+    endDate VARCHAR(8) NOT NULL,
+	state INT NOT NULL,
+	project TEXT NOT NULL,
+	FOREIGN KEY (project) REFERENCES Projects (name),
+	UNIQUE(position,startDate),
+	CHECK (state>0 AND state<4)
+);
+
+
+CREATE TABLE Notes (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	UNIQUE(position)
+);
+
+CREATE TABLE Projects (
+	name TEXT PRIMARY KEY,
+	active BOOLEAN NOT NULL
+);
+
+-- A function that computes the next available position
+CREATE FUNCTION next(date VARCHAR(8)) RETURNS INT AS $$
+  SELECT COALESCE(MAX(position),0)+1 FROM Tasks WHERE assignedDate=date
+$$ LANGUAGE SQL;
+
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION compact() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Tasks SET position = position-1 WHERE position>=OLD.position AND assignedDate=OLD.assignedDate;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER compact AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compact();
+
+
