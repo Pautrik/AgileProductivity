@@ -30,7 +30,7 @@ public class DatabaseHandler {
      *
      * @param param, a Pair of key (requesttype) and value
      * @return If GET-request a reply in the form of an JSONarray of objects
-     *         If POST-request an empty array
+     *         If POST-request return ID as a JSON object
      *         If DELETE-request and empty array
      */
     public String requestData(Pair<String, String> param){ //TODO send error reply if request could not be handled?
@@ -58,11 +58,12 @@ public class DatabaseHandler {
         }
         else if(param.getFirst().equals("Post")){
             addObject(param.getSecond(), context);
+            //returning ID after POST
+            reply.add(getLastID(context));
         }
         else if(param.getFirst().equals("Delete")){
             removeObject(param.getSecond(), context);
         }
-
 
         List<String> jsonArray = new ArrayList<>();
         for (Object object : reply){
@@ -176,6 +177,35 @@ public class DatabaseHandler {
         return asObjectArray(notes);
     }
 
+    /**
+     *
+     * @param viewname, the name of the view from which the ID should be returned
+     * @return The ID of the item with highest ID in the selected view
+     */
+    private Integer getLastID (String viewname){
+        PreparedStatement stmt =null;
+        Integer ID = null;
+        try {
+            if (viewname.equals("week")) {
+                stmt = conn.prepareStatement("SELECT ID FROM Tasks ORDER BY ID DESC LIMIT 1");
+            }
+            else if (viewname.equals("timeline")){
+                stmt = conn.prepareStatement("SELECT ID FROM TimelineTasks ORDER BY ID DESC LIMIT 1");
+            }
+            else if (viewname.equals("note")){
+                stmt = conn.prepareStatement("SELECT ID FROM Notes ORDER BY ID DESC LIMIT 1");
+            }
+
+            assert stmt != null;
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            ID = rs.getInt(1);
+
+        } catch (SQLException s) {
+        s.printStackTrace();
+        }
+        return ID;
+    }
 
 
     /**
