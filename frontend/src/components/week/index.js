@@ -5,8 +5,9 @@ import Button from "../button";
 import Arrow from "../arrow";
 import NumberSelector2 from "../numberSelector2";
 import { httpRequestJson } from "../../helpers/requests";
-const weekEndpoint = (year, week) => `http://localhost:8000?week=${year}${week}`;
-// const weekEndpoint = _ => "/week.json";
+const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
+const postTaskEndpoint = date => `/week?week=${date}`;
+const deleteTaskEndpoint = id => `/week?week=${id}`;
 const notesEndpoint = "/notes.json";
 
 const weekDays = [
@@ -53,13 +54,13 @@ class Week extends React.Component {
       chosenWeek: this.getCurrentWeekNum(),
     };
 
-    this.postTask = this.postTask.bind(this);
+    this.addTask = this.addTask.bind(this);
   }
 
   componentDidMount() {
-    // httpRequestJson(weekEndpoint)
     this.fetchWeekToState(2020, this.state.chosenWeek);
 
+    // Commented out until notes backend gets integrated
     /* httpRequestJson(notesEndpoint)
       .then(data => this.setState(data))
       .catch(err => {
@@ -70,7 +71,7 @@ class Week extends React.Component {
 
   fetchWeekToState(year, week) {
     httpRequestJson(weekEndpoint(year,week))
-      .then(data => this.setState({ days: data[0] }))
+      .then(data => this.setState({ days: data }))
       .catch(err => {
         alert(err.message);
         console.error(err);
@@ -138,15 +139,42 @@ class Week extends React.Component {
     return "notCurrentWeek";
   }
 
-  postTask(bodyPayload) {
+  addTask(text, date, dayIndex) {
+    const newTask = {
+      text,
+      date,
+      state: 1,
+      position: this.state.days[dayIndex].tasks.length
+    };
+    
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bodyPayload),
+      body: JSON.stringify(newTask),
     }
+    httpRequestJson(postTaskEndpoint(date), requestOptions)
+      .catch(() => alert("Failed to create task"));
+    
+    // Ensures no modification of the state object without setState
+    const daysCopy = [...this.state.days];
+    daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
+    daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    daysCopy[dayIndex].tasks.push(newTask);
 
-    httpRequestJson(`http://localhost:8000?week=${bodyPayload.date}`, requestOptions)
-      .catch(() => alert("Failed to create post"));
+    this.setState({ days: daysCopy });
+  }
+
+  deleteTask(id, dayIndex) {
+    httpRequestJson(deleteTaskEndpoint(id), { method: "DELETE" })
+      .catch(() => alert("Failed to delete task"));
+
+    const daysCopy = [...this.state.days];
+    daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
+    daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    const taskIndex = daysCopy[dayIndex].tasks.findIndex(x => x.id === id);
+    daysCopy[dayIndex].tasks.splice(taskIndex, 1);
+
+    this.setState({ days: daysCopy });
   }
   
   dateToDayConverter = (iDate) => {
@@ -181,23 +209,8 @@ class Week extends React.Component {
                 dayDate={this.dateToDayConverter(this.state.days[i].date)}
                 dayName={x}
                 tasks={tasks}
-                addTask={text => {
-                  const newTask = {
-                    text,
-                    date,
-                    state: 1,
-                    position: tasks.length
-                  };
-                  this.postTask(newTask);
-                  
-                  // Ensures no modification of the state object without setState
-                  const daysCopy = [...this.state.days];
-                  daysCopy[i] = { ...daysCopy[i] };
-                  daysCopy[i].tasks = [...daysCopy[i].tasks];
-                  daysCopy[i].tasks.push(newTask);
-
-                  this.setState({ days: daysCopy});
-                }} />)
+                addTask={text => this.addTask(text, date, i)}
+                deleteTask={id => this.deleteTask(id, i)}/>)
             })}
             <button onClick={this.clickDown} className="previous-week">
               <Arrow direction="left" />

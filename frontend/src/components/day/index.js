@@ -37,7 +37,7 @@ class Day extends React.Component {
         </h2>
 
         {this.props.tasks.map((x) => (
-          <Task taskText={x.text} />
+          <Task deleteTask={() => this.props.deleteTask(x.id)} taskText={x.text} />
         ))}
         {this.state.isEditing
           ? (
