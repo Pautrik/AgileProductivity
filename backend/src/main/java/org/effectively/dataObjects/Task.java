@@ -21,14 +21,12 @@ class Task {
     String date;
 
 
-
-
     public Task(Integer id, String text, Integer state, Integer position, String date) {
         this.id = id;
         this.text = text;
         this.state = state;
         this.position = position;
-        this.date =date;
+        this.date = date;
     }
 
     public Integer getId() {

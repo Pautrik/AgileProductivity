@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
     DatabaseHandler handler;
 
-    public ServerRequestHandler(String DBpassword) throws AuthenticationException {
-       handler = new DatabaseHandler(DBpassword);
+    public ServerRequestHandler(String DBpassword, String context) throws AuthenticationException {
+       handler = new DatabaseHandler(DBpassword, context);
     }
 
     @Override
@@ -34,20 +34,17 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
-        return new Pair<>(paramvalue[0]+"Get",paramvalue[1]);
+        return new Pair<>("Get",paramvalue[1]);
     }
     private Pair handleDeleteRequest(HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
         String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
 
-        return new Pair<>(paramvalue[0]+"Delete",paramvalue[1]);
+        return new Pair<>("Delete",paramvalue[1]);
     }
 
     private Pair handlePostRequest (HttpExchange httpExchange) {
-
-        //TODO make sure there are no "=" in key or value before splitting
-        String [] paramvalue = httpExchange.getRequestURI().getQuery().split("=");
         String body = null;
         try{
             InputStream bodyAsStream= httpExchange.getRequestBody();
@@ -58,7 +55,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         catch (IOException i){
             i.printStackTrace();
         }
-        return new Pair<>(paramvalue[0]+"Post",body);
+        return new Pair<>("Post",body);
     }
 
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {

@@ -18,39 +18,46 @@ public class DatabaseHandler {
     private final String user = "pi";
     private final Gson gson = new Gson();
     private Connection conn;
+    private String context;
 
-    public DatabaseHandler(String DBpassword) throws AuthenticationException{
+    public DatabaseHandler(String DBpassword, String context) throws AuthenticationException{
         connectToDatabase(DBpassword);
+        this.context= context;
     }
 
 
-    public String requestData(Pair<String, String> param){
+    /**
+     *
+     * @param param, a Pair of key (requesttype) and value
+     * @return If GET-request a reply in the form of an JSONarray of objects
+     *         If POST-request an empty array
+     *         If DELETE-request and empty array
+     */
+    public String requestData(Pair<String, String> param){ //TODO send error reply if request could not be handled?
 
         List <Object> reply = new ArrayList<>();
 
-        if(param.getFirst().equals("weekGet")) {
+        if(param.getFirst().equals("Get")) {
+            if (context.equals("week")){
+                reply = getWeekByNumber(param.getSecond());
+            }
+            else if (context.equals("timeline")){
+                String [] valueParameters = param.getSecond().split("&");
 
-            //date from param.getSecond() needs to be on format yyyyMMdd
-            reply = getWeekByNumber(param.getSecond());
+                if (valueParameters.length >= 3){
+                    String [] projectnames = Arrays.copyOfRange(valueParameters, 0, valueParameters.length - 2);
+                    reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
+                }
+            }
+            else if (context.equals("projects")){
+                reply = getProjects(param.getSecond());
+            }
         }
-        else if(param.getFirst().equals("weekPost")){
-
-            //date from param.getSecond() needs to be on format yyyyww
-            addTask(param.getSecond());
+        else if(param.getFirst().equals("Post")){
+            addTask(param.getSecond(), context);
         }
-        else if(param.getFirst().equals("weekDelete")){
-
-            //date from param.getSecond() needs to be on format id
-            removeTask(param.getSecond());
-        }
-        else if(param.getFirst().equals("timeline")) {
-            //TODO add java classes for timeline to dataObjects
-            //TODO send dummy reply
-        }
-
-        else if(param.getFirst().equals("notes")) {
-            //TODO add java classes for timeline to dataObjects
-            //TODO send dummy reply
+        else if(param.getFirst().equals("Delete")){
+            removeTask(param.getSecond(),context);
         }
 
 
@@ -61,6 +68,12 @@ public class DatabaseHandler {
         }
         return jsonArray.toString();
     }
+
+    /**
+     *
+     * @param YearAndWeek, the year and week on format yyyyww
+     * @return A list of 7 Day objects in the given year and week
+     */
     private List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
@@ -93,10 +106,8 @@ public class DatabaseHandler {
         catch(SQLException s){
             s.printStackTrace();
         }
-        List<Object> returnData = new ArrayList<>();
-        Collections.addAll(returnData,week);
 
-        return returnData;
+        return asObjectArray(week);
     }
 
     /*private List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
@@ -139,40 +150,160 @@ public class DatabaseHandler {
         return returnData;
     }*/
 
-    private void addTask(String task) {
-        Task newTask = gson.fromJson(task,Task.class);
+    /**
+     *
+     * @param task, the JSON of a Task
+     * @param viewname, the name of the view from which the task is to be removed
+     */
 
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
-            stmt.setInt(1,newTask.getPosition());
-            stmt.setString(2,newTask.getText());
-            stmt.setString(3,newTask.getDate());
-            stmt.setInt(4, newTask.getState());
+    private void addTask(String task, String viewname) {
+        PreparedStatement stmt;
 
-            stmt.executeUpdate();
+        try{
+            if (viewname.equals("week")) {
+                Task newTask = gson.fromJson(task, Task.class);
+                stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
+                stmt.setInt(1, newTask.getPosition());
+                stmt.setString(2, newTask.getText());
+                stmt.setString(3, newTask.getDate());
+                stmt.setInt(4, newTask.getState());
 
+                stmt.executeUpdate();
+            }
+            else if (viewname.equals("timeline")){
+                TimelineTask newTask = gson.fromJson(task,TimelineTask.class);
+                stmt = conn.prepareStatement("INSERT INTO TimelineTasks VALUES(DEFAULT,?,?,?,?,?,?)");
+                stmt.setInt(1,newTask.getPosition());
+                stmt.setString(2,newTask.getText());
+                stmt.setString(3,newTask.getDate());
+                stmt.setString(4,newTask.getEndDate());
+                stmt.setInt(5, newTask.getState());
+                stmt.setString(6, newTask.getProjectName());
+
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
-            s.printStackTrace();
-            //TODO handle cases where task is already in database
+                s.printStackTrace();
+                //TODO handle cases where task is already in database
         }
 
     }
 
-    private void removeTask(String task){
+    /**
+     *
+     * @param task, the id of task to be removed
+     * @param viewname, the name of the view from which the task is to be removed
+     */
 
-        PreparedStatement stmt = null;
+    private void removeTask(String task, String viewname){
+        PreparedStatement stmt;
+
         try {
-            stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
-            stmt.setInt(1,Integer.parseInt(task));
+            if (viewname.equals("week")){
+                stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
+                stmt.setInt(1,Integer.parseInt(task));
 
-            stmt.executeUpdate();
+                stmt.executeUpdate();
+            }
+            else if (viewname.equals("timeline")){
+                stmt = conn.prepareStatement("DELETE FROM TimelineTasks WHERE ID=?");
+                stmt.setInt(1,Integer.parseInt(task));
 
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
             s.printStackTrace();
         }
     }
 
+
+    /**
+     *
+     * @param projectnames, TimelineTasks needs to be in these projects to be returned
+     * @param startDate, earliest start date of returned TimelineTask
+     * @param endDate, latest end date of returned TimelineTask
+     * @return An Object list of TimelineTasks included in projectnames in the span startdate-enddate
+     */
+    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){ //TODO allow to query by active or inactive
+        PreparedStatement stmt;
+        List<TimelineTask> timeline = new ArrayList<>();
+        int startDateValue = Integer.valueOf(startDate);
+        int endDateValue = Integer.valueOf(endDate);
+
+        try{
+            for (String projectname : projectnames){
+                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+
+                stmt.setInt(1, startDateValue);
+                stmt.setInt(2, endDateValue);
+                stmt.setInt(3, startDateValue);
+                stmt.setInt(4, endDateValue);
+                stmt.setString(5, projectname);
+                ResultSet task = stmt.executeQuery();
+
+                while(task.next()){
+                    TimelineTask newTask = new TimelineTask(task.getInt(1),task.getString(3),task.getInt(6), task.getInt(2),task.getString(4),task.getString(5),task.getString(7));
+                    timeline.add(newTask);
+                }
+            }
+
+        }
+        catch(SQLException s){
+            s.printStackTrace();
+        }
+
+        return asObjectArray(timeline);
+    }
+
+    /**
+     *
+     * @param status, the status of projects wanted in return (should be "active" or "inactive")
+     * @return Returns an object list of Projects where the status matches. If the param status was not active or inactive
+     *         all projects no matter their status are returned.
+     */
+
+    private List<Object> getProjects(String status){
+        PreparedStatement stmt;
+        List<Project> projects = new ArrayList<>();
+        Boolean active = null;
+
+        if (status.equals("active")){
+            active = true;
+        }
+        else if (status.equals("inactive")){
+            active = false;
+        }
+
+        try{
+            if (active != null){
+                stmt = conn.prepareStatement("SELECT * FROM Projects WHERE active=?");
+                stmt.setBoolean(1,active);
+            }
+            else{
+                stmt = conn.prepareStatement("SELECT * FROM Projects");
+            }
+            ResultSet project = stmt.executeQuery();
+
+            while(project.next()){
+                Project newproject = new Project(project.getString(1), project.getBoolean(2));
+                projects.add(newproject);
+            }
+        }
+        catch(SQLException s){
+            s.printStackTrace();
+        }
+        return asObjectArray(projects);
+    }
+
+    private List<Object> asObjectArray(Collection<?> collection){
+        return new ArrayList<>(collection);
+    }
+
+    /**
+     *
+     * @param DBpassword, the password to the database
+     * @throws AuthenticationException, if password is incorrect
+     */
     private void connectToDatabase(String DBpassword) throws AuthenticationException{
         Properties props = new Properties();
         props.setProperty("user", user);

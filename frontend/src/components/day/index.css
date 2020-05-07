@@ -43,3 +43,11 @@
   display: flex;
   justify-content: space-between;
 }
+.day-box p {
+  color: gray;
+  margin: 0;
+}
+
+.day-box h2 {
+  margin: 0;
+}
