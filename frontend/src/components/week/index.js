@@ -18,6 +18,21 @@ const weekDays = [
   "Sunday",
 ];
 
+const yearMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 class Week extends React.Component {
   constructor(props) {
     super(props);
@@ -34,30 +49,30 @@ class Week extends React.Component {
 
       notes: [],
 
-      chosenWeek: this.weekNum(),
+      chosenWeek: this.getCurrentWeekNum(),
     };
   }
 
   componentDidMount() {
     httpRequestJson(weekEndpoint)
-      .then(data => this.setState(data))
-      .catch(err => {
+      .then((data) => this.setState(data))
+      .catch((err) => {
         alert(err.message);
         console.error(err);
       });
 
-      httpRequestJson(notesEndpoint)
-      .then(data => this.setState(data))
-      .catch(err => {
+    httpRequestJson(notesEndpoint)
+      .then((data) => this.setState(data))
+      .catch((err) => {
         alert(err.message);
         console.error(err);
       });
   }
 
-  weekNum() {
+  getCurrentWeekNum() {
     let yr2 = new Date();
     let yr = new Date().getFullYear();
-    let tdt = new Date("January 4," + yr + " " + "01:15:00");
+    let tdt = new Date(`January 4, ${yr}   01:15:00`);
     return (
       1 +
       Math.round(
@@ -69,9 +84,26 @@ class Week extends React.Component {
     );
   }
 
-  CurrentWeek = () => {
+  getCurrentWeekDay() {
+    let day = new Date().getDay();
+    if (day === 0) {
+      return weekDays[6];
+    }
+    return weekDays[day - 1];
+  }
+
+  getCurrentYearMonth() {
+    let month = new Date().getMonth();
+    return yearMonths[month];
+  }
+
+  getCurrentYear() {
+    return new Date().getFullYear();
+  }
+
+  SetCurrentWeekState = () => {
     this.setState({
-      chosenWeek: this.weekNum(),
+      chosenWeek: this.getCurrentWeekNum(),
     });
   };
 
@@ -88,11 +120,16 @@ class Week extends React.Component {
   };
 
   currentWeekDisplay() {
-    if (this.state.chosenWeek === this.weekNum()) {
+    if (this.state.chosenWeek === this.getCurrentWeekNum()) {
       return "showCurrentWeek";
     }
     return "notCurrentWeek";
   }
+
+  dateToDayConverter = (iDate) => {
+    let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
+    return date;
+  };
 
   render() {
     return (
@@ -108,12 +145,19 @@ class Week extends React.Component {
                 />
               </div>
             </span>
-            <h1>January 2020</h1>
-            <Button handleClick={this.CurrentWeek}>Current week</Button>
+            <h1 Style="color: grey">
+              {this.getCurrentYearMonth() + " " + this.getCurrentYear()}
+            </h1>
+            <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
           </div>
           <div className="days">
             {weekDays.map((x, i) => (
-              <Day dayName={x} tasks={this.state.days[i].tasks} />
+              <Day
+                todaysDay={this.getCurrentWeekDay()}
+                dayName={x}
+                tasks={this.state.days[i].tasks}
+                dayDate={this.dateToDayConverter(this.state.days[i].date)}
+              />
             ))}
             <button onClick={this.clickDown} className="previous-week">
               <Arrow direction="left" />
