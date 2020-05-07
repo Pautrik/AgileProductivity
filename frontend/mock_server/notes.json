@@ -1,0 +1,12 @@
+{
+    "notes": [
+        {
+            "text": "Do this task",
+            "state": 1
+        },
+        {
+            "text": "Or do that task",
+            "state": 1
+        }
+    ]
+}

@@ -2,12 +2,33 @@ import React from 'react';
 import Week from './components/week';
 import './App.css';
 
+
 class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      active: 'FIRST',
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+      if (this.state.active === 'FIRST')
+        this.setState({active: 'SECOND'});
+       else 
+        this.setState({active: 'FIRST'});
+  }
 
   render() {
     return (
       <div className="App">
-        <Week />
+          {this.state.active === 'FIRST' ? (
+            <Week />
+            ) : this.state.active === 'SECOND' ? (
+            <Week /> 
+            ) : null}
+        <button className="view-togle" onClick={this.handleClick}>Change view</button>
       </div>
     );
   }
