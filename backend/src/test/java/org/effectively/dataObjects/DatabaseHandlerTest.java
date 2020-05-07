@@ -1,4 +1,3 @@
-/*
 package org.effectively.dataObjects;
 
 import org.junit.Test;
@@ -9,6 +8,7 @@ public class DatabaseHandlerTest {
 
     @Test
     public void requestData() {
+
         //TODO add tests
     }
-}*/
+}

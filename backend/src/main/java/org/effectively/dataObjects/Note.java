@@ -9,13 +9,13 @@ import java.util.List;
 class Note{
     @SerializedName("id")
     @Expose
-    Integer id;
+    private Integer id;
     @SerializedName("position")
     @Expose
-    Integer position;
+    private Integer position;
     @SerializedName("description")
     @Expose
-    String description;
+    private String description;
 
 
     public Note(Integer id, Integer position, String description) {

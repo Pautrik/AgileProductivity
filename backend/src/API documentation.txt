@@ -3,6 +3,7 @@ Endpoint keys for http://localhost:8000:
 - /week
 - /note
 - /timeline
+- /projects
 
 Example calls
 
@@ -43,3 +44,8 @@ example: http://localhost:8000/timeline (attach JSON as body)
 DELETE: key=Any value=id
 
 example: http://localhost:8000/timeline?id=5
+
+projects:
+
+//get all/active/inactive projects in database
+GET: key=Any value=active OR inactive OR Any
