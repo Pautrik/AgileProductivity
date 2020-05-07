@@ -49,12 +49,15 @@ public class DatabaseHandler {
                     reply = getTimeLine(projectnames, valueParameters[valueParameters.length-2], valueParameters[valueParameters.length-1]);
                 }
             }
+            else if (context.equals("note")){
+                reply = getNotes();
+            }
         }
         else if(param.getFirst().equals("Post")){
-            addTask(param.getSecond(), context);
+            addObject(param.getSecond(), context);
         }
         else if(param.getFirst().equals("Delete")){
-            removeTask(param.getSecond(),context);
+            removeObject(param.getSecond(), context);
         }
 
 
@@ -149,16 +152,41 @@ public class DatabaseHandler {
 
     /**
      *
-     * @param task, the JSON of a Task
+     * @return an Object list of all the Notes in the database
+     */
+    private List<Object> getNotes(){
+        PreparedStatement stmt;
+        List<Note> notes = new ArrayList<>();
+
+        try{
+            stmt = conn.prepareStatement("SELECT * FROM Notes");
+
+            ResultSet note = stmt.executeQuery();
+            while(note.next()){
+                Note newNote = new Note(note.getInt(1), note.getInt(2), note.getString(3));
+                notes.add(newNote);
+            }
+        } catch (SQLException s) {
+            s.printStackTrace();
+        }
+
+        return asObjectArray(notes);
+    }
+
+
+
+    /**
+     *
+     * @param object, the JSON of either a Week, Timeline or Note
      * @param viewname, the name of the view from which the task is to be removed
      */
 
-    private void addTask(String task, String viewname) {
+    private void addObject(String object, String viewname) {
         PreparedStatement stmt;
 
         try{
             if (viewname.equals("week")) {
-                Task newTask = gson.fromJson(task, Task.class);
+                Task newTask = gson.fromJson(object, Task.class);
                 stmt = conn.prepareStatement("INSERT INTO Tasks VALUES(DEFAULT,?,?,?,?)");
                 stmt.setInt(1, newTask.getPosition());
                 stmt.setString(2, newTask.getText());
@@ -168,7 +196,7 @@ public class DatabaseHandler {
                 stmt.executeUpdate();
             }
             else if (viewname.equals("timeline")){
-                TimelineTask newTask = gson.fromJson(task,TimelineTask.class);
+                TimelineTask newTask = gson.fromJson(object,TimelineTask.class);
                 stmt = conn.prepareStatement("INSERT INTO TimelineTasks VALUES(DEFAULT,?,?,?,?,?,?)");
                 stmt.setInt(1,newTask.getPosition());
                 stmt.setString(2,newTask.getText());
@@ -176,6 +204,14 @@ public class DatabaseHandler {
                 stmt.setString(4,newTask.getEndDate());
                 stmt.setInt(5, newTask.getState());
                 stmt.setString(6, newTask.getProjectName());
+
+                stmt.executeUpdate();
+            }
+            else if(viewname.equals("note")){
+                Note newNote = gson.fromJson(object, Note.class);
+                stmt = conn.prepareStatement("INSERT INTO Notes VALUES(DEFAULT,?,?)");
+                stmt.setInt(1, newNote.getPosition());
+                stmt.setString(2, newNote.getDescription());
 
                 stmt.executeUpdate();
             }
@@ -188,23 +224,29 @@ public class DatabaseHandler {
 
     /**
      *
-     * @param task, the id of task to be removed
+     * @param object, the JSON of either a Week, Timeline or Note
      * @param viewname, the name of the view from which the task is to be removed
      */
 
-    private void removeTask(String task, String viewname){
+    private void removeObject(String object, String viewname){
         PreparedStatement stmt;
 
         try {
             if (viewname.equals("week")){
                 stmt = conn.prepareStatement("DELETE FROM Tasks WHERE ID=?");
-                stmt.setInt(1,Integer.parseInt(task));
+                stmt.setInt(1,Integer.parseInt(object));
 
                 stmt.executeUpdate();
             }
             else if (viewname.equals("timeline")){
                 stmt = conn.prepareStatement("DELETE FROM TimelineTasks WHERE ID=?");
-                stmt.setInt(1,Integer.parseInt(task));
+                stmt.setInt(1,Integer.parseInt(object));
+
+                stmt.executeUpdate();
+            }
+            else if (viewname.equals("note")){
+                stmt = conn.prepareStatement("DELETE FROM Notes WHERE ID=?");
+                stmt.setInt(1,Integer.parseInt(object));
 
                 stmt.executeUpdate();
             }
