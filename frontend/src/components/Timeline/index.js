@@ -1,13 +1,27 @@
 import React from "react";
-import DayT from "./dayT";
 import "./index.css";
 
+const currentDate = new Date();
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
 
     }
+
+
+    incDate(){
+        const date = new Date();
+        date.setDate(date.getDate() + 1);
+
+    }
+
+    decDate(){
+        const date = new Date();
+        date.setDate(date.getDate() + 1);
+
+    }
+
 
     render(){
         return(
@@ -16,16 +30,8 @@ class Timeline extends React.Component{
                 <div className="Timeline-header">
                     <h1>Timeline</h1>
                 </div>
-                <div classname="day-holder">
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
-                <DayT/>
+                <div className="day-holder">
+                    <div className="day-Timeline">1</div>
                 </div>
             </div>
         );
