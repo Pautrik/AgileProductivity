@@ -19,22 +19,49 @@ public class DatabaseHandlerTest {
 
         try{
             //week
-
-            Pair inputParameters = new Pair("Get","175403");
             DatabaseHandler weekhandler = new DatabaseHandler(System.getenv("EV1"),"week");
+
+            //GET REQUEST
+            Pair<String,String> inputParameters = new Pair("Get","175403");
             String reply = weekhandler.requestData(inputParameters);
             Day [] week = gson.fromJson(reply, Day[].class);
             assertEquals(week.length, 7);
             assertEquals(week[0].getDate(), "17540114");
             assertEquals(week[6].getDate(), "17540120");
 
+            //POST REQUEST
+            Pair<String,String> postinputParameters = new Pair("Post", "{\"text\":\"automatedtest\",\"state\":3,\"position\":1,\"date\":\"17540121\"}");
 
-            /*inputParameters = new Pair("Post", "{\"text\":\"automated test\",\"state\":3,\"position\":1,\"date\":\"00010501\"}");
-            weekhandler.requestData(inputParameters);*/
+            String idreply = weekhandler.requestData(postinputParameters);
+            Integer [] id = gson.fromJson(idreply, Integer[].class);
 
-            //TODO String id should be set to return value of POST request;
+            reply = weekhandler.requestData(new Pair<>("Get","175404"));
+            week = gson.fromJson(reply, Day[].class);
 
-            /*handler.requestData("Delete", id);*/
+
+            boolean containsID = false;
+            for (Task t : week[0].getTasks()){
+                if (t.getId() == id[0]){
+                    containsID = true;
+                }
+            }
+            assertTrue(containsID);
+
+            //DELETE REQUEST
+            Pair deleteinputParameters = new Pair("Delete", Integer.toString(id[0]));
+            weekhandler.requestData(deleteinputParameters);
+
+            reply = weekhandler.requestData(new Pair<>("Get","175404"));
+            week = gson.fromJson(reply, Day[].class);
+
+            boolean removedID = true;
+            for (Task t : week[0].getTasks()){
+                if (t.getId() == id[0]){
+                    removedID = false;
+                }
+            }
+            assertTrue(removedID);
+
 
             //timeline //TODO need return value for id on addObject to finish
 
