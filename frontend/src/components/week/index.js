@@ -152,16 +152,19 @@ class Week extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newTask),
     }
-    httpRequestJson(postTaskEndpoint(date), requestOptions)
-      .catch(() => alert("Failed to create task"));
-    
+
     // Ensures no modification of the state object without setState
     const daysCopy = [...this.state.days];
     daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
     daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
-    daysCopy[dayIndex].tasks.push(newTask);
-
-    this.setState({ days: daysCopy });
+    
+    httpRequestJson(postTaskEndpoint(date), requestOptions)
+    .then(data => {
+        daysCopy[dayIndex].tasks.push({...newTask, id: data[0]});
+        console.log(daysCopy);
+        this.setState({ days: daysCopy });
+      })
+      .catch(() => alert("Failed to create task"));
   }
 
   deleteTask(id, dayIndex) {
