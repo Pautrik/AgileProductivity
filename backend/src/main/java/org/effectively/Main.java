@@ -34,6 +34,7 @@ public class Main {
                 if (args.length == 1 && argumentCorrect){
                     server.createContext("/week", new ServerRequestHandler(args[0],"week"));
                     server.createContext("/timeline", new ServerRequestHandler(args[0],"timeline"));
+                    server.createContext("/note", new ServerRequestHandler(args[0],"note"));
                     server.createContext("/projects", new ServerRequestHandler(args[0],"projects"));
                 }
                 else{
@@ -42,6 +43,7 @@ public class Main {
                     String inputString = scanner.nextLine();
                     server.createContext("/week", new ServerRequestHandler(inputString,"week"));
                     server.createContext("/timeline", new ServerRequestHandler(inputString,"timeline"));
+                    server.createContext("/note", new ServerRequestHandler(inputString,"note"));
                     server.createContext("/projects", new ServerRequestHandler(inputString,"projects"));
                 }
                 server.start();
