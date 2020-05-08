@@ -65,15 +65,11 @@ class Timeline extends React.Component{
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
+
 
                         </div>
                         <div className="day-holder">
-                        {range(50).map((x) => (
+                        {range(100).map((x) => (
                         <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</div>
                         ))}
                         </div>
