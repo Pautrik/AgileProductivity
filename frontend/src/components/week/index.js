@@ -5,8 +5,10 @@ import Button from "../button";
 import Arrow from "../arrow";
 import NumberSelector2 from "../numberSelector2";
 import { httpRequestJson } from "../../helpers/requests";
-const weekEndpoint = "/week.json";
-const notesEndpoint = "/notes.json";
+const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
+const postTaskEndpoint = date => `/week?week=${date}`;
+const deleteTaskEndpoint = id => `/week?week=${id}`;
+// const notesEndpoint = "/notes.json";
 
 const weekDays = [
   "Monday",
@@ -51,19 +53,26 @@ class Week extends React.Component {
 
       chosenWeek: this.getCurrentWeekNum(),
     };
+
+    this.addTask = this.addTask.bind(this);
   }
 
   componentDidMount() {
-    httpRequestJson(weekEndpoint)
-      .then((data) => this.setState(data))
-      .catch((err) => {
+    this.fetchWeekToState(2020, this.state.chosenWeek);
+
+    // Commented out until notes backend gets integrated
+    /* httpRequestJson(notesEndpoint)
+      .then(data => this.setState(data))
+      .catch(err => {
         alert(err.message);
         console.error(err);
-      });
+      }); */
+  }
 
-    httpRequestJson(notesEndpoint)
-      .then((data) => this.setState(data))
-      .catch((err) => {
+  fetchWeekToState(year, week) {
+    httpRequestJson(weekEndpoint(year,week))
+      .then(data => this.setState({ days: data }))
+      .catch(err => {
         alert(err.message);
         console.error(err);
       });
@@ -102,20 +111,26 @@ class Week extends React.Component {
   }
 
   SetCurrentWeekState = () => {
+    const newWeek = this.getCurrentWeekNum();
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.getCurrentWeekNum(),
+      chosenWeek: newWeek,
     });
   };
 
   clickUp = () => {
+    const newWeek = this.state.chosenWeek + 1;
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.state.chosenWeek + 1,
+      chosenWeek: newWeek,
     });
   };
 
   clickDown = () => {
+    const newWeek = this.state.chosenWeek - 1;
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.state.chosenWeek - 1,
+      chosenWeek: newWeek,
     });
   };
 
@@ -126,6 +141,46 @@ class Week extends React.Component {
     return "notCurrentWeek";
   }
 
+  addTask(text, date, dayIndex) {
+    const newTask = {
+      text,
+      date,
+      state: 1,
+      position: this.state.days[dayIndex].tasks.length
+    };
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTask),
+    }
+
+    // Ensures no modification of the state object without setState
+    const daysCopy = [...this.state.days];
+    daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
+    daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    
+    httpRequestJson(postTaskEndpoint(date), requestOptions)
+    .then(data => {
+        daysCopy[dayIndex].tasks.push({...newTask, id: data[0]});
+        this.setState({ days: daysCopy });
+      })
+      .catch(() => alert("Failed to create task"));
+  }
+
+  deleteTask(id, dayIndex) {
+    httpRequestJson(deleteTaskEndpoint(id), { method: "DELETE" })
+      .catch(() => alert("Failed to delete task"));
+
+    const daysCopy = [...this.state.days];
+    daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
+    daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    const taskIndex = daysCopy[dayIndex].tasks.findIndex(x => x.id === id);
+    daysCopy[dayIndex].tasks.splice(taskIndex, 1);
+
+    this.setState({ days: daysCopy });
+  }
+  
   dateToDayConverter = (iDate) => {
     let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
     return date;
@@ -151,14 +206,16 @@ class Week extends React.Component {
             <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
           </div>
           <div className="days">
-            {weekDays.map((x, i) => (
-              <Day
+            {weekDays.map((x, i) => {
+              const { tasks, date } = this.state.days[i];
+              return (<Day
                 todaysDay={this.getCurrentWeekDay()}
-                dayName={x}
-                tasks={this.state.days[i].tasks}
                 dayDate={this.dateToDayConverter(this.state.days[i].date)}
-              />
-            ))}
+                dayName={x}
+                tasks={tasks}
+                addTask={text => this.addTask(text, date, i)}
+                deleteTask={id => this.deleteTask(id, i)}/>)
+            })}
             <button onClick={this.clickDown} className="previous-week">
               <Arrow direction="left" />
             </button>

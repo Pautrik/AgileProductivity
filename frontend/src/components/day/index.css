@@ -9,6 +9,40 @@
   border-bottom-right-radius: 10px;
 }
 
+.form-area, .add-task-button {
+  border: solid 2px darkslategray;
+  border-radius: 5px;
+  padding: 10px 10px;
+}
+
+.add-task-button {
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.form-area {
+  resize: vertical;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-area {
+  background-color: white;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* Reinstates placeholder from <textarea/> */
+.text-area[placeholder]:empty:before {
+  content: attr(placeholder);
+  color: #555;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+}
 .day-box p {
   color: gray;
   margin: 0;
