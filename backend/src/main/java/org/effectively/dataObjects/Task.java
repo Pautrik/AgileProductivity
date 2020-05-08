@@ -6,19 +6,19 @@ import com.google.gson.annotations.SerializedName;
 class Task {
     @SerializedName("id")
     @Expose
-    Integer id;
+    private Integer id;
     @SerializedName("text")
     @Expose
-    String text;
+    private String text;
     @SerializedName("state")
     @Expose
-    Integer state;
+    private Integer state;
     @SerializedName("position")
     @Expose
-    Integer position;
+    private Integer position;
     @SerializedName("date")
     @Expose
-    String date;
+    private String date;
 
 
     public Task(Integer id, String text, Integer state, Integer position, String date) {
