@@ -1,27 +1,33 @@
 import React from "react";
 import "./index.css";
+import {range} from "../../helpers/array";
 
-const currentDate = new Date();
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
 
+        this.currentDate = new Date();
+        this.getNextDate = this.getNextDay.bind(this);
+        this.currentDate.setDate(this.currentDate.getDate() - 3);
     }
 
 
     incDate(){
-        const date = new Date();
-        date.setDate(date.getDate() + 1);
+        return (this.currentDate.setDate(this.currentDate.getDate() + 1));
 
     }
 
     decDate(){
-        const date = new Date();
-        date.setDate(date.getDate() + 1);
+       return( this.currentDate.setDate(this.currentDate.getDate() - 1));
 
     }
 
+    getNextDay(x){
+        const y = new Date();
+        y.setDate(this.currentDate.getDate() + x);
+        return y.getDate();
+    }
 
     render(){
         return(
@@ -31,7 +37,9 @@ class Timeline extends React.Component{
                     <h1>Timeline</h1>
                 </div>
                 <div className="day-holder">
-                    <div className="day-Timeline">1</div>
+                    {range(50).map((x) => (
+                        <div className="day-Timeline">{this.getNextDay(x)}</div>
+                    ))}
                 </div>
             </div>
         );
