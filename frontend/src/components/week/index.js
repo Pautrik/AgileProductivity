@@ -111,8 +111,10 @@ class Week extends React.Component {
   }
 
   SetCurrentWeekState = () => {
+    const newWeek = this.getCurrentWeekNum();
+    this.fetchWeekToState(2020, newWeek);
     this.setState({
-      chosenWeek: this.getCurrentWeekNum(),
+      chosenWeek: newWeek,
     });
   };
 
