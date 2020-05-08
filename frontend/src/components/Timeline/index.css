@@ -14,14 +14,30 @@
     justify-content: space-around;
     align-items: center;
 }
-.Projects-container {
-    display: flex;
 
+.Timeline-holder {
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.project-day-container{
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.projects-container {
+    display: flex;
+    height: max-content;
+    width: 10%;
+    background-color: darkgray;
+    flex-direction: column;
 }
 .day-holder {
     display: flex;
-    height: 100%;
     overflow-x: auto;
+    flex: 1;
 }
 
 .day-Timeline{
