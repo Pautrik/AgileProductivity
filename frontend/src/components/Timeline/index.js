@@ -2,13 +2,23 @@ import React from "react";
 import "./index.css";
 import {range} from "../../helpers/array";
 
+const weekDays = [
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+    "Sun",
+  ];
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
 
         this.currentDate = new Date();
-        this.getNextDate = this.getNextDay.bind(this);
+        this.getNextDay = this.getNextDay.bind(this);
+        this.getWeekDay = this.getWeekDay.bind(this);
         this.currentDate.setDate(this.currentDate.getDate() - 3);
     }
 
@@ -29,6 +39,13 @@ class Timeline extends React.Component{
         return y.getDate();
     }
 
+    getWeekDay(x){
+        const y = new Date();
+        y.setDate(this.currentDate.getDate() + x);
+        console.log(y.getDay())
+        return weekDays[y.getDay()];
+    }
+
     render(){
         return(
 
@@ -38,7 +55,7 @@ class Timeline extends React.Component{
                 </div>
                 <div className="day-holder">
                     {range(50).map((x) => (
-                        <div className="day-Timeline">{this.getNextDay(x)}</div>
+                        <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</div>
                     ))}
                 </div>
             </div>
