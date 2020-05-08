@@ -7,7 +7,11 @@ class Button extends React.Component {
     this.state = {};
   }
   render() {
-    return <button className="button"> {this.props.children} </button>;
+    return (
+      <button onClick={this.props.handleClick} className="button">
+        {this.props.children}
+      </button>
+    );
   }
 }
 
