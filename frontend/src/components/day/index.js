@@ -42,7 +42,11 @@ class Day extends React.Component {
         {this.state.isEditing
           ? (
             <div className="form-area">
-              <div className="text-area" contentEditable ref={this.taskTextRef} placeholder="Enter task text"></div>
+              <div
+                className="text-area"
+                contentEditable ref={this.taskTextRef}
+                placeholder="Enter task text"
+                onKeyDown={event => event.keyCode === 13 && this.onTaskSubmit()}></div>
               <div className="buttons-container">
                 <button onClick={() => this.setState({ isEditing: false })}>Cancel</button>
                 <button onClick={this.onTaskSubmit}>Submit</button>

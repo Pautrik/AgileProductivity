@@ -8,7 +8,7 @@ import { httpRequestJson } from "../../helpers/requests";
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = date => `/week?week=${date}`;
 const deleteTaskEndpoint = id => `/week?week=${id}`;
-const notesEndpoint = "/notes.json";
+// const notesEndpoint = "/notes.json";
 
 const weekDays = [
   "Monday",
