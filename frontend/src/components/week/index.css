@@ -13,7 +13,7 @@
 
 .week-header {
   display: flex;
-  background-color: white;
+  background-color:  hsl(197, 79%, 85%);
   flex: 0;
   justify-content: space-around;
   align-items: center;
@@ -22,11 +22,48 @@
 .days {
   display: flex;
   flex: 1;
+  position: relative;
+}
+
+.previous-week,
+.next-week {
+  position: absolute;
+  top: 50%;
+  visibility: hidden;
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px grey;
+}
+
+.days:hover .previous-week,
+.days:hover .next-week {
+  visibility: visible;
+}
+
+.previous-week {
+  left: 10px;
+}
+
+.next-week {
+  right: 10px;
 }
 
 .note-container {
   display: flex;
   flex: 3;
-  background-color: bisque;
+  background-color: rgb(142, 167, 221);
   flex-direction: column;
+}
+
+.showCurrentWeek,
+.notCurrentWeek {
+  border-style: double;
+  padding: 5px;
+}
+
+.showCurrentWeek {
+  border-color: rgba(212, 96, 96, 0.808);
+}
+
+.notCurrentWeek {
+  border-color: white;
 }
