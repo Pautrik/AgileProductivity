@@ -163,7 +163,6 @@ class Week extends React.Component {
     httpRequestJson(postTaskEndpoint(date), requestOptions)
     .then(data => {
         daysCopy[dayIndex].tasks.push({...newTask, id: data[0]});
-        console.log(daysCopy);
         this.setState({ days: daysCopy });
       })
       .catch(() => alert("Failed to create task"));
