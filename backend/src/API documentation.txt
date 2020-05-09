@@ -1,0 +1,51 @@
+Endpoint keys for http://localhost:8000:
+
+- /week
+- /note
+- /timeline
+- /projects
+
+Example calls
+
+"Any" means that any String suffices
+
+week:
+
+//get all tasks in weeknumber ww of year YYYY
+GET: key=Any value=YYYYww
+
+example: http://localhost:8000/week?date=202017
+
+//add a new task to weekview, JSON is the task in JSON-format
+POST: body=JSON
+
+example: http://localhost:8000/week (attach JSON as body)
+
+//remove the task with id from weekview
+DELETE: key=Any value=id
+
+example: http://localhost:8000/week?id=19
+
+
+timeline:
+
+//get all timelinetasks in project1, project2... between startDate and endDate
+GET: key=Any value=project1&project2..&startDate&endDate
+
+example: http://localhost:8000/timeline?parameters=project1&project2&startDate&endDate
+
+//add a new task to timelineview, JSON is the task in JSON-format
+POST: body=JSON
+
+example: http://localhost:8000/timeline (attach JSON as body)
+
+
+//remove the task with id from timelineview
+DELETE: key=Any value=id
+
+example: http://localhost:8000/timeline?id=5
+
+projects:
+
+//get all/active/inactive projects in database
+GET: key=Any value=active OR inactive OR Any
