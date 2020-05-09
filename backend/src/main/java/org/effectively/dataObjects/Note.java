@@ -13,15 +13,15 @@ class Note{
     @SerializedName("position")
     @Expose
     private Integer position;
-    @SerializedName("description")
+    @SerializedName("text")
     @Expose
-    private String description;
+    private String text;
 
 
-    public Note(Integer id, Integer position, String description) {
+    public Note(Integer id, Integer position, String text) {
         this.id = id;
         this.position = position;
-        this.description = description;
+        this.text = text;//rename to text
     }
 
     public Integer getId() {
@@ -32,7 +32,7 @@ class Note{
         return position;
     }
 
-    public String getDescription() {
-        return description;
+    public String getText() {
+        return text;
     }
 }

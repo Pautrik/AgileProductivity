@@ -244,7 +244,7 @@ public class DatabaseHandler {
                 Note newNote = gson.fromJson(object, Note.class);
                 stmt = conn.prepareStatement("INSERT INTO Notes VALUES(DEFAULT,?,?)");
                 stmt.setInt(1, newNote.getPosition());
-                stmt.setString(2, newNote.getDescription());
+                stmt.setString(2, newNote.getText());
 
                 stmt.executeUpdate();
             }

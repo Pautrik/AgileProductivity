@@ -27,6 +27,23 @@ DELETE: key=Any value=id
 example: http://localhost:8000/week?id=19
 
 
+Note:
+
+//get all notes
+GET: key=Any value=any
+
+example: http://localhost:8000/note?any=any
+
+//add a new note to weekview, JSON is the task in JSON-format
+POST: body=JSON
+
+example: http://localhost:8000/note (attach JSON as body)
+
+//remove the note with id from weekview
+DELETE: key=Any value=id
+
+example: http://localhost:8000/note?id=19
+
 timeline:
 
 //get all timelinetasks in project1, project2... between startDate and endDate
