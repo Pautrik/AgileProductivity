@@ -66,3 +66,18 @@ What is my contribution towards the team’s deliveries?
   Implemented fetching and rendering of content from the backend.
   Improved the frontends error handeling.
   Helped team members with merging and how to create and review pull requests.
+
+Week7:
+What do I want to learn or understand better?
+  How to easily manage state affecting multiple parts of the application without the use of global state.
+  How to integerate CI and test runners into github.
+How can I help someone else, or the entire team, to learn something new?
+  By giving them advice or just letting them use me as a rubbery ducky.
+What is my contribution towards the team’s use of Scrum?
+  Setup pull request requirese for merging of feature branches.
+  Writing UI-test to increase a KPI.
+What is my contribution towards the team’s deliveries?
+  I discussed with the backend team and agreed upon how we in the frontend
+  team should send payloads and what we could expect to be returned in a response.
+  Based on that connected our week view to the backend to finish up the last parts
+  of two user stories.
