@@ -90,3 +90,20 @@ what is my contribution towards the team’s deliveries?
   Together with the rest of the backend group I added functionallity to add Tasks to the database 
   and also code to be able to fetch tasks from a specific week by sending week and year from frontend. 
 
+Week 5:
+
+What do I want to learn or understand better?
+  How to set up a server in differnet ways. And continuing to learn about REST API.  
+  
+how can I help someone else, or the entire team, to learn something new?
+  I can help them with scrum theory since i have read about burn down charts and how 
+  they do code reviews at google.
+  
+what is my contribution towards the team’s use of Scrum?
+  I did a burn down chart for velocity and planning, set up definition of done and code 
+  review method description in trello.
+  
+what is my contribution towards the team’s deliveries?
+  I have made a fuction to return ID of new objects when they are created so that 
+  they can be deleted without update of the page.
+
