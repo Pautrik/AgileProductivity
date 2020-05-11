@@ -4,47 +4,79 @@ import ProjectTask from "../projectTasks"
 import {range} from "../../helpers/array";
 
 const weekDays = [
+    "Sun",
     "Mon",
     "Tue",
     "Wed",
     "Thu",
     "Fri",
     "Sat",
-    "Sun",
   ];
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
 
-        this.currentDate = new Date();
+        const startDate = new Date();
+        const endDate = new Date();
+        let rangeT = 42;
+        
+        startDate.setDate(startDate.getDate() - 21)
+        endDate.setDate(endDate.getDate() + 21)
+
+
+        this.state = {
+            startDate,
+            endDate,
+            rangeT
+        }
+
+        this.scrollerRef = React.createRef();
+
         this.getNextDay = this.getNextDay.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
-        this.currentDate.setDate(this.currentDate.getDate() - 3);
-    }
-
-
-    incDate(){
-        return (this.currentDate.setDate(this.currentDate.getDate() + 1));
-
-    }
-
-    decDate(){
-       return( this.currentDate.setDate(this.currentDate.getDate() - 1));
-
+        this.state.startDate.setDate(this.state.startDate.getDate() - 7);
     }
 
     getNextDay(x){
         const y = new Date();
-        y.setDate(this.currentDate.getDate() + x);
-        return y.getDate();
+        y.setDate(this.state.startDate.getDate() + x);
+        return y;
     }
 
     getWeekDay(x){
         const y = new Date();
-        y.setDate(this.currentDate.getDate() + x);
-        console.log(y.getDay())
+        y.setDate(this.state.startDate.getDate() + x);
         return weekDays[y.getDay()];
+    }
+
+    goBack(){
+        this.state.startDate.setDate(this.state.startDate.getDate() - 7);
+        this.state.rangeT = this.state.rangeT + 7; 
+    }
+
+    handleScroll(s){
+
+    }
+
+    isKeyDate(x){
+        
+        let z = this.getNextDay(x);
+        let y = new Date();
+
+        console.log(z.getMonth())
+        console.log(y.getMonth() + 1)
+        console.log(z.getDate())
+        
+
+        if(z.getMonth() == (y.getMonth() + 1) && z.getDate() === 1){
+            console.log("funkar")
+            return true;
+        }
+        else{
+            console.log("funkar ej")
+            return false;
+        }
     }
 
     render(){
@@ -63,23 +95,25 @@ class Timeline extends React.Component{
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-
-
+                            
                         </div>
-                        <div className="day-holder">
-                        {range(100).map((x) => (
-                        <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</div>
-                        ))}
+                        <div ref={this.scrollerRef} className="day-holder">
+                            {
+                            range(this.state.rangeT).map((x) => (
+                                (this.isKeyDate(x))
+                                ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                ))
+                            }
                         </div>
-                        
                     </div>
                 </div>
             </div>
         );
     }
- 
+    componentDidMount() {
+        this.scrollerRef.current.scrollLeft = document.getElementById("key").offsetLeft - 99;
+    }
 }
 
 {/* 

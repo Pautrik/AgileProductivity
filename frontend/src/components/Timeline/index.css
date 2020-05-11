@@ -25,6 +25,7 @@
 
 .project-day-container{
     display: flex;
+    flex: 1;
     flex-direction: row;
     align-items: stretch;
     flex: 1;
