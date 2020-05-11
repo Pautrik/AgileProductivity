@@ -53,3 +53,30 @@ CREATE TRIGGER compact AFTER DELETE ON Tasks
   FOR EACH ROW EXECUTE FUNCTION compact();
 
 
+--loops through all bigger positions and increments them by 1
+CREATE OR REPLACE PROCEDURE movetransaction(pos Integer, ad VARCHAR(8))
+LANGUAGE plpgsql
+AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM tasks WHERE position>=pos AND assignedDate=ad);
+BEGIN
+	FOR VAR2 IN 0..i LOOP
+		UPDATE Tasks SET position = position+1
+		WHERE position = pos+i-VAR2 AND assignedDate=ad;
+	END LOOP;
+END
+$$;
+
+--calls procedure to be able to change table wihout breaking unique contraint
+CREATE OR REPLACE FUNCTION movebiggerposition() RETURNS TRIGGER AS $$
+BEGIN
+	CALL movetransaction(NEW.position, NEW.assignedDate);
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER movebiggerposition BEFORE INSERT ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION movebiggerposition();
+
+
