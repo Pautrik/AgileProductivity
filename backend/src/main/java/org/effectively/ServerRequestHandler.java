@@ -14,6 +14,13 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
        handler = new DatabaseHandler(DBpassword, context);
     }
 
+    /**
+     * Sets the request parameters depending on request type and calls handleResponse()
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @throws IOException
+     */
+
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         Pair<String, String> requestParamValue = null;
@@ -29,6 +36,12 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         handleResponse(httpExchange,requestParamValue);
     }
 
+    /**
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @return the request parameters as Pair <String,String> for a GET request
+     */
+
     private Pair handleGetRequest(HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
@@ -36,6 +49,13 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
 
         return new Pair<>("Get",paramvalue[1]);
     }
+
+    /**
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @return the request parameters as Pair <String,String> for a DELETE request
+     */
+
     private Pair handleDeleteRequest(HttpExchange httpExchange) {
 
         //TODO make sure there are no "=" in key or value before splitting
@@ -43,6 +63,12 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
 
         return new Pair<>("Delete",paramvalue[1]);
     }
+
+    /**
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @return the request parameters as Pair <String,String> for a POST request
+     */
 
     private Pair handlePostRequest (HttpExchange httpExchange) {
         String body = null;
@@ -57,6 +83,14 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         }
         return new Pair<>("Post",body);
     }
+
+    /**
+     * Asks the handler to fetch the required data and sends the data back to the client as a JSON response
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @param requestParamValue, the parameters of the request as a Pair <String,String>
+     * @throws IOException
+     */
 
     private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
