@@ -15,8 +15,7 @@ class Day extends React.Component {
   }
 
   enterEditMode() {
-    this.setState({ isEditing: true },
-      () => this.taskTextRef.current.focus());
+    this.setState({ isEditing: true }, () => this.taskTextRef.current.focus());
   }
 
   onTaskSubmit() {
@@ -37,24 +36,33 @@ class Day extends React.Component {
         </h2>
 
         {this.props.tasks.map((x) => (
-          <Task deleteTask={() => this.props.deleteTask(x.id)} taskText={x.text} />
+          <Task
+            deleteTask={() => this.props.deleteTask(x.id)}
+            taskText={x.text}
+            status={x.state}
+          />
         ))}
-        {this.state.isEditing
-          ? (
-            <div className="form-area">
-              <div
-                className="text-area"
-                contentEditable ref={this.taskTextRef}
-                placeholder="Enter task text"
-                onKeyDown={event => event.keyCode === 13 && this.onTaskSubmit()}></div>
-              <div className="buttons-container">
-                <button onClick={() => this.setState({ isEditing: false })}>Cancel</button>
-                <button onClick={this.onTaskSubmit}>Submit</button>
-              </div>
+        {this.state.isEditing ? (
+          <div className="form-area">
+            <div
+              className="text-area"
+              contentEditable
+              ref={this.taskTextRef}
+              placeholder="Enter task text"
+              onKeyDown={(event) => event.keyCode === 13 && this.onTaskSubmit()}
+            ></div>
+            <div className="buttons-container">
+              <button onClick={() => this.setState({ isEditing: false })}>
+                Cancel
+              </button>
+              <button onClick={this.onTaskSubmit}>Submit</button>
             </div>
-          )
-          : <button onClick={this.enterEditMode} className="add-task-button">+</button>
-        }
+          </div>
+        ) : (
+          <button onClick={this.enterEditMode} className="add-task-button">
+            +
+          </button>
+        )}
       </div>
     );
   }
