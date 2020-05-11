@@ -7,14 +7,14 @@ class Task extends React.Component {
     let buttonText = "";
     let taskColor = "";
     if (status === 1) {
-      buttonText = "Start";
+      buttonText = "To do";
       taskColor = "";
     } else if (status === 2) {
-      buttonText = "Done";
-      taskColor = "hsl(49, 69%, 73%)";
+      buttonText = "Completed";
+      taskColor = "hsl(120, 100%, 85%)";
     } else if (status === 3) {
-      buttonText = "Archive";
-      taskColor = "hsl(93, 69%, 73%)";
+      buttonText = "Archived";
+      taskColor = "hsl(0, 0%, 95%)";
     }
 
     return (

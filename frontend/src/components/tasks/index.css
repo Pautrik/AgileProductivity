@@ -1,6 +1,7 @@
 .task {
-  background-color: hsl(210, 69%, 73%);
-  border: solid black 1px;
+  background-color: hsl(60, 100%, 85%);
+  border: solid black;
+  border-width: 0.5px 0.25px 1px 0.5px;
   border-radius: 0px;
   min-height: 40px;
   display: flex;
@@ -9,18 +10,22 @@
 }
 
 .x-button {
-  background-color: hsl(205, 74%, 53%);
+  background-color: transparent;
   border-radius: 20px;
   align-self: flex-end;
+  font-weight: bold;
+  font-size: 1.1em;
   margin-top: 5px;
   margin-right: 5px;
   border-style: hidden;
   visibility: hidden;
 }
+
 .done-button {
-  background-color: hsl(205, 74%, 53%);
+  background-color: hsl(60, 100%, 50%);
   border-radius: 20px;
   align-self: flex-end;
+  font-weight: bold;
   margin-top: 15px;
   margin-bottom: 5px;
   margin-right: 5px;
@@ -30,4 +35,8 @@
 .task:hover .done-button,
 .task:hover .x-button {
   visibility: visible;
+}
+
+.x-button:hover, .done-button:hover{
+  opacity: 0.7;
 }

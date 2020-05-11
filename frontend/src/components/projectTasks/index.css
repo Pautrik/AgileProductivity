@@ -10,7 +10,7 @@
     margin-bottom: 10px;
   }
   .x-button {
-    background-color: hsl(205, 74%, 53%);
+    /* background-color: hsl(205, 74%, 53%); */
     border-radius: 20px;
     align-self: flex-end;
     margin-top: 5px;
@@ -19,7 +19,7 @@
     visibility: hidden;
   }
   .done-button {
-    background-color: hsl(205, 74%, 53%);
+    /* background-color: hsl(205, 74%, 53%); */
     border-radius: 20px;
     align-self: flex-end;
     margin-top: 15px;
@@ -31,4 +31,3 @@
   .project-task:hover .done-button, .project-task:hover .x-button {
     visibility: visible;
   }
-  

@@ -13,7 +13,6 @@
 
 .week-header {
   display: flex;
-  background-color: hsl(197, 79%, 85%);
   flex: 0;
   justify-content: space-around;
   align-items: center;
@@ -40,11 +39,11 @@
 }
 
 .previous-week {
-  left: 10px;
+  left: 15px;
 }
 
 .next-week {
-  right: 10px;
+  right: 15px;
 }
 
 .note-container {
@@ -52,4 +51,9 @@
   flex: 3;
   background-color: rgb(142, 167, 221);
   flex-direction: column;
+}
+
+.previous-week:hover,
+.next-week:hover{
+  transform: scale(1.5);
 }

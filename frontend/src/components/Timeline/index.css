@@ -9,7 +9,6 @@
     width: 100%;
     height: 10%;
     display: flex;
-    background-color:  hsl(197, 79%, 85%);
     flex: 0;
     justify-content: space-around;
     align-items: center;

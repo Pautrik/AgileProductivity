@@ -2,22 +2,33 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: hsl(0, 6%, 93%);
   flex: 1;
-  border: outset black 1px;
+  border: outset black 0.5px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  border-top-style: none;
+  background: linear-gradient(0deg, hsl(178, 15%, 85%) 0%, hsl(0, 0%, 100%)
+ 100%);
 }
 
 .form-area, .add-task-button {
-  border: solid 2px darkslategray;
+  border: solid 2px;
+  border-color: white white black white;
   border-radius: 5px;
   padding: 10px 10px;
 }
 
 .add-task-button {
   font-size: 2em;
+  opacity: 0.7;
   cursor: pointer;
+  background: linear-gradient(0deg, hsl(178, 15%, 75%) 0%, hsl(0, 0%, 100%)
+ 100%);
+}
+
+.add-task-button:hover{
+  background: linear-gradient(0deg, hsl(178, 15%, 50%) 0%, hsl(0, 0%, 85%)
+ 100%);
 }
 
 .form-area {
@@ -27,10 +38,15 @@
 }
 
 .text-area {
-  background-color: white;
+  /* background-color: white; */
   word-wrap: break-word;
   overflow-wrap: break-word;
   white-space: normal;
+  margin-bottom: 3px;
+}
+
+.text-area:focus, input:focus{
+    outline: none;
 }
 
 /* Reinstates placeholder from <textarea/> */
@@ -50,4 +66,7 @@
 
 .day-box h2 {
   margin: 0;
+  border: solid black;
+  border-width: 0px 0px 0.5px 0.5px;
+  font-size: 1.2em;
 }
