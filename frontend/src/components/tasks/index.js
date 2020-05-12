@@ -6,15 +6,19 @@ class Task extends React.Component {
     const { status, taskText } = this.props;
     let buttonText = "";
     let taskColor = "";
+    let doneButtonColor = "";
     if (status === 1) {
       buttonText = "To do";
       taskColor = "";
+      doneButtonColor = "";
     } else if (status === 2) {
       buttonText = "Completed";
       taskColor = "hsl(120, 100%, 85%)";
+      doneButtonColor = "hsl(120, 60%, 50%)";
     } else if (status === 3) {
       buttonText = "Archived";
       taskColor = "hsl(0, 0%, 95%)";
+      doneButtonColor = "hsl(0, 0%, 70%)";
     }
 
     return (
@@ -25,7 +29,7 @@ class Task extends React.Component {
           </button>
         )}
         {taskText}
-        {status && <button className="done-button">{buttonText}</button>}
+        {status && <button className="done-button" style={{ backgroundColor: doneButtonColor }}>{buttonText}</button>}
       </div>
     );
   }
