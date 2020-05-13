@@ -16,7 +16,8 @@ const renderDay = ({
             tasks={tasks}
             addTask={addTask}
             deleteTask={deleteTask}
-        />);
+        />
+    );
 
 describe("<Day />", () => {
     it("Renders dayName", () => {

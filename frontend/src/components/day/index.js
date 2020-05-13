@@ -29,7 +29,7 @@ class Day extends React.Component {
         <h2>
           {this.props.dayName}
           {this.props.dayDate && this.props.dayName === this.props.todaysDay ? (
-            <p Style="color:red">{this.props.dayDate}</p>
+            <p style={{color: "red"}}>{this.props.dayDate}</p>
           ) : (
             <p>{this.props.dayDate}</p>
           )}
