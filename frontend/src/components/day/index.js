@@ -34,9 +34,9 @@ class Day extends React.Component {
             <p>{this.props.dayDate}</p>
           )}
         </h2>
-
         {this.props.tasks.map((x) => (
           <Task
+            key={`${x.id}`}
             deleteTask={() => this.props.deleteTask(x.id)}
             taskText={x.text}
             status={x.state}

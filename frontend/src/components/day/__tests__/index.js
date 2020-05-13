@@ -25,7 +25,7 @@ describe("<Day />", () => {
         expect(getByText(testDayName)).toBeInTheDocument();
     });
 
-    describe("Addition of task", () => {
+    describe("Addition of task:", () => {
         it("Renders add task button", () => {
             const { getByText } = renderDay();
             expect(getByText("+")).toBeInTheDocument();

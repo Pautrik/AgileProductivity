@@ -1,18 +1,40 @@
 import React from "react";
 import { render } from "@testing-library/react";
 
-import fetch from "mockedFetch";
-
 import Week from '../index';
 
 
 describe("<Week />", () => {
     it("Renders", () => {
-        
+        global.fetch = jest.fn(url => {
+            let respData = mockWeek;
+            if(url.includes("notes")) {
+                respData = mockNotes;
+            }
+            return Promise.resolve({ ok: true, json: () => respData })
+        });
         const { container } = render(<Week />);
         expect(container).toBeInTheDocument();
     });
 });
+
+const mockNotes = [
+    {
+        "id": 0,
+        "text": "Note 0",
+        "position": 0
+    },
+    {
+        "id": 1,
+        "text": "Note 1",
+        "position": 1
+    },
+    {
+        "id": 2,
+        "text": "Note 2",
+        "position": 2
+    }
+]
 
 const mockWeek = [
     {
@@ -21,17 +43,20 @@ const mockWeek = [
             {
                 "text": "Do this 1.0",
                 "state": 1,
-                "position": 0
+                "position": 0,
+                "id": 0
             },
             {
                 "text": "Do this 1.1",
                 "state": 1,
-                "position": 1
+                "position": 1,
+                "id": 1
             },
             {
                 "text": "Do this 1.2",
                 "state": 2,
-                "position": 2
+                "position": 2,
+                "id": 2
             }
         ]
     },
@@ -41,7 +66,8 @@ const mockWeek = [
             {
                 "text": "Do this 2",
                 "state": 3,
-                "position": 0
+                "position": 0,
+                "id": 3
             }
         ]
     },
@@ -51,7 +77,8 @@ const mockWeek = [
             {
                 "text": "Do this 3",
                 "state": 2,
-                "position": 0
+                "position": 0,
+                "id": 4
             }
         ]
     },
@@ -61,7 +88,8 @@ const mockWeek = [
             {
                 "text": "Do this 4",
                 "state": 3,
-                "position": 0
+                "position": 0,
+                "id": 5
             }
         ]
     },
@@ -71,7 +99,8 @@ const mockWeek = [
             {
                 "text": "Do this 5",
                 "state": 1,
-                "position": 0
+                "position": 0,
+                "id": 6
             }
         ]
     },
@@ -81,7 +110,8 @@ const mockWeek = [
             {
                 "text": "Do this 6",
                 "state": 1,
-                "position": 0
+                "position": 0,
+                "id": 7
             }
         ]
     },
@@ -91,7 +121,8 @@ const mockWeek = [
             {
                 "text": "Do this 7",
                 "state": 2,
-                "position": 0
+                "position": 0,
+                "id": 8
             }
         ]
     }
