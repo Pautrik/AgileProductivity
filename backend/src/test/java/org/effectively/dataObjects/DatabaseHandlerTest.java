@@ -6,6 +6,10 @@ import org.junit.Test;
 
 import javax.naming.AuthenticationException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,17 +25,7 @@ public class DatabaseHandlerTest {
             e.printStackTrace();
         }
 
-
-        //timeline //TODO need return value for id on addObject to finish
-
-            /*inputParameters = new Pair("Get","testproject1&testproject2&20200410&20200501");
-            DatabaseHandler timelinehandler = new DatabaseHandler(System.getenv("EV1"),"timeline");
-            reply = timelinehandler.requestData(inputParameters);
-            TimelineTask [] timelinetasks = gson.fromJson(reply, TimelineTask[].class);*/
-
-        //projects //TODO need return value for id on addObject to finish
-
-        //note //TODO need return value for id on addObject to finish
+        //note //TODO add tests for notes endpoint
 
 
     }
@@ -126,14 +120,38 @@ public class DatabaseHandlerTest {
         String idreply = timelinehandler.requestData(postinputParameters);
         Integer[] id = gson.fromJson(idreply, Integer[].class);
 
+        postinputParameters = new Pair("Post", "{\"endDate\":\"17540115\",\"project\":{\"name\":\"automatedtestproject2\",\"active\":false},\"text\":\"automated test2\",\"state\":2,\"position\":1,\"date\":\"17540114\"}");
+
+        idreply = timelinehandler.requestData(postinputParameters);
+        Integer[] id2 = gson.fromJson(idreply, Integer[].class);
+
+        //GET REQUEST
         String reply = timelinehandler.requestData(new Pair<>("Get", "automatedtestproject&17540114&17540115"));
         TimelineTask [] timelineitems = gson.fromJson(reply, TimelineTask[].class);
 
         assertEquals(timelineitems.length, 1);
+        assertEquals(id[0],timelineitems[0].getId());
 
-        /*//GET REQUEST
-        Pair<String, String> inputParameters = new Pair("Get", "175403");
-        String reply = timelinehandler.requestData(inputParameters);
-        Day[] week = gson.fromJson(reply, Day[].class);*/
+        reply = timelinehandler.requestData(new Pair<>("Get", "automatedtestproject&automatedtestproject2&17540114&17540115"));
+        timelineitems = gson.fromJson(reply, TimelineTask[].class);
+
+        assertEquals(timelineitems.length, 2);
+        for (TimelineTask t : timelineitems){
+            assertTrue(t.getId().equals(id[0])|| t.getId().equals(id2[0]));
+        }
+
+        //DELETE REQUEST
+        Pair deleteinputParameters = new Pair("Delete", Integer.toString(id[0]));
+        timelinehandler.requestData(deleteinputParameters);
+
+        deleteinputParameters = new Pair("Delete", Integer.toString(id2[0]));
+        timelinehandler.requestData(deleteinputParameters);
+
+        reply = timelinehandler.requestData(new Pair<>("Get", "automatedtestproject&17540114&17540115"));
+        timelineitems = gson.fromJson(reply, TimelineTask[].class);
+
+        assertEquals(timelineitems.length,0);
+
+
     }
 }
