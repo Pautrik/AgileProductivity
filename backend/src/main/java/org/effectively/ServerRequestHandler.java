@@ -26,11 +26,12 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         Pair<String, String> requestParamValue = null;
         if("GET".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handleGetRequest(httpExchange);
-
         }else if("POST".equals(httpExchange.getRequestMethod())) {
             requestParamValue = handlePostRequest(httpExchange);
         }else if("DELETE".equals(httpExchange.getRequestMethod())){
             requestParamValue = handleDeleteRequest(httpExchange);
+        }else if("PATCH".equals(httpExchange.getRequestMethod())){
+            requestParamValue = handlePatchRequest(httpExchange);
         }
 
         handleResponse(httpExchange,requestParamValue);
@@ -83,6 +84,22 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         }
         return new Pair<>("Post",body);
     }
+
+    private Pair handlePatchRequest (HttpExchange httpExchange) {
+        String body = null;
+        try{
+            InputStream bodyAsStream= httpExchange.getRequestBody();
+            body = new BufferedReader(new InputStreamReader(bodyAsStream))
+                    .lines().collect(Collectors.joining("\n"));
+            bodyAsStream.close();
+        }
+        catch (IOException i){
+            i.printStackTrace();
+        }
+        return new Pair<>("Patch",body);
+    }
+
+
 
     /**
      * Asks the handler to fetch the required data and sends the data back to the client as a JSON response
