@@ -21,13 +21,10 @@ public class DatabaseHandlerTest {
             weekEndpointTests();
             projectsEndpointTests();
             timelineEndpointTests();
+            nodeEndpointTests();
         } catch (AuthenticationException e) {
             e.printStackTrace();
         }
-
-        //note //TODO add tests for notes endpoint
-
-
     }
 
     public void weekEndpointTests() throws AuthenticationException {
@@ -147,11 +144,51 @@ public class DatabaseHandlerTest {
         deleteinputParameters = new Pair("Delete", Integer.toString(id2[0]));
         timelinehandler.requestData(deleteinputParameters);
 
-        reply = timelinehandler.requestData(new Pair<>("Get", "automatedtestproject&17540114&17540115"));
+        reply = timelinehandler.requestData(new Pair<>("Get", "automatedtestproject&automatedtestproject2&17540114&17540115"));
         timelineitems = gson.fromJson(reply, TimelineTask[].class);
 
         assertEquals(timelineitems.length,0);
 
+
+    }
+    public void nodeEndpointTests() throws AuthenticationException {
+        Gson gson = new Gson();
+
+        //SETUP DBHANDLER
+        DatabaseHandler notehandler = new DatabaseHandler(System.getenv("EV1"), "note");
+
+        //POST REQUEST
+        Pair<String, String> postinputParameters = new Pair("Post", "{\"text\":\"automated testnote\",\"position\":99999999}");
+
+        String idreply = notehandler.requestData(postinputParameters);
+        Integer[] id = gson.fromJson(idreply, Integer[].class);
+
+        String reply = notehandler.requestData(new Pair<>("Get", "DUMMY VARIABLE"));
+        Note [] allnotes = gson.fromJson(reply, Note[].class);
+
+        boolean containsID = false;
+        for (Note n : allnotes){
+            if (n.getId().equals(id[0])){
+                containsID = true;
+            }
+        }
+        assertTrue(containsID);
+
+        //DELETE REQUEST
+
+        Pair deleteinputParameters = new Pair("Delete", Integer.toString(id[0]));
+        notehandler.requestData(deleteinputParameters);
+
+        reply = notehandler.requestData(new Pair<>("Get", "DUMMY VARIABLE"));
+        allnotes = gson.fromJson(reply, Note[].class);
+
+        boolean removedID = true;
+        for (Note n : allnotes){
+            if (n.getId().equals(id[0])){
+                removedID = false;
+            }
+        }
+        assertTrue(removedID);
 
     }
 }
