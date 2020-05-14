@@ -18,23 +18,24 @@ class Timeline extends React.Component{
         super(props);
 
         const startDate = new Date();
-        const endDate = new Date();
-        let rangeT = 42;
+        let rangeT = 56;
+        let lowestScroll = 0;
+        let highestScroll = 0;
         
-        startDate.setDate(startDate.getDate() - 21)
-        endDate.setDate(endDate.getDate() + 21)
-
+        startDate.setDate(startDate.getDate() - 28)
 
         this.state = {
             startDate,
-            endDate,
-            rangeT
+            rangeT,
+            lowestScroll,
+            highestScroll
         }
 
         this.scrollerRef = React.createRef();
 
         this.getNextDay = this.getNextDay.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
+        this.handleScroll = this.handleScroll.bind(this);
         this.state.startDate.setDate(this.state.startDate.getDate() - 7);
     }
 
@@ -54,30 +55,50 @@ class Timeline extends React.Component{
         this.state.startDate.setDate(this.state.startDate.getDate() - 7);
         this.state.rangeT = this.state.rangeT + 7; 
     }
-
-    handleScroll(s){
-
+    goForward(){
+        this.state.rangeT = this.state.rangeT + 7; 
     }
 
     isKeyDate(x){
         
         let z = this.getNextDay(x);
+        z.setMonth(z.getMonth() - 1);
         let y = new Date();
-
-        console.log(z.getMonth())
-        console.log(y.getMonth() + 1)
-        console.log(z.getDate())
+        y.setDate(y.getDate() - 9);
         
+        if(z.getMonth() === y.getMonth() && z.getDate() === y.getDate()){
 
-        if(z.getMonth() == (y.getMonth() + 1) && z.getDate() === 1){
-            console.log("funkar")
             return true;
         }
         else{
-            console.log("funkar ej")
             return false;
         }
+        
     }
+
+    handleScroll() {
+
+        console.log("hej")
+
+        let s = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth)
+
+        console.log(s)
+
+        if(s < this.state.lowestScroll){
+
+            this.state.lowestScroll = s;
+            console.log(this.state.lowestScroll)
+            this.goBack();
+        }
+        else if(s > this.state.lowestScroll){
+            
+            this.state.highestScroll = s;
+            console.log(this.state.highestScroll)
+            this.goForward();
+        }
+    }
+
+
 
     render(){
         return(
@@ -97,7 +118,7 @@ class Timeline extends React.Component{
                             <ProjectTask > </ProjectTask>
                             
                         </div>
-                        <div ref={this.scrollerRef} className="day-holder">
+                        <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
                             {
                             range(this.state.rangeT).map((x) => (
                                 (this.isKeyDate(x))
@@ -112,7 +133,12 @@ class Timeline extends React.Component{
         );
     }
     componentDidMount() {
-        this.scrollerRef.current.scrollLeft = document.getElementById("key").offsetLeft - 99;
+        this.scrollerRef.current.scrollLeft = document.getElementById("key").offsetLeft;
+        this.state.lowestScroll = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth);
+        this.state.highestScroll = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth);
+        console.log(this.state.highestScroll)
+        console.log(this.state.lowestScroll)
+
     }
 }
 
