@@ -1,5 +1,9 @@
 package org.effectively.dataObjects;
 
+/**
+ * The specification for a TimelineTask object
+ */
+
 class TimelineTask extends Task {
     private String endDate;
     private Project project;

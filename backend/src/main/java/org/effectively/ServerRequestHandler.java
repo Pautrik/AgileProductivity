@@ -85,6 +85,12 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         return new Pair<>("Post",body);
     }
 
+    /**
+     *
+     * @param httpExchange, the httprequest sent from client
+     * @return the request parameters as Pair <String,String> for a PATCH request
+     */
+
     private Pair handlePatchRequest (HttpExchange httpExchange) {
         String body = null;
         try{
