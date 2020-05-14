@@ -64,6 +64,9 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("Delete")){
             removeObject(param.getSecond(), context);
         }
+        else if(param.getFirst().equals("Patch")){
+            updateObject(param.getSecond(), context);
+        }
 
         List<String> jsonArray = new ArrayList<>();
         for (Object object : reply){
@@ -153,6 +156,36 @@ public class DatabaseHandler {
 
         return returnData;
     }*/
+
+    /**
+     *
+     * @param objects, the JSON of either a Week, Timeline or Note
+     * @param viewname, the name of the view from which the task is to be removed
+     */
+    private void updateObject(String objects, String viewname){
+        PreparedStatement stmt;
+        Task[] tasks = gson.fromJson(objects, Task[].class);
+
+        try{
+            if(viewname.equals("week")){
+                for(Task task : tasks){
+                    System.out.println(task.getPosition() +" , " + task.getId() + " , " + task.getDate() + " , " + task.getText() + " , " + task.getState());
+                    stmt = conn.prepareStatement("UPDATE Tasks SET position = ? , description = ? , assignedDate = ? , state = ? WHERE id = ?");
+                    stmt.setInt(1, task.getPosition());
+                    stmt.setString(2, task.getText());
+                    stmt.setString(3, task.getDate());
+                    stmt.setInt(4, task.getState());
+                    stmt.setInt(5, task.getId());
+
+                    stmt.executeUpdate();
+
+                }
+            }
+        } catch (SQLException s) {
+            s.printStackTrace();
+        }
+    }
+
 
     /**
      *
