@@ -5,6 +5,9 @@ import Button from "../button";
 import Arrow from "../arrow";
 import NumberSelector2 from "../numberSelector2";
 import { httpRequestJson } from "../../helpers/requests";
+import Backend from "react-dnd-html5-backend";
+import { DndProvider } from "react-dnd";
+
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
@@ -238,53 +241,55 @@ class Week extends React.Component {
 
   render() {
     return (
-      <div className="week-view">
-        <div className="week">
-          <div className="week-header">
-            <span>
-              <div>
-                <NumberSelector2
-                  handleClickUp={this.clickUp}
-                  handleClickDown={this.clickDown}
-                  value={this.state.chosenWeek}
-                />
-              </div>
-            </span>
-            <h1 Style="color: grey">
-              {this.getCurrentYearMonth() + " " + this.getCurrentYear()}
-            </h1>
-            <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
+      <DndProvider backend={Backend}>
+        <div className="week-view">
+          <div className="week">
+            <div className="week-header">
+              <span>
+                <div>
+                  <NumberSelector2
+                    handleClickUp={this.clickUp}
+                    handleClickDown={this.clickDown}
+                    value={this.state.chosenWeek}
+                  />
+                </div>
+              </span>
+              <h1 Style="color: grey">
+                {this.getCurrentYearMonth() + " " + this.getCurrentYear()}
+              </h1>
+              <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
+            </div>
+            <div className="days">
+              {weekDays.map((x, i) => {
+                const { tasks, date } = this.state.days[i];
+                return (
+                  <Day
+                    todaysDay={this.getCurrentWeekDay()}
+                    dayDate={this.dateToDayConverter(this.state.days[i].date)}
+                    dayName={x}
+                    tasks={tasks}
+                    addTask={(text) => this.addTask(text, date, i)}
+                    deleteTask={(id) => this.deleteTask(id, i)}
+                  />
+                );
+              })}
+              <button onClick={this.clickDown} className="previous-week">
+                <Arrow direction="left" />
+              </button>
+              <button onClick={this.clickUp} className="next-week">
+                <Arrow direction="right" />
+              </button>
+            </div>
           </div>
-          <div className="days">
-            {weekDays.map((x, i) => {
-              const { tasks, date } = this.state.days[i];
-              return (
-                <Day
-                  todaysDay={this.getCurrentWeekDay()}
-                  dayDate={this.dateToDayConverter(this.state.days[i].date)}
-                  dayName={x}
-                  tasks={tasks}
-                  addTask={(text) => this.addTask(text, date, i)}
-                  deleteTask={(id) => this.deleteTask(id, i)}
-                />
-              );
-            })}
-            <button onClick={this.clickDown} className="previous-week">
-              <Arrow direction="left" />
-            </button>
-            <button onClick={this.clickUp} className="next-week">
-              <Arrow direction="right" />
-            </button>
+          <div className="note-container">
+            <Day 
+              dayName="Notes"
+              tasks={this.state.notes}
+              addTask={this.addNote}
+              deleteTask={this.deleteNote}/>
           </div>
         </div>
-        <div className="note-container">
-          <Day 
-            dayName="Notes"
-            tasks={this.state.notes}
-            addTask={this.addNote}
-            deleteTask={this.deleteNote}/>
-        </div>
-      </div>
+      </DndProvider>
     );
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.css";
-import Task from "../tasks";
+import Task from "../task";
 
 class Day extends React.Component {
   constructor(props) {
@@ -23,6 +23,7 @@ class Day extends React.Component {
     this.props.addTask(text);
     this.setState({ isEditing: false });
   }
+
   render() {
     return (
       <div className="day-box">
@@ -38,6 +39,7 @@ class Day extends React.Component {
         {this.props.tasks.map((x) => (
           <Task
             deleteTask={() => this.props.deleteTask(x.id)}
+            id={x.id}
             taskText={x.text}
             status={x.state}
           />
