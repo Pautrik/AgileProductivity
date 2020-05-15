@@ -180,6 +180,21 @@ class Week extends React.Component {
     return date;
   };
 
+  onChangeTaskState(taskId, i, date) {
+    let daysCopy = this.state.days;
+    const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
+    let newState;
+    if (state === 3) {
+      newState = 1;
+    } else {
+      newState = state + 1;
+    }
+
+    daysCopy[i].tasks.find((x) => x.id === taskId).state = newState;
+
+    this.setState({ days: daysCopy });
+  }
+
   render() {
     return (
       <div className="week-view">
@@ -210,6 +225,9 @@ class Week extends React.Component {
                   tasks={tasks}
                   addTask={(text) => this.addTask(text, date, i)}
                   deleteTask={(id) => this.deleteTask(id, i)}
+                  changeTaskState={(taskId) =>
+                    this.onChangeTaskState(taskId, i, date)
+                  }
                 />
               );
             })}
