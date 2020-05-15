@@ -9,7 +9,6 @@ class Day extends React.Component {
       isEditing: false,
     };
     this.taskTextRef = React.createRef();
-
     this.onTaskSubmit = this.onTaskSubmit.bind(this);
     this.enterEditMode = this.enterEditMode.bind(this);
   }
@@ -30,14 +29,14 @@ class Day extends React.Component {
         <h2>
           {this.props.dayName}
           {this.props.dayDate && this.props.dayName === this.props.todaysDay ? (
-            <p Style="color:red">{this.props.dayDate}</p>
+            <p style={{color: "red"}}>{this.props.dayDate}</p>
           ) : (
             <p>{this.props.dayDate}</p>
           )}
         </h2>
-
         {this.props.tasks.map((x) => (
           <Task
+            key={`${x.id}`}
             deleteTask={() => this.props.deleteTask(x.id)}
             moveTask={(source, destination) => this.props.moveTask(source, destination)}
             id={x.id}
@@ -45,6 +44,7 @@ class Day extends React.Component {
             status={x.state}
             timestamp={this.props.timestamp}
             position={x.position}
+            changeTaskState={() => this.props.changeTaskState(x.id)}
           />
         ))}
         {this.state.isEditing ? (

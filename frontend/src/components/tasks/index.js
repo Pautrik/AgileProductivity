@@ -18,30 +18,31 @@ class Task extends React.Component {
     let buttonText = "";
     let taskColor = "";
     if (status === 1) {
-      buttonText = "Start";
       taskColor = "";
     } else if (status === 2) {
-      buttonText = "Done";
       taskColor = "hsl(49, 69%, 73%)";
     } else if (status === 3) {
-      buttonText = "Archive";
       taskColor = "hsl(93, 69%, 73%)";
     }
 
     return connectDropTarget(
       connectDragSource(
-        <div>
-          {hovered && <div className="hovered"></div>}
-          <div className="task" style={{ backgroundColor: taskColor }}>
-            {(
-              <button onClick={deleteTask} className="x-button">
-                X
-              </button>
-            )}
-            {taskText}
-            {status && <button className="done-button">{buttonText}</button>}
-          </div>
+      <div>
+        {hovered && <div className="hovered"></div>}
+        <div className="task" style={{ backgroundColor: taskColor }}>
+          {
+            <button onClick={this.props.deleteTask} className="x-button">
+              X
+            </button>
+          }
+          {taskText}
+          {status && (
+            <button onClick={this.props.changeTaskState} className="done-button">
+              &#10004;
+            </button>
+          )}
         </div>
+      </div>
       )
     );
   }

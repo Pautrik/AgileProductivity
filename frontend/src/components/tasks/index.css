@@ -35,3 +35,6 @@
 .hovered {
   height: 100px; /* Should maybe be switched to other measurement */
 }
+.span {
+  content: "\2715";
+}
