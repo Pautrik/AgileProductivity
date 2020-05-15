@@ -19,7 +19,7 @@ class Task extends React.Component {
 
     return (
       <div className="task" style={{ backgroundColor: taskColor }}>
-        {status && (
+        {(
           <button onClick={this.props.deleteTask} className="x-button">
             X
           </button>
