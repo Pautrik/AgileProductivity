@@ -31,3 +31,7 @@
 .task:hover .x-button {
   visibility: visible;
 }
+
+.span {
+  content: "\2715";
+}
