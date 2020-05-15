@@ -42,13 +42,13 @@ class Week extends React.Component {
     super(props);
     this.state = {
       days: [
-        { tasks: [] },
-        { tasks: [] },
-        { tasks: [] },
-        { tasks: [] },
-        { tasks: [] },
-        { tasks: [] },
-        { tasks: [] },
+        { date: "20200416", tasks: [] },
+        { date: "20200417", tasks: [] },
+        { date: "20200418", tasks: [] },
+        { date: "20200419", tasks: [] },
+        { date: "20200420", tasks: [] },
+        { date: "20200421", tasks: [] },
+        { date: "20200422", tasks: [] },
       ],
 
       notes: [],
@@ -250,7 +250,7 @@ class Week extends React.Component {
                 />
               </div>
             </span>
-            <h1 Style="color: grey">
+            <h1 style={{color: "grey"}}>
               {this.getCurrentYearMonth() + " " + this.getCurrentYear()}
             </h1>
             <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
@@ -266,6 +266,7 @@ class Week extends React.Component {
                   tasks={tasks}
                   addTask={(text) => this.addTask(text, date, i)}
                   deleteTask={(id) => this.deleteTask(id, i)}
+                  key={JSON.stringify(this.state.days[i])}
                 />
               );
             })}
