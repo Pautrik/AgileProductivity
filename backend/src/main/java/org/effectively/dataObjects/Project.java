@@ -1,5 +1,9 @@
 package org.effectively.dataObjects;
 
+/**
+ * The specification for a Project object
+ */
+
 class Project {
     private String name;
     private boolean active;

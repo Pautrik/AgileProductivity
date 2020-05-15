@@ -2,6 +2,10 @@ package org.effectively.dataObjects;
 
 import java.util.List;
 
+/**
+ * The specification for a Day object
+ */
+
 class Day {
     private String date;
     private List<Task> tasks;
