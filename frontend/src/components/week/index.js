@@ -133,6 +133,14 @@ class Week extends React.Component {
     });
   };
 
+  timeBlockDisplay() {
+    let d = new Date().getDay();
+    let weekDate = this.state.days[d].date;
+    let month = parseInt(weekDate.slice(4, 6));
+    let year = weekDate.slice(0, 4);
+    return yearMonths[month - 1] + " " + year;
+  }
+
   clickUp = () => {
     const newWeek = this.state.chosenWeek + 1;
     this.fetchWeekToState(2020, newWeek);
@@ -266,9 +274,7 @@ class Week extends React.Component {
                 />
               </div>
             </span>
-            <h1 style={{color: "grey"}}>
-              {this.getCurrentYearMonth() + " " + this.getCurrentYear()}
-            </h1>
+            <h1 Style="color: grey">{this.timeBlockDisplay()}</h1>
             <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
           </div>
           <div className="days">
