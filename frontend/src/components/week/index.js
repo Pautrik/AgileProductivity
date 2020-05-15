@@ -8,6 +8,8 @@ import { httpRequestJson } from "../../helpers/requests";
 import Backend from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
+import { ItemTypes } from "../../helpers/constants";
+
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
@@ -63,6 +65,7 @@ class Week extends React.Component {
     this.deleteTask = this.deleteTask.bind(this);
     this.addNote = this.addNote.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
+    this.moveTask = this.moveTask.bind(this);
   }
 
   componentDidMount() {
@@ -194,7 +197,31 @@ class Week extends React.Component {
     this.setState({ days: daysCopy });
   }
 
-  // Removes gaps in position
+  moveTask(source, destination) {
+    if(source.type === destination.type) {
+      if(source.type === ItemTypes.TASK) {
+        const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
+        const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
+        
+        const daysCopy = [...this.state.days];
+        daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
+        daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
+        daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
+        daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
+
+        const sourceTask = daysCopy[sourceIndex].tasks.find(task => task.position === source.item.position);
+        daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(task => task.position !== source.item.position);
+        this.correctPositions(daysCopy[sourceIndex].tasks);
+
+        daysCopy[destinationIndex].tasks.splice(destination.item.position, 0, sourceTask);
+        this.correctPositions(daysCopy[destinationIndex].tasks)
+
+        this.setState({ days: daysCopy });
+      }
+    }
+  }
+
+  // Removes gaps in position through modification
   correctPositions(arr) {
     arr.sort((a, b) => a.position - b.position);
     arr.forEach((x, i) => x.position = i);
@@ -265,11 +292,13 @@ class Week extends React.Component {
                 return (
                   <Day
                     todaysDay={this.getCurrentWeekDay()}
+                    timestamp={date}
                     dayDate={this.dateToDayConverter(this.state.days[i].date)}
                     dayName={x}
                     tasks={tasks}
                     addTask={(text) => this.addTask(text, date, i)}
                     deleteTask={(id) => this.deleteTask(id, i)}
+                    moveTask={(source, destination) => this.moveTask(source, destination)}
                   />
                 );
               })}
@@ -286,6 +315,7 @@ class Week extends React.Component {
               dayName="Notes"
               tasks={this.state.notes}
               addTask={this.addNote}
+              moveTask={(a, b) => {}}
               deleteTask={this.deleteNote}/>
           </div>
         </div>

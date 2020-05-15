@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.css";
-import Task from "../task";
+import Task from "../tasks";
 
 class Day extends React.Component {
   constructor(props) {
@@ -39,9 +39,12 @@ class Day extends React.Component {
         {this.props.tasks.map((x) => (
           <Task
             deleteTask={() => this.props.deleteTask(x.id)}
+            moveTask={(source, destination) => this.props.moveTask(source, destination)}
             id={x.id}
             taskText={x.text}
             status={x.state}
+            timestamp={this.props.timestamp}
+            position={x.position}
           />
         ))}
         {this.state.isEditing ? (

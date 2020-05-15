@@ -31,3 +31,7 @@
 .task:hover .x-button {
   visibility: visible;
 }
+
+.hovered {
+  height: 100px; /* Should maybe be switched to other measurement */
+}

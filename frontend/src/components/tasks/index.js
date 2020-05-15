@@ -5,9 +5,16 @@ import { ItemTypes } from "../../helpers/constants";
 
 class Task extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      isHoverTarget: false,
+    }
+  }
+
   render() {
     const { status, taskText, deleteTask } = this.props;
-    const { isDragging, connectDragSource, connectDropTarget } = this.props; // DnD injected props
+    const { isDragging, connectDragSource, connectDropTarget, hovered } = this.props; // DnD injected props
     let buttonText = "";
     let taskColor = "";
     if (status === 1) {
@@ -23,14 +30,17 @@ class Task extends React.Component {
 
     return connectDropTarget(
       connectDragSource(
-        <div className="task" style={{ backgroundColor: taskColor }}>
-          {(
-            <button onClick={deleteTask} className="x-button">
-              X
-            </button>
-          )}
-          {taskText}
-          {status && <button className="done-button">{buttonText}</button>}
+        <div>
+          {hovered && <div className="hovered"></div>}
+          <div className="task" style={{ backgroundColor: taskColor }}>
+            {(
+              <button onClick={deleteTask} className="x-button">
+                X
+              </button>
+            )}
+            {taskText}
+            {status && <button className="done-button">{buttonText}</button>}
+          </div>
         </div>
       )
     );
@@ -40,7 +50,7 @@ class Task extends React.Component {
 /* Stuff for DnD */
 const taskSource = {
   beginDrag: props => {
-    const item = { id: props.id };
+    const item = { timestamp: props.timestamp, position: props.position };
     return item;
   },
   endDrag: (props, monitor, component) => {
@@ -66,7 +76,10 @@ const targetTypes = [ ItemTypes.TASK ];
 const taskTarget = {
   drop: (props, monitor, component) => {
     console.log("Dropped on task");
-    console.dir(monitor.getItem());
+    const source = { item: monitor.getItem(), type: monitor.getItemType() };
+    const destination = { item: { timestamp: props.timestamp, position: props.position }, type: monitor.getItemType() }
+
+    props.moveTask(source, destination);
   },
 }
 
