@@ -9,7 +9,6 @@ class Day extends React.Component {
       isEditing: false,
     };
     this.taskTextRef = React.createRef();
-
     this.onTaskSubmit = this.onTaskSubmit.bind(this);
     this.enterEditMode = this.enterEditMode.bind(this);
   }
@@ -23,6 +22,7 @@ class Day extends React.Component {
     this.props.addTask(text);
     this.setState({ isEditing: false });
   }
+
   render() {
     return (
       <div className="day-box">
@@ -40,6 +40,7 @@ class Day extends React.Component {
             deleteTask={() => this.props.deleteTask(x.id)}
             taskText={x.text}
             status={x.state}
+            changeTaskState={() => this.props.changeTaskState(x.id)}
           />
         ))}
         {this.state.isEditing ? (

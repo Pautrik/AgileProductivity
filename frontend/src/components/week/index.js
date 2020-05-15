@@ -10,7 +10,7 @@ const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
 const getNotesEndpoint = "/notes?key=value";
 const postNotesEndpoint = "/notes?key=value";
-const deleteNotesEndpoint = id => `/notes?id=${id}`;
+const deleteNotesEndpoint = (id) => `/notes?id=${id}`;
 
 const weekDays = [
   "Monday",
@@ -70,8 +70,10 @@ class Week extends React.Component {
   fetchWeekToState(year, week) {
     httpRequestJson(weekEndpoint(year, week))
       .then((data) => {
-        data.forEach(day => day.tasks.sort((a,b) => a.position - b.position));
-        this.setState({ days: data })
+        data.forEach((day) =>
+          day.tasks.sort((a, b) => a.position - b.position)
+        );
+        this.setState({ days: data });
       })
       .catch((err) => {
         alert(err.message);
@@ -81,11 +83,11 @@ class Week extends React.Component {
 
   fetchNotesToState() {
     httpRequestJson(getNotesEndpoint)
-      .then(data => {
+      .then((data) => {
         data.sort((a, b) => a.position - b.position);
-        this.setState({ notes: data })
+        this.setState({ notes: data });
       })
-      .catch(err => {
+      .catch((err) => {
         alert(err.message);
         console.error(err);
       });
@@ -175,10 +177,9 @@ class Week extends React.Component {
   }
 
   deleteTask(id, dayIndex) {
-    httpRequestJson(deleteTaskEndpoint(id), { method: "DELETE" })
-      .catch(() =>
-        alert("Failed to delete task")
-      );
+    httpRequestJson(deleteTaskEndpoint(id), { method: "DELETE" }).catch(() =>
+      alert("Failed to delete task")
+    );
 
     const daysCopy = [...this.state.days];
     daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
@@ -194,13 +195,13 @@ class Week extends React.Component {
   // Removes gaps in position
   correctPositions(arr) {
     arr.sort((a, b) => a.position - b.position);
-    arr.forEach((x, i) => x.position = i);
+    arr.forEach((x, i) => (x.position = i));
   }
 
   addNote(text) {
     const newNote = {
       text,
-      position: this.state.notes.length
+      position: this.state.notes.length,
     };
 
     const requestOptions = {
@@ -210,20 +211,20 @@ class Week extends React.Component {
     };
 
     httpRequestJson(postNotesEndpoint, requestOptions)
-      .then(data => {
+      .then((data) => {
         newNote.id = data[0];
-        this.setState({ notes : [...this.state.notes, newNote] });
+        this.setState({ notes: [...this.state.notes, newNote] });
       })
       .catch(() => alert("Failed to create note"));
-
   }
 
   deleteNote(id) {
-    httpRequestJson(deleteNotesEndpoint(id), { method: "DELETE" })
-      .catch(() => alert("Failed to delete task"));
+    httpRequestJson(deleteNotesEndpoint(id), { method: "DELETE" }).catch(() =>
+      alert("Failed to delete task")
+    );
 
     const notesCopy = [...this.state.notes];
-    const noteIndex = notesCopy.findIndex(x => x.id === id);
+    const noteIndex = notesCopy.findIndex((x) => x.id === id);
     notesCopy.splice(noteIndex, 1);
 
     this.correctPositions(notesCopy);
@@ -235,6 +236,21 @@ class Week extends React.Component {
     let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
     return date;
   };
+
+  onChangeTaskState(taskId, i) {
+    let daysCopy = this.state.days;
+    const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
+    let newState;
+    if (state === 3) {
+      newState = 1;
+    } else {
+      newState = state + 1;
+    }
+
+    daysCopy[i].tasks.find((x) => x.id === taskId).state = newState;
+
+    this.setState({ days: daysCopy });
+  }
 
   render() {
     return (
@@ -266,6 +282,9 @@ class Week extends React.Component {
                   tasks={tasks}
                   addTask={(text) => this.addTask(text, date, i)}
                   deleteTask={(id) => this.deleteTask(id, i)}
+                  changeTaskState={(taskId) =>
+                    this.onChangeTaskState(taskId, i)
+                  }
                   key={JSON.stringify(this.state.days[i])}
                 />
               );
@@ -279,11 +298,12 @@ class Week extends React.Component {
           </div>
         </div>
         <div className="note-container">
-          <Day 
+          <Day
             dayName="Notes"
             tasks={this.state.notes}
             addTask={this.addNote}
-            deleteTask={this.deleteNote}/>
+            deleteTask={this.deleteNote}
+          />
         </div>
       </div>
     );
