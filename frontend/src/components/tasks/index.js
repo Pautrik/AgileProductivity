@@ -79,7 +79,7 @@ const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
 const taskTarget = {
   drop: (props, monitor, component) => {
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
-    const destination = { item: { timestamp: props.timestamp, position: props.position }, type: monitor.getItemType() }
+    const destination = { item: { timestamp: props.timestamp, position: props.position }, type: sourceType(props) }
 
     props.moveTask(source, destination);
   },

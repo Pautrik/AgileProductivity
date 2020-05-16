@@ -206,41 +206,75 @@ class Week extends React.Component {
     this.setState({ days: daysCopy });
   }
 
+  // Could definitely use some refactoring, uses way too much duplication but does the job
   moveTask(source, destination) {
-    if(source.type === destination.type) {
-      if(source.type === ItemTypes.TASK) {
-        const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
-        const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
-        
-        // Duplicates week, relevant days and their tasks
-        const daysCopy = [...this.state.days];
-        daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
-        daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
-        daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
-        daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
+    if(source.type === ItemTypes.TASK && destination.type === ItemTypes.TASK) {
+      const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
+      const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
+      
+      // Duplicates week, relevant days and their tasks
+      const daysCopy = [...this.state.days];
+      daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
+      daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
+      daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
+      daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
 
-        // Extracts source task
-        const sourceTask = daysCopy[sourceIndex].tasks.find(task => task.position === source.item.position);
-        // Removes source task from its origin
-        daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(task => task.position !== source.item.position);
-        // Remove positional gap after removal
-        this.correctPositions(daysCopy[sourceIndex].tasks);
+      // Extracts source task
+      const sourceTask = daysCopy[sourceIndex].tasks.find(task => task.position === source.item.position);
+      // Removes source task from its origin
+      daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(task => task.position !== source.item.position);
+      // Remove positional gap after removal
+      this.correctPositions(daysCopy[sourceIndex].tasks);
 
-        // Slots in source task into destination and shifts tasks position below
-        daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.item.position);
+      // Makes sure task has correct date to where it's positioned
+      sourceTask.date = daysCopy[destinationIndex].date;
 
-        this.setState({ days: daysCopy });
-      }
-      else if(source.type === ItemTypes.NOTE) {
-        // Extracts note and closes positional gap
-        let notesCopy = [ ...this.state.notes ];
-        const [ sourceNote ] = notesCopy.splice(source.item.position, 1);
-        this.correctPositions(notesCopy);
+      // Slots in source task into destination and shifts tasks position below
+      daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.item.position);
+      this.setState({ days: daysCopy });
+    }
+    else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.NOTE) {
+      // Extracts note and closes positional gap
+      let notesCopy = [ ...this.state.notes ];
+      const [ sourceNote ] = notesCopy.splice(source.item.position, 1);
+      this.correctPositions(notesCopy);
 
-        notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destination.item.position);
+      notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destination.item.position);
 
-        this.setState({ notes: notesCopy });
-      }
+      this.setState({ notes: notesCopy });
+    }
+    else if(source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
+      const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
+      
+      const daysCopy = [ ...this.state.days ];
+      daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
+      daysCopy[sourceIndex].tasks = [ ...daysCopy[sourceIndex].tasks ];
+
+      const [ sourceTask ] = daysCopy[sourceIndex].tasks.splice(source.item.position, 1);
+      let notesCopy = [ ...this.state.notes ];
+      // TODO get new id from Notes POST
+      const newNote = { id: sourceTask.id, position: destination.item.position, text: sourceTask.text };
+      notesCopy = this.insertAndShiftTask(notesCopy, newNote, destination.item.position);
+
+      this.setState({ days: daysCopy, notes: notesCopy });
+    }
+    else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.TASK) {
+      // Add date, state before insertion
+      
+      const notesCopy = [ ...this.state.notes ];
+      
+      const [ sourceNote ] = notesCopy.splice(source.item.position, 1);
+      
+      const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
+      const daysCopy = [ ...this.state.days ];
+      daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
+      daysCopy[destinationIndex].tasks = [ ...daysCopy[destinationIndex].tasks ];
+
+      // TODO get new id from Tasks POST
+      const newTask = { ...sourceNote, date: daysCopy[destinationIndex].date, state: 1 };
+      daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, newTask, destination.item.position);
+
+      this.setState({ days: daysCopy, notes: notesCopy });
     }
   }
 
