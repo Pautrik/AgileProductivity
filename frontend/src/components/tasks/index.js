@@ -15,7 +15,7 @@ class Task extends React.Component {
   render() {
     const { status, taskText, deleteTask } = this.props;
     const { isDragging, connectDragSource, connectDropTarget, hovered } = this.props; // DnD injected props
-    let buttonText = "";
+
     let taskColor = "";
     if (status === 1) {
       taskColor = "";
@@ -31,12 +31,12 @@ class Task extends React.Component {
         {hovered && <div className="hovered"></div>}
         <div className="task" style={{ backgroundColor: taskColor }}>
           {
-            <button onClick={this.props.deleteTask} className="x-button">
+            <button onClick={deleteTask} className="x-button">
               X
             </button>
           }
           {taskText}
-          {status && (
+          {status && ( // is a note if no status is found
             <button onClick={this.props.changeTaskState} className="done-button">
               &#10004;
             </button>
@@ -47,6 +47,8 @@ class Task extends React.Component {
     );
   }
 }
+
+const sourceType = props => props.status ? ItemTypes.TASK : ItemTypes.NOTE;
 
 /* Stuff for DnD */
 const taskSource = {
@@ -72,11 +74,10 @@ const collectSource = (connect, monitor) => ({
   isDragging: monitor.isDragging(),
 })
 
-const targetTypes = [ ItemTypes.TASK ];
+const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
 
 const taskTarget = {
   drop: (props, monitor, component) => {
-    console.log("Dropped on task");
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
     const destination = { item: { timestamp: props.timestamp, position: props.position }, type: monitor.getItemType() }
 
@@ -90,4 +91,4 @@ const collectTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 });
 
-export default DragSource(ItemTypes.TASK, taskSource, collectSource)(DropTarget(targetTypes, taskTarget, collectTarget)(Task));
+export default DragSource(sourceType, taskSource, collectSource)(DropTarget(targetTypes, taskTarget, collectTarget)(Task));

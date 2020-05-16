@@ -33,7 +33,7 @@
 }
 
 .hovered {
-  height: 100px; /* Should maybe be switched to other measurement */
+  height: 80px; /* Should maybe be switched to other measurement */
 }
 .span {
   content: "\2715";

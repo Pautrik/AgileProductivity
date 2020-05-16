@@ -212,20 +212,34 @@ class Week extends React.Component {
         const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
         const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
         
+        // Duplicates week, relevant days and their tasks
         const daysCopy = [...this.state.days];
         daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
         daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
         daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
         daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
 
+        // Extracts source task
         const sourceTask = daysCopy[sourceIndex].tasks.find(task => task.position === source.item.position);
+        // Removes source task from its origin
         daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(task => task.position !== source.item.position);
+        // Remove positional gap after removal
         this.correctPositions(daysCopy[sourceIndex].tasks);
 
-        daysCopy[destinationIndex].tasks.splice(destination.item.position, 0, sourceTask);
-        this.correctPositions(daysCopy[destinationIndex].tasks)
+        // Slots in source task into destination and shifts tasks position below
+        daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.item.position);
 
         this.setState({ days: daysCopy });
+      }
+      else if(source.type === ItemTypes.NOTE) {
+        // Extracts note and closes positional gap
+        let notesCopy = [ ...this.state.notes ];
+        const [ sourceNote ] = notesCopy.splice(source.item.position, 1);
+        this.correctPositions(notesCopy);
+
+        notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destination.item.position);
+
+        this.setState({ notes: notesCopy });
       }
     }
   }
@@ -234,6 +248,14 @@ class Week extends React.Component {
   correctPositions(arr) {
     arr.sort((a, b) => a.position - b.position);
     arr.forEach((x, i) => (x.position = i));
+  }
+
+  insertAndShiftTask(tasks, newTask, newPos) {
+    const firstPart = tasks.slice(0, newPos);
+    const secondPart = tasks.slice(newPos, tasks.length)
+      .map(x => ({ ...x, position: x.position + 1 }));
+    
+    return [...firstPart, { ...newTask, position: newPos }, ...secondPart];
   }
 
   addNote(text) {
@@ -305,7 +327,7 @@ class Week extends React.Component {
                   />
                 </div>
               </span>
-              <h1 Style="color: grey">{this.timeBlockDisplay()}</h1>
+              <h1 style={{color: "grey"}}>{this.timeBlockDisplay()}</h1>
               <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
             </div>
             <div className="days">
@@ -342,7 +364,7 @@ class Week extends React.Component {
               tasks={this.state.notes}
               addTask={this.addNote}
               deleteTask={this.deleteNote}
-              moveTask={(a,b) => {}}
+              moveTask={this.moveTask}
             />
           </div>
         </div>
