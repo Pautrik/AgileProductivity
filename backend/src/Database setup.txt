@@ -16,8 +16,7 @@ CREATE TABLE TimelineTasks (
     endDate VARCHAR(8) NOT NULL,
 	state INT NOT NULL,
 	project TEXT NOT NULL,
-	FOREIGN KEY (project) REFERENCES Projects (name),
-	UNIQUE(position,startDate),
+	UNIQUE(position),
 	CHECK (state>0 AND state<4)
 );
 
@@ -118,5 +117,22 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER cascadeNotes BEFORE INSERT ON Notes
   FOR EACH ROW EXECUTE FUNCTION cascadeNotes();
 
+
+
+
+CREATE OR REPLACE FUNCTION addproject()
+  RETURNS trigger AS
+$$
+BEGIN
+	INSERT INTO Projects
+    SELECT project, true
+    FROM TimelineTasks
+    WHERE project NOT IN(SELECT name FROM Projects);
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER addproject AFTER INSERT ON TimelineTasks
+EXECUTE FUNCTION addproject();
 
 
