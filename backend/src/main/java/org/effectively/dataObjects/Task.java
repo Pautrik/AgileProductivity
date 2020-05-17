@@ -3,6 +3,10 @@ package org.effectively.dataObjects;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The specification for a Task object
+ */
+
 class Task {
     @SerializedName("id")
     @Expose

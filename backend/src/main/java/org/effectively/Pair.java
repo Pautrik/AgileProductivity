@@ -1,5 +1,12 @@
 package org.effectively;
 
+/**
+ * The specification of a generic Pair object that stores two parameters
+ *
+ * @param <F> The pair's first parameter
+ * @param <S> The pair's second parameter
+ */
+
 public class Pair <F,S> {
     private F first;
     private S second;

@@ -106,4 +106,25 @@ what is my contribution towards the team’s use of Scrum?
 what is my contribution towards the team’s deliveries?
   I have made a fuction to return ID of new objects when they are created so that 
   they can be deleted without update of the page.
+  
+  Week 6:
+  
+ What do I want to learn or understand better?
+  How to work with css and design a web page, next week the backend has no more user 
+  stories for the MVP so i will have to learn how to work wit design to contribute.
+  
+how can I help someone else, or the entire team, to learn something new?
+  I can help the others by knowing how the storage of data in the databes is working.
+  
+what is my contribution towards the team’s use of Scrum?
+ I took initiative to update our time writing excel sheet to be able to better compare spent
+ time in the project with our velocity for each week. By doing this we have the opputunity
+ to furthure eveluate how effectively we have worked each week and help eachother if 
+ someone has to spend exessive amounts of time on something.
+ 
+  
+what is my contribution towards the team’s deliveries?
+  I  fixes tiggers for cascadeing anc collapsing objects in tasks and notes tables 
+  to make it possible to inser and delete object in the middle of the lists.
+  This  makes it possible to implement a drag and drop system.
 
