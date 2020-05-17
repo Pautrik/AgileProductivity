@@ -27,9 +27,9 @@ class Task extends React.Component {
 
     return connectDropTarget(
       connectDragSource(
-      <div>
+      <div style={isDragging ? { display: "none" } : {}}>
         {hovered && <div className="hovered"></div>}
-        <div className="task" style={{ backgroundColor: taskColor }}>
+        <div className="task" style={{ backgroundColor: taskColor}}>
           {
             <button onClick={deleteTask} className="x-button">
               X
@@ -56,17 +56,6 @@ const taskSource = {
     const item = { timestamp: props.timestamp, position: props.position };
     return item;
   },
-  endDrag: (props, monitor, component) => {
-    if (!monitor.didDrop()) {
-      return;
-    }
-
-    // When dropped on a compatible target, do something
-    const item = monitor.getItem();
-    const dropResult = monitor.getDropResult();
-    /* Move task in state */
-    // CardActions.moveCardToList(item.id, dropResult.listId)
-  }
 }
 
 const collectSource = (connect, monitor) => ({
