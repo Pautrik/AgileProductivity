@@ -90,3 +90,41 @@ what is my contribution towards the team’s deliveries?
   Together with the rest of the backend group I added functionallity to add Tasks to the database 
   and also code to be able to fetch tasks from a specific week by sending week and year from frontend. 
 
+Week 5:
+
+What do I want to learn or understand better?
+  How to set up a server in differnet ways. And continuing to learn about REST API.  
+  
+how can I help someone else, or the entire team, to learn something new?
+  I can help them with scrum theory since i have read about burn down charts and how 
+  they do code reviews at google.
+  
+what is my contribution towards the team’s use of Scrum?
+  I did a burn down chart for velocity and planning, set up definition of done and code 
+  review method description in trello.
+  
+what is my contribution towards the team’s deliveries?
+  I have made a fuction to return ID of new objects when they are created so that 
+  they can be deleted without update of the page.
+  
+  Week 6:
+  
+ What do I want to learn or understand better?
+  How to work with css and design a web page, next week the backend has no more user 
+  stories for the MVP so i will have to learn how to work wit design to contribute.
+  
+how can I help someone else, or the entire team, to learn something new?
+  I can help the others by knowing how the storage of data in the databes is working.
+  
+what is my contribution towards the team’s use of Scrum?
+ I took initiative to update our time writing excel sheet to be able to better compare spent
+ time in the project with our velocity for each week. By doing this we have the opputunity
+ to furthure eveluate how effectively we have worked each week and help eachother if 
+ someone has to spend exessive amounts of time on something.
+ 
+  
+what is my contribution towards the team’s deliveries?
+  I  fixes tiggers for cascadeing anc collapsing objects in tasks and notes tables 
+  to make it possible to inser and delete object in the middle of the lists.
+  This  makes it possible to implement a drag and drop system.
+
