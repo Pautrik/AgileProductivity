@@ -52,8 +52,9 @@ class Week extends React.Component {
       ],
 
       notes: [],
-
       chosenWeek: this.getCurrentWeekNum(),
+      year: this.getCurrentYear(),
+      ISOWeek: this.getISOWeek(this.getCurrentWeekNum(),this.getCurrentYear()),
     };
 
     this.addTask = this.addTask.bind(this);
@@ -98,7 +99,6 @@ class Week extends React.Component {
     let yr = new Date().getFullYear();
     let tdt = new Date(`January 4, ${yr}   01:15:00`);
     return (
-      1 +
       Math.round(
         ((yr2.getTime() - tdt.getTime()) / 86400000 -
           3 +
@@ -142,20 +142,36 @@ class Week extends React.Component {
   }
 
   clickUp = () => {
+    var newYear = this.state.year;
+    const newISO = this.getISOWeek(this.state.chosenWeek + 1,this.state.year);
     const newWeek = this.state.chosenWeek + 1;
+    if (newISO == this.weeksInYear(this.state.year)){
+      newYear = this.state.year + 1;
+    }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
+      ISOWeek: newISO,
+      year: newYear,
       chosenWeek: newWeek,
     });
   };
 
   clickDown = () => {
+    var newYear = this.state.year;
+    const newISO = this.getISOWeek(this.state.chosenWeek - 1,this.state.year);
     const newWeek = this.state.chosenWeek - 1;
+    if (newISO == 1){
+      newYear = this.state.year - 1;
+    }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
+      ISOWeek: newISO,
+      year: newYear,
       chosenWeek: newWeek,
     });
   };
+
+
 
   addTask(text, date, dayIndex) {
     const newTask = {
@@ -260,6 +276,48 @@ class Week extends React.Component {
     this.setState({ days: daysCopy });
   }
 
+  weeksInYear(year){
+    const longyears = [2009,2015,2020,2026,2032,2037];
+    var weeksInYear
+    console.log(year);
+    if (longyears.includes(year)){
+      return 53;
+    }
+    return 52;
+  }
+
+  getISOWeek(value, year){
+    console.log(year);
+    if (this.weeksInYear(year) == 53){
+      // console.log(weeksInYear);
+      if (value%53 == 0){
+        return this.weeksInYear(year);
+      }
+      if (value > 0){
+        if (value%53 == 0){
+          return this.weeksInYear(year);
+        }
+        return value%53;
+      }
+      else{
+        return (53) - (Math.abs((value)%53));
+      }
+    }
+
+    else{
+       //console.log(weeksInYear);
+       if (value > 0){
+         if (value%52 == 0){
+           return 52;
+         }
+         return value%52;
+       }
+       else{
+         return (52) - (Math.abs((value)%52));
+       }
+    }
+  }
+
   render() {
     return (
       <div className="week-view">
@@ -271,6 +329,7 @@ class Week extends React.Component {
                   handleClickUp={this.clickUp}
                   handleClickDown={this.clickDown}
                   value={this.state.chosenWeek}
+                  week={this.state.ISOWeek}
                 />
               </div>
             </span>

@@ -5,13 +5,12 @@ import Arrow from "../arrow";
 class NumberSelector2 extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
   render() {
     return (
       <div className="numberSelector2">
         <span>Week</span>
-        <div className={"numberSelectorBox"}>{this.props.value}</div>
+        <div className={"numberSelectorBox"}>{this.props.week}</div>
         <div className="buttonBox">
           <button onClick={this.props.handleClickUp} className="button">
             <Arrow direction="up" />
