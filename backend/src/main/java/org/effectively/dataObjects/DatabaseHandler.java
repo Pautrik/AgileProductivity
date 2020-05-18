@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.Date;
 
 public class DatabaseHandler {
-    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo";
+    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
     private final String user = "pi";
     private final Gson gson = new Gson();
     private Connection conn;
@@ -164,7 +164,7 @@ public class DatabaseHandler {
      */
     private void updateObject(String objects, String viewname){
         PreparedStatement stmt;
-
+        System.out.println(objects);
 
         try{
             if(viewname.equals("week")){
@@ -202,6 +202,7 @@ public class DatabaseHandler {
                     stmt.setString(2, note.getText());
                     stmt.setInt(3, note.getId());
 
+                    System.out.println(stmt);
                     stmt.executeUpdate();
                 }
             }
