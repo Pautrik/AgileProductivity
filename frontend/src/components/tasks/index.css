@@ -31,3 +31,10 @@
 .task:hover .x-button {
   visibility: visible;
 }
+
+.hovered {
+  height: 80px; /* Should maybe be switched to other measurement */
+}
+.span {
+  content: "\2715";
+}

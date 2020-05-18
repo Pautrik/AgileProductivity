@@ -1,6 +1,9 @@
 import React from "react";
 import "./index.css";
+import { DropTarget } from "react-dnd";
+
 import Task from "../tasks";
+import { ItemTypes } from "../../helpers/constants";
 
 class Day extends React.Component {
   constructor(props) {
@@ -9,7 +12,6 @@ class Day extends React.Component {
       isEditing: false,
     };
     this.taskTextRef = React.createRef();
-
     this.onTaskSubmit = this.onTaskSubmit.bind(this);
     this.enterEditMode = this.enterEditMode.bind(this);
   }
@@ -23,27 +25,33 @@ class Day extends React.Component {
     this.props.addTask(text);
     this.setState({ isEditing: false });
   }
+
   render() {
-    return (
+    return this.props.connectDropTarget(
       <div className="day-box">
         <h2>
           {this.props.dayName}
           {this.props.dayDate && this.props.dayName === this.props.todaysDay ? (
-            <p Style="color:red">{this.props.dayDate}</p>
+            <p style={{color: "red"}}>{this.props.dayDate}</p>
           ) : (
             <p>{this.props.dayDate}</p>
           )}
         </h2>
-
         {this.props.tasks.map((x) => (
           <Task
+            key={`${x.id}`}
             deleteTask={() => this.props.deleteTask(x.id)}
+            moveTask={(source, destination) => this.props.moveTask(source, destination)}
+            id={x.id}
             taskText={x.text}
             status={x.state}
+            timestamp={this.props.timestamp}
+            position={x.position}
+            changeTaskState={() => this.props.changeTaskState(x.id)}
           />
         ))}
         {this.state.isEditing ? (
-          <div className="form-area">
+          <div className="form-area" style={this.props.hovered ? { marginTop: "80px" } : {}}>
             <div
               className="text-area"
               contentEditable
@@ -59,7 +67,7 @@ class Day extends React.Component {
             </div>
           </div>
         ) : (
-          <button onClick={this.enterEditMode} className="add-task-button">
+          <button onClick={this.enterEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
             +
           </button>
         )}
@@ -68,4 +76,20 @@ class Day extends React.Component {
   }
 }
 
-export default Day;
+const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
+
+const dayTarget = {
+  drop: (props, monitor, component) => {
+    const source = { item: monitor.getItem(), type: monitor.getItemType() };
+    const destination = { item: { timestamp: props.timestamp, position: props.tasks.length }, type: props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE };
+
+    props.moveTask(source, destination);
+  }
+}
+
+const collectTarget = (connect, monitor) => ({
+  hovered: monitor.isOver({ shallow: true }),
+  connectDropTarget: connect.dropTarget(),
+})
+
+export default DropTarget(targetTypes, dayTarget, collectTarget)(Day);

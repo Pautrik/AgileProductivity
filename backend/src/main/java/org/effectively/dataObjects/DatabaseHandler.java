@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.Date;
 
 public class DatabaseHandler {
-    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo";
+    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
     private final String user = "pi";
     private final Gson gson = new Gson();
     private Connection conn;
@@ -63,6 +63,9 @@ public class DatabaseHandler {
         }
         else if(param.getFirst().equals("Delete")){
             removeObject(param.getSecond(), context);
+        }
+        else if(param.getFirst().equals("Patch")){
+            updateObject(param.getSecond(), context);
         }
 
         List<String> jsonArray = new ArrayList<>();
@@ -153,6 +156,61 @@ public class DatabaseHandler {
 
         return returnData;
     }*/
+
+    /**
+     *
+     * @param objects, the JSON of either a Week, Timeline or Note
+     * @param viewname, the name of the view from which the task is to be removed
+     */
+    private void updateObject(String objects, String viewname){
+        PreparedStatement stmt;
+        System.out.println(objects);
+
+        try{
+            if(viewname.equals("week")){
+                Task[] tasks = gson.fromJson(objects, Task[].class);
+                for(Task task : tasks){
+                    stmt = conn.prepareStatement("UPDATE Tasks SET position = ? , description = ? , assignedDate = ? , state = ? WHERE id = ?");
+                    stmt.setInt(1, task.getPosition());
+                    stmt.setString(2, task.getText());
+                    stmt.setString(3, task.getDate());
+                    stmt.setInt(4, task.getState());
+                    stmt.setInt(5, task.getId());
+
+                    stmt.executeUpdate();
+                }
+            } else if(viewname.equals("timeline")){
+                TimelineTask[] timelineTasks = gson.fromJson(objects, TimelineTask[].class);
+                for(TimelineTask timelineTask : timelineTasks){
+                    stmt = conn.prepareStatement("UPDATE Timelinetasks SET position = ? , description = ? , startDate = ? , endDate = ? " +
+                            ", state = ? , project = ? WhHERE id = ?");
+                    stmt.setInt(1, timelineTask.getPosition());
+                    stmt.setString(2, timelineTask.getText());
+                    stmt.setString(3, timelineTask.getDate());
+                    stmt.setString(4, timelineTask.getEndDate());
+                    stmt.setInt(5, timelineTask.getState());
+                    stmt.setString(6, timelineTask.getProjectName());
+                    stmt.setInt(7, timelineTask.getId());
+
+                    stmt.executeUpdate();
+                }
+            } else if(viewname.equals("note")){
+                Note[] notes = gson.fromJson(objects, Note[].class);
+                for(Note note : notes){
+                    stmt = conn.prepareStatement("UPDATE Notes SET position = ? , description = ? WHERE id = ?");
+                    stmt.setInt(1, note.getPosition());
+                    stmt.setString(2, note.getText());
+                    stmt.setInt(3, note.getId());
+
+                    System.out.println(stmt);
+                    stmt.executeUpdate();
+                }
+            }
+        } catch (SQLException s) {
+            s.printStackTrace();
+        }
+    }
+
 
     /**
      *
