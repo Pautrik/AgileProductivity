@@ -54,6 +54,7 @@ class Week extends React.Component {
       notes: [],
       chosenWeek: this.getCurrentWeekNum(),
       year: this.getCurrentYear(),
+      longyear: 0,
       ISOWeek: this.getISOWeek(this.getCurrentWeekNum(),this.getCurrentYear()),
     };
 
@@ -143,31 +144,42 @@ class Week extends React.Component {
 
   clickUp = () => {
     var newYear = this.state.year;
-    const newISO = this.getISOWeek(this.state.chosenWeek + 1,this.state.year);
+    const newISO = this.getISOWeek(this.state.chosenWeek + 1 - this.state.longyear,this.state.year);
     const newWeek = this.state.chosenWeek + 1;
+    var newLongyear = this.state.longyear;
     if (newISO == this.weeksInYear(this.state.year)){
       newYear = this.state.year + 1;
+      if (this.weeksInYear(this.state.year) == 53){
+        newLongyear = newLongyear = this.state.longyear + 1;
+      }
     }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
       ISOWeek: newISO,
       year: newYear,
       chosenWeek: newWeek,
+      longyear: newLongyear,
     });
   };
 
   clickDown = () => {
     var newYear = this.state.year;
-    const newISO = this.getISOWeek(this.state.chosenWeek - 1,this.state.year);
+    const newISO = this.getISOWeek(this.state.chosenWeek - 1 - this.state.longyear,this.state.year);
     const newWeek = this.state.chosenWeek - 1;
+    var newLongyear = this.state.longyear;
     if (newISO == 1){
       newYear = this.state.year - 1;
+      if (this.weeksInYear(this.state.year) == 53 && this.weeksInYear(newYear) == 52){
+        newLongyear = newLongyear = this.state.longyear - 1;
+      }
+      // newLongyear = this.state.longyear - 1;
     }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
       ISOWeek: newISO,
       year: newYear,
       chosenWeek: newWeek,
+      longyear: newLongyear,
     });
   };
 
