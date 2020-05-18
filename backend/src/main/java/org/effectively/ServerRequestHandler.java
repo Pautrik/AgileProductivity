@@ -75,7 +75,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         String body = null;
         try{
             InputStream bodyAsStream= httpExchange.getRequestBody();
-            body = new BufferedReader(new InputStreamReader(bodyAsStream, "ISO-8859-1"))
+            body = new BufferedReader(new InputStreamReader(bodyAsStream))
                     .lines().collect(Collectors.joining("\n"));
             bodyAsStream.close();
         }
@@ -121,6 +121,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         //Request the wanted data from DatabaseHandler
         String jsonResponse = handler.requestData(requestParamValue);
 
+        httpExchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
         httpExchange.sendResponseHeaders(200, jsonResponse.getBytes().length);
         outputStream.write(jsonResponse.getBytes());
         outputStream.flush();
