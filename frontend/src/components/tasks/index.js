@@ -1,38 +1,85 @@
 import "./index.css";
 import React from "react";
+import { DragSource, DropTarget } from "react-dnd";
+import { ItemTypes } from "../../helpers/constants";
 
 class Task extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isHoverTarget: false,
+    }
+  }
+
   render() {
-    const { status, taskText } = this.props;
-    let buttonText = "";
+    const { status, taskText, deleteTask } = this.props;
+    const { isDragging, connectDragSource, connectDropTarget, hovered } = this.props; // DnD injected props
+
     let taskColor = "";
     let doneButtonColor = "";
     if (status === 1) {
-      buttonText = "To do";
       taskColor = "";
       doneButtonColor = "";
     } else if (status === 2) {
-      buttonText = "Completed";
-      taskColor = "hsl(120, 100%, 85%)";
-      doneButtonColor = "hsl(120, 60%, 50%)";
+      taskColor = "hsl(49, 69%, 73%)";
     } else if (status === 3) {
-      buttonText = "Archived";
-      taskColor = "hsl(0, 0%, 95%)";
-      doneButtonColor = "hsl(0, 0%, 70%)";
+      taskColor = "hsl(93, 69%, 73%)";
     }
 
-    return (
-      <div className="task" style={{ backgroundColor: taskColor }}>
-        {(
-          <button onClick={this.props.deleteTask} className="x-button">
-            X
-          </button>
-        )}
-        {taskText}
-        {status && <button className="done-button" style={{ backgroundColor: doneButtonColor }}>{buttonText}</button>}
+    return connectDropTarget(
+      connectDragSource(
+      <div style={isDragging ? { display: "none" } : {}}>
+        {hovered && <div className="hovered"></div>}
+        <div className="task" style={{ backgroundColor: taskColor}}>
+          {
+            <button onClick={deleteTask} className="x-button">
+              X
+            </button>
+          }
+          {taskText}
+          {status && ( // is a note if no status is found
+            <button onClick={this.props.changeTaskState} className="done-button">
+              &#10004;
+            </button>
+          )}
+        </div>
       </div>
+      )
     );
   }
 }
 
-export default Task;
+const sourceType = props => props.status ? ItemTypes.TASK : ItemTypes.NOTE;
+
+/* Stuff for DnD */
+const taskSource = {
+  beginDrag: props => {
+    const item = { timestamp: props.timestamp, position: props.position };
+    return item;
+  },
+}
+
+const collectSource = (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  isDragging: monitor.isDragging(),
+})
+
+const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
+
+const taskTarget = {
+  drop: (props, monitor, component) => {
+    const source = { item: monitor.getItem(), type: monitor.getItemType() };
+    const destination = { item: { timestamp: props.timestamp, position: props.position }, type: sourceType(props) }
+
+    props.moveTask(source, destination);
+  },
+}
+
+const collectTarget = (connect, monitor) => ({
+  highlighted: monitor.canDrop(),
+  hovered: monitor.isOver(),
+  connectDropTarget: connect.dropTarget(),
+});
+
+export default DragSource(sourceType, taskSource, collectSource)(DropTarget(targetTypes, taskTarget, collectTarget)(Task));

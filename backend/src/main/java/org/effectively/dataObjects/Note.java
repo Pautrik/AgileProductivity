@@ -6,6 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The specification for a Note object
+ */
+
 class Note{
     @SerializedName("id")
     @Expose
