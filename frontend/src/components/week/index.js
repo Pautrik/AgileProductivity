@@ -59,7 +59,7 @@ class Week extends React.Component {
       notes: [],
       chosenWeek: this.getCurrentWeekNum(),
       year: this.getCurrentYear(),
-      longyear: 0,
+      // longyear: 0,
       ISOWeek: this.getISOWeek(this.getCurrentWeekNum(),this.getCurrentYear()),
     };
 
@@ -106,6 +106,7 @@ class Week extends React.Component {
     let yr = new Date().getFullYear();
     let tdt = new Date(`January 4, ${yr}   01:15:00`);
     return (
+      1 +
       Math.round(
         ((yr2.getTime() - tdt.getTime()) / 86400000 -
           3 +
@@ -134,9 +135,13 @@ class Week extends React.Component {
 
   SetCurrentWeekState = () => {
     const newWeek = this.getCurrentWeekNum();
+    const newISOWeek = this.getISOWeek(this.getCurrentWeekNum(),this.getCurrentYear());
+    const newYear = this.getCurrentYear();
     this.fetchWeekToState(2020, newWeek);
     this.setState({
+      ISOWeek: newISOWeek,
       chosenWeek: newWeek,
+      year: newYear,
     });
   };
 
@@ -149,43 +154,63 @@ class Week extends React.Component {
   }
 
   clickUp = () => {
+    console.log(this.state.year);
+    // console.log(this.state.longyear);
+    console.log(this.state.ISOWeek);
+
+
     var newYear = this.state.year;
-    const newISO = this.getISOWeek(this.state.chosenWeek + 1 - this.state.longyear,this.state.year);
+    var newISO = this.getISOWeek(this.state.chosenWeek + 1,this.state.year);
     const newWeek = this.state.chosenWeek + 1;
-    var newLongyear = this.state.longyear;
-    if (newISO == this.weeksInYear(this.state.year)){
+    // var newLongyear = this.state.longyear;
+    if (this.state.ISOWeek == 53){
+      newISO = newISO + 1;
+    }
+    if (this.state.ISOWeek == 52 && this.weeksInYear(this.state.year) == 52){
+      newISO = newISO + 1;
+    }
+    if (newISO == 1){
       newYear = this.state.year + 1;
-      if (this.weeksInYear(this.state.year) == 53){
-        newLongyear = newLongyear = this.state.longyear + 1;
-      }
+      // if (this.weeksInYear(this.state.year) == 53){
+      //   // newLongyear = newLongyear = this.state.longyear + 1;
+      // }
     }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
       ISOWeek: newISO,
       year: newYear,
       chosenWeek: newWeek,
-      longyear: newLongyear,
+      // longyear: newLongyear,
     });
   };
 
   clickDown = () => {
+    console.log(this.state.year);
+    // console.log(this.state.longyear);
+    console.log(this.state.ISOWeek);
+
     var newYear = this.state.year;
-    const newISO = this.getISOWeek(this.state.chosenWeek - 1 - this.state.longyear,this.state.year);
+    var newISO = this.getISOWeek(this.state.chosenWeek - 1,this.state.year);
     const newWeek = this.state.chosenWeek - 1;
-    var newLongyear = this.state.longyear;
-    if (newISO == 1){
+    // var newLongyear = this.state.longyear;
+    if (this.state.ISOWeek == 1){
       newYear = this.state.year - 1;
-      if (this.weeksInYear(this.state.year) == 53 && this.weeksInYear(newYear) == 52){
-        newLongyear = newLongyear = this.state.longyear - 1;
+      if (this.weeksInYear(newYear) == 53){
+        newISO = 53;
       }
-      // newLongyear = this.state.longyear - 1;
+      else{
+        // newISO = 52;
+      }
+      // if (this.weeksInYear(newYear - 1) == 53)
+        // newLongyear = this.state.longyear - 1;
+        // newISO = 53;
     }
     this.fetchWeekToState(2020, newWeek);
     this.setState({
       ISOWeek: newISO,
       year: newYear,
       chosenWeek: newWeek,
-      longyear: newLongyear,
+      // longyear: newLongyear,
     });
   };
 
@@ -389,7 +414,6 @@ class Week extends React.Component {
   weeksInYear(year){
     const longyears = [2009,2015,2020,2026,2032,2037];
     var weeksInYear
-    console.log(year);
     if (longyears.includes(year)){
       return 53;
     }
@@ -397,35 +421,44 @@ class Week extends React.Component {
   }
 
   getISOWeek(value, year){
-    console.log(year);
+    var addweek = 0;
     if (this.weeksInYear(year) == 53){
-      // console.log(weeksInYear);
-      if (value%53 == 0){
-        return this.weeksInYear(year);
-      }
-      if (value > 0){
-        if (value%53 == 0){
-          return this.weeksInYear(year);
-        }
-        return value%53;
-      }
-      else{
-        return (53) - (Math.abs((value)%53));
-      }
+      addweek = 1
     }
-
+    if (value > 0){
+      return (value%(53 + addweek));
+    }
     else{
-       //console.log(weeksInYear);
-       if (value > 0){
-         if (value%52 == 0){
-           return 52;
-         }
-         return value%52;
-       }
-       else{
-         return (52) - (Math.abs((value)%52));
-       }
+      return (53) - (Math.abs((value)%(53+ addweek)));
     }
+    // if (this.weeksInYear(year) == 53){
+    //   // console.log(weeksInYear);
+    //   if (value%53 == 0){
+    //     return this.weeksInYear(year);
+    //   }
+    //   if (value > 0){
+    //     if (value%53 == 0){
+    //       return this.weeksInYear(year);
+    //     }
+    //     return value%53;
+    //   }
+    //   else{
+    //     return (53) - (Math.abs((value)%53));
+    //   }
+    // }
+    //
+    // else{
+    //    //console.log(weeksInYear);
+    //    if (value > 0){
+    //      if (value%52 == 0){
+    //        return 52;
+    //      }
+    //      return value%52;
+    //    }
+    //    else{
+    //      return (52) - (Math.abs((value)%52));
+    //    }
+    // }
   }
 
   render() {
