@@ -121,7 +121,8 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
         //Request the wanted data from DatabaseHandler
         String jsonResponse = handler.requestData(requestParamValue);
 
-        httpExchange.sendResponseHeaders(200, jsonResponse.length());
+        httpExchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+        httpExchange.sendResponseHeaders(200, jsonResponse.getBytes().length);
         outputStream.write(jsonResponse.getBytes());
         outputStream.flush();
         outputStream.close();
