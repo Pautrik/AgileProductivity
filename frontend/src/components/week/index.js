@@ -393,7 +393,7 @@ class Week extends React.Component {
   };
 
   onChangeTaskState(taskId, i) {
-    let daysCopy = this.state.days;
+    let daysCopy = [...this.state.days];
     const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
     let newState;
     if (state === 3) {
