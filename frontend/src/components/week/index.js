@@ -225,6 +225,8 @@ class Week extends React.Component {
       daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
 
       const [sourceTask] = daysCopy[sourceIndex].tasks.splice(source.item.position, 1);
+      
+      this.correctPositions(daysCopy[sourceIndex].tasks);
       let notesCopy = [...this.state.notes];
       // TODO get new id from Notes POST
       const newNote = { id: sourceTask.id, position: destination.item.position, text: sourceTask.text };
@@ -238,6 +240,7 @@ class Week extends React.Component {
       const notesCopy = [...this.state.notes];
 
       const [sourceNote] = notesCopy.splice(source.item.position, 1);
+      this.correctPositions(notesCopy);
 
       const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
       const daysCopy = [...this.state.days];
