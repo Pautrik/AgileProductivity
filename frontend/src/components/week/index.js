@@ -13,6 +13,7 @@ import { ItemTypes } from "../../helpers/constants";
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
+const patchTaskEndpoint = "/week?key=value";
 const getNotesEndpoint = "/notes?key=value";
 const postNotesEndpoint = "/notes?key=value";
 const deleteNotesEndpoint = (id) => `/notes?id=${id}`;
@@ -259,8 +260,35 @@ class Week extends React.Component {
     sourceTask.date = daysCopy[destinationIndex].date;
 
     // Slots in source task into destination and shifts tasks position below
-    daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.position);
+    const newDayTasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.position);
+    daysCopy[destinationIndex].tasks = newDayTasks;
     this.setState({ days: daysCopy });
+
+    let patchBody;
+    if(source.date === destination.date) {
+      patchBody = daysCopy[sourceIndex].tasks.filter((_, i) => 
+        i >= Math.min(source.position, destination.position));
+
+        // Weird backend specific clause
+        if(source.position < destination.position) {
+          const patchDestinationIndex = patchBody.findIndex(x => x.id === sourceTask.id);
+          patchBody[patchDestinationIndex] = { ...patchBody[patchDestinationIndex], position: patchBody[patchDestinationIndex].position+1 };
+        }
+    }
+    else {
+      const sourcePatchBody = daysCopy[sourceIndex].tasks.filter((_, i) => i >= source.position);
+      const destinationPatchBody = daysCopy[destinationIndex].tasks.filter((_, i) => i >= destination.position);
+      patchBody = [...sourcePatchBody, ...destinationPatchBody];
+    }
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patchBody),
+    };
+
+    httpRequestJson(patchTaskEndpoint, requestOptions)
+      .catch(() => alert("Failed to move task"));
   }
 
   moveNote(sourcePosition, destinationPosition) {
