@@ -163,12 +163,13 @@ class Week extends React.Component {
     });
   };
 
-  addTask(text, date, dayIndex) {
+  addTask(text, date, dayIndex, position = undefined) {
+    const pos = position || this.state.days[dayIndex].tasks.length;
     const newTask = {
       text,
       date,
       state: 1,
-      position: this.state.days[dayIndex].tasks.length,
+      position: pos
     };
 
     const requestOptions = {
@@ -181,11 +182,21 @@ class Week extends React.Component {
     const daysCopy = [...this.state.days];
     daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
     daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    if(position === undefined) {
+      daysCopy[dayIndex].tasks.push(newTask);
+    }
+    else {
+      daysCopy[dayIndex].tasks = this.insertAndShiftTask(daysCopy[dayIndex].tasks, newTask, pos);
+    }
+    this.setState({ days: daysCopy }); // Id gets added when the request resolves
 
     httpRequestJson(postTaskEndpoint(date), requestOptions)
       .then((data) => {
-        daysCopy[dayIndex].tasks.push({ ...newTask, id: data[0] });
-        this.setState({ days: daysCopy });
+        const newDaysCopy = [ ...daysCopy ];
+        newDaysCopy[dayIndex] = { ...newDaysCopy[dayIndex] };
+        newDaysCopy[dayIndex].tasks = [ ...newDaysCopy[dayIndex].tasks ];
+        newDaysCopy[dayIndex].tasks[pos] = { ...newDaysCopy[dayIndex].tasks[pos], id: data[0] }
+        this.setState({ days: newDaysCopy });
       })
       .catch(() => alert("Failed to create task"));
   }
@@ -307,10 +318,11 @@ class Week extends React.Component {
     return [...firstPart, { ...newTask, position: newPos }, ...secondPart];
   }
 
-  addNote(text) {
+  addNote(text, position = undefined) {
+    const pos = position || this.state.notes.length;
     const newNote = {
       text,
-      position: this.state.notes.length,
+      position: pos
     };
 
     const requestOptions = {
@@ -319,10 +331,20 @@ class Week extends React.Component {
       body: JSON.stringify(newNote),
     };
 
+    let notesCopy = [ ...this.state.notes ];
+    if(position === undefined) {
+      notesCopy.push(newNote);
+    }
+    else {
+      notesCopy = this.insertAndShiftTask(notesCopy, newNote, pos);
+    }
+    this.setState({ notes: notesCopy });
+
     httpRequestJson(postNotesEndpoint, requestOptions)
       .then((data) => {
-        newNote.id = data[0];
-        this.setState({ notes: [...this.state.notes, newNote] });
+        const newNotesCopy = [ ...notesCopy ];
+        newNotesCopy[pos] = { ...newNotesCopy[pos], id: data[0] };
+        this.setState({ notes: newNotesCopy });
       })
       .catch(() => alert("Failed to create note"));
   }
