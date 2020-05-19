@@ -7,28 +7,28 @@
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   border-top-style: none;
-  background: linear-gradient(0deg, hsl(178, 15%, 85%) 0%, hsl(0, 0%, 100%)
- 100%);
+  background: transparent;
 }
 
-.form-area, .add-task-button {
+.form-area,
+.add-task-button {
   border: solid 2px;
-  border-color: white white black white;
+  border-color: transparent;
   border-radius: 5px;
   padding: 10px 10px;
 }
 
 .add-task-button {
   font-size: 2em;
-  opacity: 0.7;
-  cursor: pointer;
-  background: linear-gradient(0deg, hsl(178, 15%, 75%) 0%, hsl(0, 0%, 100%)
- 100%);
+  opacity: 0;
+  background: transparent;
 }
 
-.add-task-button:hover{
-  background: linear-gradient(0deg, hsl(178, 15%, 50%) 0%, hsl(0, 0%, 85%)
- 100%);
+.add-task-button:hover {
+  font-size: 2em;
+  opacity: 0.7;
+  cursor: pointer;
+  background: linear-gradient(180deg, white, hsl(43, 100%, 67%));
 }
 
 .form-area {
@@ -45,8 +45,9 @@
   margin-bottom: 3px;
 }
 
-.text-area:focus, input:focus{
-    outline: none;
+.text-area:focus,
+input:focus {
+  outline: none;
 }
 
 /* Reinstates placeholder from <textarea/> */

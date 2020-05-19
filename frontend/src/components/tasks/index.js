@@ -4,17 +4,21 @@ import { DragSource, DropTarget } from "react-dnd";
 import { ItemTypes } from "../../helpers/constants";
 
 class Task extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
       isHoverTarget: false,
-    }
+    };
   }
 
   render() {
     const { status, taskText, deleteTask } = this.props;
-    const { isDragging, connectDragSource, connectDropTarget, hovered } = this.props; // DnD injected props
+    const {
+      isDragging,
+      connectDragSource,
+      connectDropTarget,
+      hovered,
+    } = this.props; // DnD injected props
 
     let taskColor = "";
     let doneButtonColor = "";
@@ -23,58 +27,67 @@ class Task extends React.Component {
       doneButtonColor = "";
     } else if (status === 2) {
       taskColor = "hsl(49, 69%, 73%)";
+      doneButtonColor = "hsl(95, 70%, 90%)";
     } else if (status === 3) {
       taskColor = "hsl(93, 69%, 73%)";
+      doneButtonColor = "hsl(20, 70%, 90%)";
     }
 
     return connectDropTarget(
       connectDragSource(
-      <div style={isDragging ? { display: "none" } : {}}>
-        {hovered && <div className="hovered"></div>}
-        <div className="task" style={{ backgroundColor: taskColor}}>
-          {
-            <button onClick={deleteTask} className="x-button">
-              X
-            </button>
-          }
-          {taskText}
-          {status && ( // is a note if no status is found
-            <button onClick={this.props.changeTaskState} className="done-button">
-              &#10004;
-            </button>
-          )}
+        <div style={isDragging ? { display: "none" } : {}}>
+          {hovered && <div className="hovered"></div>}
+          <div className="task" style={{ backgroundColor: taskColor }}>
+            {
+              <button onClick={deleteTask} className="x-button">
+                X
+              </button>
+            }
+            {taskText}
+            {status && ( // is a note if no status is found
+              <button
+                onClick={this.props.changeTaskState}
+                className="done-button"
+                style={{ backgroundColor: doneButtonColor }}
+              >
+                &#10004;
+              </button>
+            )}
+          </div>
         </div>
-      </div>
       )
     );
   }
 }
 
-const sourceType = props => props.status ? ItemTypes.TASK : ItemTypes.NOTE;
+const sourceType = (props) => (props.status ? ItemTypes.TASK : ItemTypes.NOTE);
 
 /* Stuff for DnD */
 const taskSource = {
-  beginDrag: props => {
+  beginDrag: (props) => {
     const item = { timestamp: props.timestamp, position: props.position };
     return item;
   },
-}
+};
 
 const collectSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   isDragging: monitor.isDragging(),
-})
+});
 
-const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
+const targetTypes = [ItemTypes.TASK, ItemTypes.NOTE];
 
 const taskTarget = {
   drop: (props, monitor, component) => {
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
-    const destination = { item: { timestamp: props.timestamp, position: props.position }, type: sourceType(props) }
+    const destination = {
+      item: { timestamp: props.timestamp, position: props.position },
+      type: sourceType(props),
+    };
 
     props.moveTask(source, destination);
   },
-}
+};
 
 const collectTarget = (connect, monitor) => ({
   highlighted: monitor.canDrop(),
@@ -82,4 +95,8 @@ const collectTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 });
 
-export default DragSource(sourceType, taskSource, collectSource)(DropTarget(targetTypes, taskTarget, collectTarget)(Task));
+export default DragSource(
+  sourceType,
+  taskSource,
+  collectSource
+)(DropTarget(targetTypes, taskTarget, collectTarget)(Task));

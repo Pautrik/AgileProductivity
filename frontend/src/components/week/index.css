@@ -49,11 +49,11 @@
 .note-container {
   display: flex;
   flex: 3;
-  background-color: rgb(142, 167, 221);
+  background-color: transparent;
   flex-direction: column;
 }
 
 .previous-week:hover,
-.next-week:hover{
+.next-week:hover {
   transform: scale(1.5);
 }
