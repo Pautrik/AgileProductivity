@@ -42,10 +42,19 @@ class Timeline extends React.Component{
 
     getWeekDay(x){
         const y = new Date();
-        y.setDate(this.currentDate.getDate() + x);
+        y.setDate(this.currentDate.getDate() + x -1);
         console.log(y.getDay())
         return weekDays[y.getDay()];
     }
+
+    currentDayDisplay(x){
+        if (x === 3 ){
+            return "current-day-header";
+          }
+          return "day-header";
+    }
+
+
 
     render(){
         return(
@@ -74,7 +83,9 @@ class Timeline extends React.Component{
                         </div>
                         <div className="day-holder">
                         {range(50).map((x) => (
-                        <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</div>
+                        <div className="day-Timeline">
+                            <h2 className={this.currentDayDisplay(x)}>{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</h2>
+                        </div>
                         ))}
                         </div>
                         
