@@ -229,40 +229,10 @@ class Week extends React.Component {
       this.moveNote(source.item.position, destination.item.position);
     }
     else if(source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
-      const sourceIndex = this.state.days.findIndex(day => source.item.timestamp === day.date);
-
-      const daysCopy = [...this.state.days];
-      daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
-      daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
-
-      const [sourceTask] = daysCopy[sourceIndex].tasks.splice(source.item.position, 1);
-      
-      this.correctPositions(daysCopy[sourceIndex].tasks);
-      let notesCopy = [...this.state.notes];
-      // TODO get new id from Notes POST
-      const newNote = { id: sourceTask.id, position: destination.item.position, text: sourceTask.text };
-      notesCopy = this.insertAndShiftTask(notesCopy, newNote, destination.item.position);
-
-      this.setState({ days: daysCopy, notes: notesCopy });
+      this.moveDayTaskToNote(source.item.timestamp, source.item.position, destination.item.position);
     }
     else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.TASK) {
-      // Add date, state before insertion
-
-      const notesCopy = [...this.state.notes];
-
-      const [sourceNote] = notesCopy.splice(source.item.position, 1);
-      this.correctPositions(notesCopy);
-
-      const destinationIndex = this.state.days.findIndex(day => destination.item.timestamp === day.date);
-      const daysCopy = [...this.state.days];
-      daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
-      daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
-
-      // TODO get new id from Tasks POST
-      const newTask = { ...sourceNote, date: daysCopy[destinationIndex].date, state: 1 };
-      daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, newTask, destination.item.position);
-
-      this.setState({ days: daysCopy, notes: notesCopy });
+      this.moveNoteToDayTask(source.item.position, destination.item.timestamp, destination.item.position);
     }
   }
 
@@ -302,6 +272,33 @@ class Week extends React.Component {
     notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destinationPosition);
 
     this.setState({ notes: notesCopy });
+  }
+
+  moveDayTaskToNote(dayDate, dayPosition, notePosition) {
+    const sourceIndex = this.state.days.findIndex(day => dayDate === day.date);
+
+    const { id, text } = this.state.days[sourceIndex].tasks[dayPosition];
+
+    this.deleteTask(id, sourceIndex);
+    this.addNote(text, notePosition);
+  }
+
+  moveNoteToDayTask(notePosition, dayDate, dayPosition) {
+    const notesCopy = [...this.state.notes];
+
+    const [sourceNote] = notesCopy.splice(notePosition, 1);
+    this.correctPositions(notesCopy);
+
+    const destinationIndex = this.state.days.findIndex(day => dayDate === day.date);
+    const daysCopy = [...this.state.days];
+    daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
+    daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
+
+    // TODO get new id from Tasks POST
+    const newTask = { ...sourceNote, date: daysCopy[destinationIndex].date, state: 1 };
+    daysCopy[destinationIndex].tasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, newTask, dayPosition);
+
+    this.setState({ days: daysCopy, notes: notesCopy });
   }
 
   // Removes gaps in position through modification
