@@ -4,46 +4,50 @@ import ProjectTask from "../projectTasks"
 import {range} from "../../helpers/array";
 
 const weekDays = [
+    "Sun",
     "Mon",
     "Tue",
     "Wed",
     "Thu",
     "Fri",
     "Sat",
-    "Sun",
   ];
 
 class Timeline extends React.Component{
     constructor(props){
         super(props);
 
-        this.currentDate = new Date();
+        const startDate = new Date();
+        let rangeT = 56;
+        let lowestScroll = 0;
+        let highestScroll = 0;
+        
+        startDate.setDate(startDate.getDate() - 28)
+
+        this.state = {
+            startDate,
+            rangeT,
+            lowestScroll,
+            highestScroll
+        }
+
+        this.scrollerRef = React.createRef();
+
         this.getNextDay = this.getNextDay.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
-        this.currentDate.setDate(this.currentDate.getDate() - 3);
-    }
-
-
-    incDate(){
-        return (this.currentDate.setDate(this.currentDate.getDate() + 1));
-
-    }
-
-    decDate(){
-       return( this.currentDate.setDate(this.currentDate.getDate() - 1));
-
+        this.handleScroll = this.handleScroll.bind(this);
+        this.state.startDate.setDate(this.state.startDate.getDate() - 7);
     }
 
     getNextDay(x){
         const y = new Date();
-        y.setDate(this.currentDate.getDate() + x);
-        return y.getDate();
+        y.setDate(this.state.startDate.getDate() + x);
+        return y;
     }
 
     getWeekDay(x){
         const y = new Date();
-        y.setDate(this.currentDate.getDate() + x -1);
-        console.log(y.getDay())
+        y.setDate(this.state.startDate.getDate() + x);
         return weekDays[y.getDay()];
     }
 
@@ -52,6 +56,55 @@ class Timeline extends React.Component{
             return "current-day-header";
           }
           return "day-header";
+
+       
+    }
+
+    goBack(){
+        this.state.startDate.setDate(this.state.startDate.getDate() - 7);
+        this.state.rangeT = this.state.rangeT + 7; 
+    }
+    goForward(){
+        this.state.rangeT = this.state.rangeT + 7; 
+    }
+
+    isKeyDate(x){
+        
+        let z = this.getNextDay(x);
+        z.setMonth(z.getMonth() - 1);
+        let y = new Date();
+        y.setDate(y.getDate() - 9);
+        
+        if(z.getMonth() === y.getMonth() && z.getDate() === y.getDate()){
+
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    }
+
+    handleScroll() {
+
+        console.log("hej")
+
+        let s = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth)
+
+        console.log(s)
+
+        if(s < this.state.lowestScroll){
+
+            this.state.lowestScroll = s;
+            console.log(this.state.lowestScroll)
+            this.goBack();
+        }
+        else if(s > this.state.lowestScroll){
+            
+            this.state.highestScroll = s;
+            console.log(this.state.highestScroll)
+            this.goForward();
+        }
     }
 
 
@@ -72,29 +125,30 @@ class Timeline extends React.Component{
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
                             <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-
+                            
                         </div>
-                        <div className="day-holder">
-                        {range(50).map((x) => (
-                        <div className="day-Timeline">
-                            <h2 className={this.currentDayDisplay(x)}>{this.getWeekDay(x)} <br></br> {this.getNextDay(x)}</h2>
+                        <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
+                            {
+                            range(this.state.rangeT).map((x) => (
+                                (this.isKeyDate(x))
+                                ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                ))
+                            }
                         </div>
-                        ))}
-                        </div>
-                        
                     </div>
                 </div>
             </div>
         );
     }
- 
+    componentDidMount() {
+        this.scrollerRef.current.scrollLeft = document.getElementById("key").offsetLeft;
+        this.state.lowestScroll = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth);
+        this.state.highestScroll = (this.scrollerRef.current.offsetLeft)/(document.documentElement.scrollWidth);
+        console.log(this.state.highestScroll)
+        console.log(this.state.lowestScroll)
+
+    }
 }
 
 {/* 

@@ -60,3 +60,35 @@ strukurera veckan. Nu går vi för att arbeta mer indivituellt jämfört med inn
 kommunikation genom hela gruppen.
 
 4. Fortsätter arbeta med designen av applicationen för att den ska vara användarvänlig och estetiskt tilltalande. 
+
+V.7
+
+1. Jag skulle vilja lära mig mer om iteractionen på hemsidan för att kunna använda de feetures som vi har implementerat.
+Än så länge har vi mest focuserat på design och komponenter, men nu ska vi mer fokusera på användarvänligheten och 
+funktionaliteten av hemsian. Detta vill jag lära mig mer om för att veta hur vi ska koppla detta till databasen och backend. 
+
+2. Det jag kan hjälpa gruppen med är att arbeta smart med codningen av två olika vyer som vi håller på med just nu. Det vi 
+ska göra är att bygga en ny vy nu som ska kunna togglas till från den förra. För att kunna arbeta med den har jag varit med 
+och planerat själva strukturearandet och planerandet av detta. 
+
+3. Denna veckan har jag varit med och strukturerat upp user storys och tasks för att det ska vara mer tydligt vad vi ska göra 
+för varje sprint. Innan har det varit väldigt breda user storys och varit svårt att aplicera till hur vi ska arbeta med codning. 
+För att det ska bli lättare har jag delat upp user storys till fler mindre user storys och tasks för att enklare förstå 
+veckans arbete. 
+
+4. Denna veckan har jag arbetat med bytet mellan vyer och struktureringen av den nya vyn.
+
+V.8
+
+1. Denna veckan skulle jag vilja lära mig mer om att lösa buggar som finns i koden och felsökning av dessa. Nu börjar vi 
+komma till ett stadie där koden börjar bli komplex och ändringar i den kan skapa en kedjereaktion med errors. Dessa kan vara
+svåra att lösa och det skulle jag vilja lära mig mer om.
+
+2. Den tiden jag har arbetat med koden har jag försökt lära mig hur man löser buggar i systemet. Denna kunskap kan jag ta med 
+mig till resten av gruppen nästa vecka. 
+
+3. På grund av att vi hade inlämning i kandidatarbetet denna veckan har jag inte varit med och hjälpt till. Dock har jag vari 
+med och planerat och utverderat veckans sprint vilket har hjälp teamet som helhet. 
+
+4. På grund av att vi hade inlämning i kandidatarbetet denna veckan har jag inte varit med och skapat så mycket kod. 
+Förhoppningsvis kan jag hjälpa till mer i helgen.

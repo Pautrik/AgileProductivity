@@ -26,8 +26,10 @@
 .project-day-container{
     flex-grow: 1;
     display: flex;
+    flex: 1;
     flex-direction: row;
     align-items: stretch;
+    flex: 1;
 }
 
 .projects-container {

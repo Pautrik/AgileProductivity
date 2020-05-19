@@ -13,7 +13,7 @@
 
 .week-header {
   display: flex;
-  background-color:  hsl(197, 79%, 85%);
+  background-color: hsl(197, 79%, 85%);
   flex: 0;
   justify-content: space-around;
   align-items: center;
@@ -52,18 +52,4 @@
   flex: 3;
   background-color: rgb(142, 167, 221);
   flex-direction: column;
-}
-
-.showCurrentWeek,
-.notCurrentWeek {
-  border-style: double;
-  padding: 5px;
-}
-
-.showCurrentWeek {
-  border-color: rgba(212, 96, 96, 0.808);
-}
-
-.notCurrentWeek {
-  border-color: white;
 }
