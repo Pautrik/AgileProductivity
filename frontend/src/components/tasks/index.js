@@ -67,6 +67,7 @@ const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
 
 const taskTarget = {
   drop: (props, monitor, component) => {
+    if(monitor.didDrop()) return undefined;
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
     const destination = { item: { timestamp: props.timestamp, position: props.position }, type: sourceType(props) }
 
