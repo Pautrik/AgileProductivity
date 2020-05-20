@@ -13,6 +13,21 @@ const weekDays = [
     "Sat",
   ];
 
+  const months = [
+    "Jan",
+    "Feb",
+    "Mars",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dec"
+  ];
+
 class Timeline extends React.Component{
     constructor(props){
         super(props);
@@ -49,6 +64,12 @@ class Timeline extends React.Component{
         const y = new Date();
         y.setDate(this.state.startDate.getDate() + x);
         return weekDays[y.getDay()];
+    }
+
+    getMonth(x){
+        const y = new Date();
+        y.setDate(this.state.startDate.getDate() + x);
+        return months[y.getMonth()];
     }
 
     currentDayDisplay(x){
@@ -132,7 +153,7 @@ class Timeline extends React.Component{
                             range(this.state.rangeT).map((x) => (
                                 (this.isKeyDate(x))
                                 ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
-                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getMonth} <br></br> {this.getNextDay(x).getDate()}</div>
                                 ))
                             }
                         </div>
