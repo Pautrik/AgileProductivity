@@ -68,4 +68,17 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER addproject AFTER INSERT ON TimelineTasks
 EXECUTE FUNCTION addproject();
 
+CREATE OR REPLACE FUNCTION removeproject()
+  RETURNS trigger AS
+$$
+BEGIN
+    DELETE FROM Projects WHERE (name NOT IN (SELECT project FROM TimelineTasks));
+    RETURN NULL;
+
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER removeproject AFTER DELETE ON TimelineTasks
+EXECUTE FUNCTION removeproject();
+
 
