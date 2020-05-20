@@ -13,6 +13,22 @@ const weekDays = [
     "Sat",
   ];
 
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dec",
+
+  ];
+
   
 
 class Timeline extends React.Component{
@@ -34,6 +50,7 @@ class Timeline extends React.Component{
         this.getNextDay = this.getNextDay.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
+        this.getMonth = this.getMonth.bind(this);
     }
 
     getNextDay(x){
@@ -46,6 +63,12 @@ class Timeline extends React.Component{
         const y = new Date();
         y.setDate(this.state.startDate.getDate() + x);
         return weekDays[y.getDay()];
+    }
+
+    getMonth(x) {
+        const y = new Date();
+        y.setDate(this.state.startDate.getDate() + x);
+        return months[y.getMonth() - 1];
     }
 
     goBack(){
@@ -114,8 +137,8 @@ class Timeline extends React.Component{
                             {
                             range(this.state.rangeT).map((x) => (
                                 (this.isKeyDate(x))
-                                ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
-                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getMonth(x)} <br></br> {this.getNextDay(x).getDate()}</div>
+                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getMonth(x)} <br></br> {this.getNextDay(x).getDate()}</div>
                                 ))
                             }
                         </div>
