@@ -13,6 +13,7 @@ import { ItemTypes } from "../../helpers/constants";
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
+const patchTaskEndpoint = "/week?key=value";
 const getNotesEndpoint = "/notes?key=value";
 const postNotesEndpoint = "/notes?key=value";
 const deleteNotesEndpoint = (id) => `/notes?id=${id}`;
@@ -393,16 +394,30 @@ class Week extends React.Component {
   };
 
   onChangeTaskState(taskId, i) {
-    let daysCopy = [...this.state.days];
-    const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
+    const daysCopy = [...this.state.days];
+    daysCopy[i] = { ...daysCopy[i] };
+    daysCopy[i].tasks = [...daysCopy[i].tasks];
+    const taskIndex = daysCopy[i].tasks.findIndex((x) => x.id === taskId);
+    daysCopy[i].tasks[taskIndex] = { ...daysCopy[i].tasks[taskIndex] };
+    const task = daysCopy[i].tasks[taskIndex];
+
     let newState;
-    if (state === 3) {
+    if (task.state === 3) {
       newState = 1;
     } else {
-      newState = state + 1;
+      newState = task.state + 1;
     }
 
-    daysCopy[i].tasks.find((x) => x.id === taskId).state = newState;
+    task.state = newState;
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify([task]),
+    };
+    httpRequestJson(patchTaskEndpoint, requestOptions).catch(() =>
+      alert("Failed to update state of task")
+    );
 
     this.setState({ days: daysCopy });
   }
