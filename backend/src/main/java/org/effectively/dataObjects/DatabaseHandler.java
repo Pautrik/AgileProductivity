@@ -164,9 +164,10 @@ public class DatabaseHandler {
      */
     private void updateObject(String objects, String viewname){
         PreparedStatement stmt;
-        System.out.println(objects);
 
         try{
+            //conn.setAutoCommit(false);
+
             if(viewname.equals("week")){
                 Task[] tasks = gson.fromJson(objects, Task[].class);
                 for(Task task : tasks){
@@ -206,6 +207,8 @@ public class DatabaseHandler {
                     stmt.executeUpdate();
                 }
             }
+            /*conn.commit();
+            conn.setAutoCommit(true);*/
         } catch (SQLException s) {
             s.printStackTrace();
         }

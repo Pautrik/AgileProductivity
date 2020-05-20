@@ -4,7 +4,6 @@ CREATE TABLE Tasks (
 	description TEXT NOT NULL,
 	assignedDate VARCHAR(8) NOT NULL,
 	state INT NOT NULL,
-	UNIQUE(position,assignedDate),
 	CHECK (state>0 AND state<4)
 );
 
@@ -50,6 +49,23 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER compact AFTER DELETE ON Tasks
   FOR EACH ROW EXECUTE FUNCTION compact();
+
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION expand() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Tasks SET position = position+1 WHERE assignedDate=NEW.assignedDate AND position >= NEW.position AND id != NEW.id;
+  UPDATE Tasks SET position = position-1 WHERE position>OLD.position AND assignedDate=OLD.assignedDate;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER expand AFTER UPDATE ON Tasks
+  FOR EACH ROW WHEN (pg_trigger_depth() < 1)
+  EXECUTE FUNCTION expand();
+
+
 
 
 
