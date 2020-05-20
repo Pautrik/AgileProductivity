@@ -31,7 +31,7 @@ class Day extends React.Component {
       <div className="day-box">
         <h2>
           {this.props.dayName}
-          {this.props.dayDate && this.props.dayName === this.props.todaysDay ? (
+          {this.props.isToday ? (
             <p style={{color: "red"}}>{this.props.dayDate}</p>
           ) : (
             <p>{this.props.dayDate}</p>

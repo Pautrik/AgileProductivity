@@ -123,14 +123,30 @@ class Week extends React.Component {
     return weekDays[day - 1];
   }
 
+  getCurrentDayNumber(){
+    let today = new Date().getDate();
+    console.log(today);
+    return today;
+  }
+
   getCurrentYearMonth() {
     let month = new Date().getMonth();
     return yearMonths[month];
   }
 
+  getCurrentYearMonthNumber(){
+    let month = new Date().getMonth() + 1;
+    if (month < 10){
+      var zero = '0';
+      month = zero.concat(month);
+    }
+    return month;
+  }
+
   getCurrentYear() {
     return new Date().getFullYear();
   }
+
 
   SetCurrentWeekState = () => {
     const newWeek = this.getCurrentWeekNum();
@@ -393,6 +409,15 @@ class Week extends React.Component {
     return date;
   };
 
+  isTodaysDate(date){
+    if (date.substring(0,4) == this.getCurrentYear() &&
+    date.substring(4,6) == this.getCurrentYearMonthNumber() &&
+    (date.substring(6,8) == this.getCurrentDayNumber()) ){
+      return true;
+    }
+    return false;
+  }
+
   onChangeTaskState(taskId, i) {
     const daysCopy = [...this.state.days];
     daysCopy[i] = { ...daysCopy[i] };
@@ -451,6 +476,7 @@ class Week extends React.Component {
                   <Day
                     todaysDay={this.getCurrentWeekDay()}
                     dayDate={this.dateToDayConverter(this.state.days[i].date)}
+                    isToday = {this.isTodaysDate(this.state.days[i].date)}
                     dayName={x}
                     tasks={tasks}
                     addTask={(text) => this.addTask(text, date, i)}
