@@ -111,17 +111,23 @@ class Week extends React.Component {
         ((yr2.getTime() - tdt.getTime()) / 86400000 -
           3 +
           ((tdt.getDay() + 6) % 7)) /
-        7
+          7
       )
     );
   }
 
   getCurrentWeekDay() {
     let day = new Date().getDay();
-    if(day === 0) {
+    if (day === 0) {
       return weekDays[6];
     }
     return weekDays[day - 1];
+  }
+
+  getCurrentDayNumber(){
+    let today = new Date().getDate();
+    console.log(today);
+    return today;
   }
 
   getCurrentYearMonth() {
@@ -129,9 +135,19 @@ class Week extends React.Component {
     return yearMonths[month];
   }
 
+  getCurrentYearMonthNumber(){
+    let month = new Date().getMonth() + 1;
+    if (month < 10){
+      var zero = '0';
+      month = zero.concat(month);
+    }
+    return month;
+  }
+
   getCurrentYear() {
     return new Date().getFullYear();
   }
+
 
   SetCurrentWeekState = () => {
     const newWeek = this.getCurrentWeekNum();
@@ -221,13 +237,18 @@ class Week extends React.Component {
 
   // Could definitely use some refactoring, uses way too much duplication but does the job
   moveTask(source, destination) {
-    if(source.type === ItemTypes.TASK && destination.type === ItemTypes.TASK) {
+    if (source.type === ItemTypes.TASK && destination.type === ItemTypes.TASK) {
       this.moveDayTask(
         { date: source.item.timestamp, position: source.item.position },
-        { date: destination.item.timestamp, position: destination.item.position }
+        {
+          date: destination.item.timestamp,
+          position: destination.item.position,
+        }
       );
-    }
-    else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.NOTE) {
+    } else if (
+      source.type === ItemTypes.NOTE &&
+      destination.type === ItemTypes.NOTE
+    ) {
       this.moveNote(source.item.position, destination.item.position);
     }
     else if(source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
@@ -240,8 +261,12 @@ class Week extends React.Component {
 
   // Expects each parameter to be { date: yyyymmdd, position: X }
   moveDayTask(source, destination) {
-    const sourceIndex = this.state.days.findIndex(day => source.date === day.date);
-    const destinationIndex = this.state.days.findIndex(day => destination.date === day.date);
+    const sourceIndex = this.state.days.findIndex(
+      (day) => source.date === day.date
+    );
+    const destinationIndex = this.state.days.findIndex(
+      (day) => destination.date === day.date
+    );
 
     // Duplicates week, relevant days and their tasks
     const daysCopy = [...this.state.days];
@@ -251,9 +276,13 @@ class Week extends React.Component {
     daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
 
     // Extracts source task
-    const sourceTask = daysCopy[sourceIndex].tasks.find(task => task.position === source.position);
+    const sourceTask = daysCopy[sourceIndex].tasks.find(
+      (task) => task.position === source.position
+    );
     // Removes source task from its origin
-    daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(task => task.position !== source.position);
+    daysCopy[sourceIndex].tasks = daysCopy[sourceIndex].tasks.filter(
+      (task) => task.position !== source.position
+    );
     // Remove positional gap after removal
     this.correctPositions(daysCopy[sourceIndex].tasks);
 
@@ -298,7 +327,11 @@ class Week extends React.Component {
     const [sourceNote] = notesCopy.splice(sourcePosition, 1);
     this.correctPositions(notesCopy);
 
-    notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destinationPosition);
+    notesCopy = this.insertAndShiftTask(
+      notesCopy,
+      sourceNote,
+      destinationPosition
+    );
 
     this.setState({ notes: notesCopy });
 
@@ -347,8 +380,9 @@ class Week extends React.Component {
 
   insertAndShiftTask(tasks, newTask, newPos) {
     const firstPart = tasks.slice(0, newPos);
-    const secondPart = tasks.slice(newPos, tasks.length)
-      .map(x => ({ ...x, position: x.position + 1 }));
+    const secondPart = tasks
+      .slice(newPos, tasks.length)
+      .map((x) => ({ ...x, position: x.position + 1 }));
 
     return [...firstPart, { ...newTask, position: newPos }, ...secondPart];
   }
@@ -403,11 +437,20 @@ class Week extends React.Component {
     return date;
   };
 
+  isTodaysDate(date){
+    if (date.substring(0,4) == this.getCurrentYear() &&
+    date.substring(4,6) == this.getCurrentYearMonthNumber() &&
+    (date.substring(6,8) == this.getCurrentDayNumber()) ){
+      return true;
+    }
+    return false;
+  }
+
   onChangeTaskState(taskId, i) {
-    let daysCopy = this.state.days;
+    let daysCopy = [...this.state.days];
     const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
     let newState;
-    if(state === 3) {
+    if (state === 3) {
       newState = 1;
     } else {
       newState = state + 1;
@@ -424,17 +467,21 @@ class Week extends React.Component {
         <div className="week-view">
           <div className="week">
             <div className="week-header">
-              <span>
-                <div>
-                  <NumberSelector2
-                    handleClickUp={this.clickUp}
-                    handleClickDown={this.clickDown}
-                    value={this.state.chosenWeek}
-                  />
-                </div>
-              </span>
-              <h1 style={{ color: "grey" }}>{this.timeBlockDisplay()}</h1>
-              <Button handleClick={this.SetCurrentWeekState}>Current week</Button>
+              <div style={{ paddingLeft: "15%" }}>
+                <NumberSelector2
+                  handleClickUp={this.clickUp}
+                  handleClickDown={this.clickDown}
+                  value={this.state.chosenWeek}
+                />
+              </div>
+              <div>
+                <h1 style={{ color: "grey" }}>{this.timeBlockDisplay()}</h1>
+              </div>
+              <div style={{ paddingRight: "15%" }}>
+                <Button handleClick={this.SetCurrentWeekState}>
+                  Current week
+                </Button>
+              </div>
             </div>
             <div className="days">
               {weekDays.map((x, i) => {
@@ -443,11 +490,14 @@ class Week extends React.Component {
                   <Day
                     todaysDay={this.getCurrentWeekDay()}
                     dayDate={this.dateToDayConverter(this.state.days[i].date)}
+                    isToday = {this.isTodaysDate(this.state.days[i].date)}
                     dayName={x}
                     tasks={tasks}
                     addTask={(text) => this.addTask(text, date, i)}
                     deleteTask={(id) => this.deleteTask(id, i)}
-                    moveTask={(source, destination) => this.moveTask(source, destination)}
+                    moveTask={(source, destination) =>
+                      this.moveTask(source, destination)
+                    }
                     timestamp={date}
                     changeTaskState={(taskId) =>
                       this.onChangeTaskState(taskId, i)
