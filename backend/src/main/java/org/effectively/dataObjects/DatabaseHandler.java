@@ -166,8 +166,6 @@ public class DatabaseHandler {
         PreparedStatement stmt;
 
         try{
-            //conn.setAutoCommit(false);
-
             if(viewname.equals("week")){
                 Task[] tasks = gson.fromJson(objects, Task[].class);
                 for(Task task : tasks){
@@ -207,8 +205,6 @@ public class DatabaseHandler {
                     stmt.executeUpdate();
                 }
             }
-            /*conn.commit();
-            conn.setAutoCommit(true);*/
         } catch (SQLException s) {
             s.printStackTrace();
         }
