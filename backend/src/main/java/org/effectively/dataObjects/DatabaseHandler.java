@@ -361,7 +361,7 @@ public class DatabaseHandler {
 
         try{
             for (String projectname : projectnames){
-                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) OR (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
 
                 stmt.setInt(1, startDateValue);
                 stmt.setInt(2, endDateValue);
