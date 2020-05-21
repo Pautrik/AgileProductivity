@@ -2,6 +2,10 @@ import React from "react";
 import "./index.css";
 import ProjectTask from "../projectTasks"
 import {range} from "../../helpers/array";
+import { httpRequestJson } from "../../helpers/requests";
+
+const projectEndpoint = activeState => `/projects?select=${activeState}`;
+const timelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 
 const weekDays = [
     "Sun",
@@ -42,6 +46,9 @@ class Timeline extends React.Component{
         this.state = {
             startDate,
             rangeT,
+            projectState: 0,
+            projects: [],
+            tasks: [],
         }
 
         this.scrollerRef = React.createRef();
@@ -50,6 +57,15 @@ class Timeline extends React.Component{
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
+    }
+
+    fetchProjectsAndTasksToState() {
+        const projectStates = ["any", "active", "inactive"];
+        httpRequestJson(projectEndpoint(projectStates[this.state.projectState]))
+            .then(projects => {
+                httpRequestJson(timelineTaskEndpoint(projects.map(x => x.name), "20200401", "20200427"))
+                    .then(tasks => this.setState({ projects, tasks }, () => console.log(this.state)));
+            })
     }
 
     getNextDay(x){
@@ -148,7 +164,7 @@ class Timeline extends React.Component{
     }
     componentDidMount() {
         this.scrollerRef.current.scrollLeft = document.getElementById("key").offsetLeft;
-
+        this.fetchProjectsAndTasksToState();
     }
 }
 
