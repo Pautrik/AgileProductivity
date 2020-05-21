@@ -164,7 +164,6 @@ public class DatabaseHandler {
      */
     private void updateObject(String objects, String viewname){
         PreparedStatement stmt;
-        System.out.println(objects);
 
         try{
             if(viewname.equals("week")){
