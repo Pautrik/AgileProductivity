@@ -17,6 +17,7 @@ const patchTaskEndpoint = "/week?key=value";
 const getNotesEndpoint = "/notes?key=value";
 const postNotesEndpoint = "/notes?key=value";
 const deleteNotesEndpoint = (id) => `/notes?id=${id}`;
+const patchNotesEndpoint = "/notes?key=value";
 
 const weekDays = [
   "Monday",
@@ -300,6 +301,23 @@ class Week extends React.Component {
     notesCopy = this.insertAndShiftTask(notesCopy, sourceNote, destinationPosition);
 
     this.setState({ notes: notesCopy });
+
+    const patchBody = notesCopy.filter((_, i) => 
+      i >= Math.min(sourcePosition, destinationPosition));
+    
+    if(sourcePosition < destinationPosition) {
+      const notesDestinationIndex = patchBody.findIndex(x => x.id === sourceNote.id);
+      patchBody[notesDestinationIndex] = { ...patchBody[notesDestinationIndex], position: patchBody[notesDestinationIndex].position+1 }
+    }
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patchBody),
+    };
+
+    httpRequestJson(patchNotesEndpoint, requestOptions)
+      .catch(() => alert("Failed to move note"));
   }
 
   moveDayTaskToNote(dayDate, dayPosition, notePosition) {
