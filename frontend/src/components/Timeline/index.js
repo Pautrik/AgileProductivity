@@ -16,11 +16,7 @@ const weekDays = [
   const months = [
     "Jan",
     "Feb",
-<<<<<<< HEAD
-    "Mars",
-=======
     "Mar",
->>>>>>> 9806d6b8a8d432f2d3c977a158eb23c98261bfbf
     "Apr",
     "May",
     "Jun",
@@ -29,18 +25,11 @@ const weekDays = [
     "Sep",
     "Okt",
     "Nov",
-<<<<<<< HEAD
-    "Dec"
-  ];
-
-=======
     "Dec",
-
   ];
 
   
 
->>>>>>> 9806d6b8a8d432f2d3c977a158eb23c98261bfbf
 class Timeline extends React.Component{
     constructor(props){
         super(props);
@@ -75,26 +64,10 @@ class Timeline extends React.Component{
         return weekDays[y.getDay()];
     }
 
-<<<<<<< HEAD
-    getMonth(x){
-        const y = new Date();
-        y.setDate(this.state.startDate.getDate() + x);
-        return months[y.getMonth()];
-    }
-
-    currentDayDisplay(x){
-        if (x === 3 ){
-            return "current-day-header";
-          }
-          return "day-header";
-
-       
-=======
     getMonth(x) {
         const y = new Date();
         y.setDate(this.state.startDate.getDate() + x);
         return months[y.getMonth() - 1];
->>>>>>> 9806d6b8a8d432f2d3c977a158eb23c98261bfbf
     }
 
     goBack(){
@@ -163,13 +136,8 @@ class Timeline extends React.Component{
                             {
                             range(this.state.rangeT).map((x) => (
                                 (this.isKeyDate(x))
-<<<<<<< HEAD
-                                ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getDate()}</div>
-                                : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getNextDay(x).getMonth} <br></br> {this.getNextDay(x).getDate()}</div>
-=======
                                 ? <div className="day-Timeline" id="key">{this.getWeekDay(x)} <br></br> {this.getMonth(x)} <br></br> {this.getNextDay(x).getDate()}</div>
                                 : <div className="day-Timeline">{this.getWeekDay(x)} <br></br> {this.getMonth(x)} <br></br> {this.getNextDay(x).getDate()}</div>
->>>>>>> 9806d6b8a8d432f2d3c977a158eb23c98261bfbf
                                 ))
                             }
                         </div>
