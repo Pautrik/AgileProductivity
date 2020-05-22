@@ -44,14 +44,20 @@ class Task extends React.Component {
               </button>
             }
             {taskText}
-            {status && ( // is a note if no status is found
+            {status ? ( // is a note if no status is found
               <button
                 onClick={this.props.changeTaskState}
                 className="done-button"
               >
                 &#10004;
               </button>
-            )}
+            ) : (
+                <button
+                  style={{ visibility: "hidden" }}
+                >
+                  &#10004;
+                </button>
+              )}
           </div>
         </div>
       )
