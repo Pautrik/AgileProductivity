@@ -62,7 +62,7 @@ CREATE TRIGGER compactNotes AFTER DELETE ON Notes
 
 
 -- A function to adjust positions after someone is added to the list
-CREATE OR REPLACE FUNCTION expand() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION expandTasks() RETURNS TRIGGER AS $$
 BEGIN
   UPDATE Tasks SET position = position+1 WHERE assignedDate=NEW.assignedDate AND position >= NEW.position AND id != NEW.id;
   UPDATE Tasks SET position = position-1 WHERE position>OLD.position AND assignedDate=OLD.assignedDate;
@@ -71,12 +71,12 @@ END
 $$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER expand AFTER UPDATE ON Tasks
+CREATE TRIGGER expandTasks AFTER UPDATE ON Tasks
   FOR EACH ROW WHEN (pg_trigger_depth() < 1)
-  EXECUTE FUNCTION expand();
+  EXECUTE FUNCTION expandTasks();
 
 
-CREATE OR REPLACE FUNCTION expand() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION expandNotes() RETURNS TRIGGER AS $$
 BEGIN
   UPDATE Notes SET position = position+1 WHERE position >= NEW.position AND id != NEW.id;
   UPDATE Notes SET position = position-1 WHERE position>OLD.position;
@@ -85,7 +85,7 @@ END
 $$ LANGUAGE plpgsql;
 
 
-CREATE TRIGGER expand AFTER UPDATE ON Notes
+CREATE TRIGGER expandNotes AFTER UPDATE ON Notes
   FOR EACH ROW WHEN (pg_trigger_depth() < 1)
   EXECUTE FUNCTION expand();
 
