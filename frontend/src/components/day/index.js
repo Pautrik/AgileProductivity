@@ -51,28 +51,34 @@ class Day extends React.Component {
           />
         ))}
         {this.state.isEditing ? (
-          <div className="form-area" style={this.props.hovered ? { marginTop: "80px" } : {}}>
-            <div
-              className="text-area"
-              contentEditable
-              ref={this.taskTextRef}
-              placeholder="Enter task text"
-              onKeyDown={(event) => event.keyCode === 13 && this.onTaskSubmit()}
-            ></div>
-            <div onClick={() => this.setState({ isEditing: false })} className="layerClick">
+          <>
+            <div className="form-area" style={this.props.hovered ? { marginTop: "80px" } : {}}>
+              <div
+                className="text-area"
+                contentEditable
+                ref={this.taskTextRef}
+                placeholder="Enter task text"
+                onKeyDown={(event) => {
+                  if (event.keyCode === 13)
+                    this.onTaskSubmit()
+                  else if (event.keyCode === 27) this.setState({ isEditing: false })
+                }}
+
+
+              ></div>
               <div className="buttons-container">
-                <button onClick={() => this.setState({ isEditing: false })}>
-                  Cancel
-              </button>
-                <button onClick={this.onTaskSubmit}>Submit</button>
+                <button className="submit-button" onClick={this.onTaskSubmit}>&#10147;</button>
               </div>
+
             </div>
-          </div>
+            <div onClick={() => this.setState({ isEditing: false })} className="layerClick"></div>
+          </>
         ) : (
             <button onClick={this.enterEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
               +
             </button>
-          )}
+          )
+        }
       </div>
     );
   }
