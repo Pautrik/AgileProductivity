@@ -31,19 +31,89 @@ CREATE TABLE Projects (
 	active BOOLEAN NOT NULL
 );
 
--- A function that computes the next available position
-CREATE FUNCTION next(date VARCHAR(8)) RETURNS INT AS $$
-  SELECT COALESCE(MAX(position),0)+1 FROM Tasks WHERE assignedDate=date
-$$ LANGUAGE SQL;
 
+
+----------------------------TASKS-----------------------------------
 
 -- A function to adjust positions after someone is removed from the list
 CREATE OR REPLACE FUNCTION compactTasks() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Tasks WHERE position>=OLD.position AND assignedDate=OLD.assignedDate);
 BEGIN
-  UPDATE Tasks SET position = position-1 WHERE position>=OLD.position AND assignedDate=OLD.assignedDate;
+	FOR VAR2 IN 0..i LOOP
+		UPDATE Tasks SET position = position-1
+		WHERE position = OLD.position+VAR2 AND assignedDate=OLD.assignedDate;
+	END LOOP;
   RETURN NULL;
 END
 $$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER compactTasks AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compactTasks();
+
+
+
+--calls procedure to be able to change table wihout breaking unique contraint
+CREATE OR REPLACE FUNCTION cascadeTasks() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Tasks WHERE position>=NEW.position AND assignedDate=NEW.assignedDate);
+BEGIN
+	IF(EXISTS(SELECT * FROM Tasks WHERE NEW.position = position AND assignedDate=NEW.assignedDate))
+	THEN
+		FOR VAR2 IN 0..i LOOP
+			UPDATE Tasks SET position = position+1
+			WHERE position = NEW.position+i-VAR2 AND assignedDate=NEW.assignedDate;
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER cascadeTasks BEFORE INSERT ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION cascadeTasks();
+
+
+---------------------------------NOTES---------------------------
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION compactNotes() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Notes WHERE position>=OLD.position);
+BEGIN
+	FOR VAR2 IN 0..i LOOP
+		UPDATE Notes SET position = position-1
+		WHERE position = OLD.position+VAR2;
+	END LOOP;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER compactNotes AFTER DELETE ON Notes
+  FOR EACH ROW EXECUTE FUNCTION compactNotes();
+
+--to cascade note if a note is inserted in the middle of a list
+--loops through all bigger positions and increments them by 1
+CREATE OR REPLACE FUNCTION cascadeNotes() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Notes WHERE position>=NEW.position);
+BEGIN
+	IF(EXISTS(SELECT * FROM notes WHERE NEW.position = position))
+		THEN
+		FOR VAR2 IN 0..i LOOP
+			UPDATE Notes SET position = position+1
+			WHERE position = NEW.position+i-VAR2;
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER cascadeNotes BEFORE INSERT ON Notes
+  FOR EACH ROW EXECUTE FUNCTION cascadeNotes();
 
 
 CREATE TRIGGER compactTasks AFTER DELETE ON Tasks
@@ -88,7 +158,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER expandNotes AFTER UPDATE ON Notes
   FOR EACH ROW WHEN (pg_trigger_depth() < 1)
   EXECUTE FUNCTION expand();
-
 
 
 CREATE OR REPLACE FUNCTION addproject()

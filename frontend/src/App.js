@@ -1,5 +1,6 @@
 import React from 'react';
 import Week from './components/week';
+import Timeline from './components/Timeline';
 import './App.css';
 
 
@@ -26,7 +27,7 @@ class App extends React.Component {
           {this.state.active === 'FIRST' ? (
             <Week />
             ) : this.state.active === 'SECOND' ? (
-            <Week /> 
+              <Timeline /> 
             ) : null}
         <button className="view-togle" onClick={this.handleClick}>Change view</button>
       </div>
