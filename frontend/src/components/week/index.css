@@ -1,8 +1,8 @@
 .week-view {
   display: flex;
   height: 100%;
-  background-color: rgb(60, 60, 60);
-  color: white;
+  background-color: rgb(40, 40, 40);
+  color: rgba(255,255,255,0.8);
 }
 
 .week {
@@ -32,7 +32,9 @@
   top: 50%;
   visibility: hidden;
   border-radius: 50%;
-  box-shadow: 2px 2px 5px grey;
+  border-color: rgb(70, 70, 70);
+  box-shadow: 2px 2px 5px black;
+  background-color: rgb(100, 100, 100);
 }
 
 .days:hover .previous-week,
