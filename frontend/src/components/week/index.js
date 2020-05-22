@@ -8,14 +8,17 @@ import { httpRequestJson } from "../../helpers/requests";
 import Backend from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
+
 import { ItemTypes } from "../../helpers/constants";
 
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
 const postTaskEndpoint = (date) => `/week?week=${date}`;
 const deleteTaskEndpoint = (id) => `/week?week=${id}`;
+const patchTaskEndpoint = "/week?key=value";
 const getNotesEndpoint = "/notes?key=value";
 const postNotesEndpoint = "/notes?key=value";
 const deleteNotesEndpoint = (id) => `/notes?id=${id}`;
+const patchNotesEndpoint = "/notes?key=value";
 
 const weekDays = [
   "Monday",
@@ -59,6 +62,7 @@ class Week extends React.Component {
       notes: [],
 
       chosenWeek: this.getCurrentWeekNum(),
+      chosenYear: this.getCurrentYear()
     };
 
     this.addTask = this.addTask.bind(this);
@@ -69,7 +73,7 @@ class Week extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchWeekToState(2020, this.state.chosenWeek);
+    this.fetchWeekToState(this.state.chosenYear, this.state.chosenWeek);
     this.fetchNotesToState();
   }
 
@@ -109,7 +113,7 @@ class Week extends React.Component {
         ((yr2.getTime() - tdt.getTime()) / 86400000 -
           3 +
           ((tdt.getDay() + 6) % 7)) /
-          7
+        7
       )
     );
   }
@@ -122,7 +126,7 @@ class Week extends React.Component {
     return weekDays[day - 1];
   }
 
-  getCurrentDayNumber(){
+  getCurrentDayNumber() {
     let today = new Date().getDate();
     console.log(today);
     return today;
@@ -133,9 +137,9 @@ class Week extends React.Component {
     return yearMonths[month];
   }
 
-  getCurrentYearMonthNumber(){
+  getCurrentYearMonthNumber() {
     let month = new Date().getMonth() + 1;
-    if (month < 10){
+    if (month < 10) {
       var zero = '0';
       month = zero.concat(month);
     }
@@ -149,9 +153,9 @@ class Week extends React.Component {
 
   SetCurrentWeekState = () => {
     const newWeek = this.getCurrentWeekNum();
-    this.fetchWeekToState(2020, newWeek);
+    this.fetchWeekToState(this.getCurrentYear(), newWeek);
     this.setState({
-      chosenWeek: newWeek,
+      chosenYear: this.getCurrentYear(), chosenWeek: newWeek,
     });
   };
 
@@ -163,28 +167,78 @@ class Week extends React.Component {
     return yearMonths[month - 1] + " " + year;
   }
 
+  longYear(yearIn) {
+    let year = yearIn;
+    let yearSubOne = year - 1;
+    let weekVariable = ((year + Math.floor((year / 4)) - Math.floor((year / 100)) + Math.floor((year / 400))) % 7)
+    let weekVariable2 = ((yearSubOne + Math.floor((yearSubOne / 4)) - Math.floor((yearSubOne / 100)) + Math.floor((yearSubOne / 400))) % 7)
+    if (weekVariable === 4 || weekVariable2 === 3)
+      return true;
+    else return false;
+  }
+
   clickUp = () => {
-    const newWeek = this.state.chosenWeek + 1;
-    this.fetchWeekToState(2020, newWeek);
-    this.setState({
-      chosenWeek: newWeek,
-    });
+    let newWeek = this.state.chosenWeek + 1;
+
+    if (newWeek === 53 && (this.longYear(this.state.chosenYear) === false)) {
+      newWeek = 1;
+      this.fetchWeekToState(this.state.chosenYear + 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear + 1, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 53 && (this.longYear(this.state.chosenYear))) {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenWeek: newWeek, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 54) {
+      newWeek = 1
+      this.fetchWeekToState(this.state.chosenYear + 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear + 1, chosenWeek: newWeek
+      });
+    }
+    else {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear, chosenWeek: newWeek,
+      });
+    }
   };
 
   clickDown = () => {
-    const newWeek = this.state.chosenWeek - 1;
-    this.fetchWeekToState(2020, newWeek);
-    this.setState({
-      chosenWeek: newWeek,
-    });
+    let newWeek = this.state.chosenWeek - 1;
+    if (newWeek === 0 && this.longYear(this.state.chosenYear - 1)) {
+      newWeek = 53
+      this.fetchWeekToState(this.state.chosenYear - 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear - 1, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 0 && !this.longYear(this.state.chosenYear - 1)) {
+      newWeek = 52
+      this.fetchWeekToState(this.state.chosenYear - 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear - 1, chosenWeek: newWeek
+      });
+    }
+    else {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear, chosenWeek: newWeek
+      });
+    }
   };
 
-  addTask(text, date, dayIndex) {
+  addTask(text, date, dayIndex, position = undefined) {
+    const pos = position || this.state.days[dayIndex].tasks.length;
     const newTask = {
       text,
       date,
       state: 1,
-      position: this.state.days[dayIndex].tasks.length,
+      position: pos
     };
 
     const requestOptions = {
@@ -197,11 +251,21 @@ class Week extends React.Component {
     const daysCopy = [...this.state.days];
     daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
     daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
+    if(position === undefined) {
+      daysCopy[dayIndex].tasks.push(newTask);
+    }
+    else {
+      daysCopy[dayIndex].tasks = this.insertAndShiftTask(daysCopy[dayIndex].tasks, newTask, pos);
+    }
+    this.setState({ days: daysCopy }); // Id gets added when the request resolves
 
     httpRequestJson(postTaskEndpoint(date), requestOptions)
       .then((data) => {
-        daysCopy[dayIndex].tasks.push({ ...newTask, id: data[0] });
-        this.setState({ days: daysCopy });
+        const newDaysCopy = [ ...daysCopy ];
+        newDaysCopy[dayIndex] = { ...newDaysCopy[dayIndex] };
+        newDaysCopy[dayIndex].tasks = [ ...newDaysCopy[dayIndex].tasks ];
+        newDaysCopy[dayIndex].tasks[pos] = { ...newDaysCopy[dayIndex].tasks[pos], id: data[0] }
+        this.setState({ days: newDaysCopy });
       })
       .catch(() => alert("Failed to create task"));
   }
@@ -237,66 +301,12 @@ class Week extends React.Component {
       destination.type === ItemTypes.NOTE
     ) {
       this.moveNote(source.item.position, destination.item.position);
-    } else if (
-      source.type === ItemTypes.TASK &&
-      destination.type === ItemTypes.NOTE
-    ) {
-      const sourceIndex = this.state.days.findIndex(
-        (day) => source.item.timestamp === day.date
-      );
-
-      const daysCopy = [...this.state.days];
-      daysCopy[sourceIndex] = { ...daysCopy[sourceIndex] };
-      daysCopy[sourceIndex].tasks = [...daysCopy[sourceIndex].tasks];
-
-      const [sourceTask] = daysCopy[sourceIndex].tasks.splice(
-        source.item.position,
-        1
-      );
-      let notesCopy = [...this.state.notes];
-      // TODO get new id from Notes POST
-      const newNote = {
-        id: sourceTask.id,
-        position: destination.item.position,
-        text: sourceTask.text,
-      };
-      notesCopy = this.insertAndShiftTask(
-        notesCopy,
-        newNote,
-        destination.item.position
-      );
-
-      this.setState({ days: daysCopy, notes: notesCopy });
-    } else if (
-      source.type === ItemTypes.NOTE &&
-      destination.type === ItemTypes.TASK
-    ) {
-      // Add date, state before insertion
-
-      const notesCopy = [...this.state.notes];
-
-      const [sourceNote] = notesCopy.splice(source.item.position, 1);
-
-      const destinationIndex = this.state.days.findIndex(
-        (day) => destination.item.timestamp === day.date
-      );
-      const daysCopy = [...this.state.days];
-      daysCopy[destinationIndex] = { ...daysCopy[destinationIndex] };
-      daysCopy[destinationIndex].tasks = [...daysCopy[destinationIndex].tasks];
-
-      // TODO get new id from Tasks POST
-      const newTask = {
-        ...sourceNote,
-        date: daysCopy[destinationIndex].date,
-        state: 1,
-      };
-      daysCopy[destinationIndex].tasks = this.insertAndShiftTask(
-        daysCopy[destinationIndex].tasks,
-        newTask,
-        destination.item.position
-      );
-
-      this.setState({ days: daysCopy, notes: notesCopy });
+    }
+    else if(source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
+      this.moveDayTaskToNote(source.item.timestamp, source.item.position, destination.item.position);
+    }
+    else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.TASK) {
+      this.moveNoteToDayTask(source.item.position, destination.item.timestamp, destination.item.position);
     }
   }
 
@@ -331,12 +341,35 @@ class Week extends React.Component {
     sourceTask.date = daysCopy[destinationIndex].date;
 
     // Slots in source task into destination and shifts tasks position below
-    daysCopy[destinationIndex].tasks = this.insertAndShiftTask(
-      daysCopy[destinationIndex].tasks,
-      sourceTask,
-      destination.position
-    );
+    const newDayTasks = this.insertAndShiftTask(daysCopy[destinationIndex].tasks, sourceTask, destination.position);
+    daysCopy[destinationIndex].tasks = newDayTasks;
     this.setState({ days: daysCopy });
+
+    let patchBody;
+    if(source.date === destination.date) {
+      patchBody = daysCopy[sourceIndex].tasks.filter((_, i) => 
+        i >= Math.min(source.position, destination.position));
+
+        // Weird backend specific clause
+        if(source.position < destination.position) {
+          const patchDestinationIndex = patchBody.findIndex(x => x.id === sourceTask.id);
+          patchBody[patchDestinationIndex] = { ...patchBody[patchDestinationIndex], position: patchBody[patchDestinationIndex].position+1 };
+        }
+    }
+    else {
+      const sourcePatchBody = daysCopy[sourceIndex].tasks.filter((_, i) => i >= source.position);
+      const destinationPatchBody = daysCopy[destinationIndex].tasks.filter((_, i) => i >= destination.position);
+      patchBody = [...sourcePatchBody, ...destinationPatchBody];
+    }
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patchBody),
+    };
+
+    httpRequestJson(patchTaskEndpoint, requestOptions)
+      .catch(() => alert("Failed to move task"));
   }
 
   moveNote(sourcePosition, destinationPosition) {
@@ -352,6 +385,42 @@ class Week extends React.Component {
     );
 
     this.setState({ notes: notesCopy });
+
+    const patchBody = notesCopy.filter((_, i) => 
+      i >= Math.min(sourcePosition, destinationPosition));
+    
+    if(sourcePosition < destinationPosition) {
+      const notesDestinationIndex = patchBody.findIndex(x => x.id === sourceNote.id);
+      patchBody[notesDestinationIndex] = { ...patchBody[notesDestinationIndex], position: patchBody[notesDestinationIndex].position+1 }
+    }
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patchBody),
+    };
+
+    httpRequestJson(patchNotesEndpoint, requestOptions)
+      .catch(() => alert("Failed to move note"));
+  }
+
+  moveDayTaskToNote(dayDate, dayPosition, notePosition) {
+    const sourceIndex = this.state.days.findIndex(day => dayDate === day.date);
+
+    const { id, text } = this.state.days[sourceIndex].tasks[dayPosition];
+
+    this.deleteTask(id, sourceIndex);
+    this.addNote(text, notePosition);
+  }
+
+  moveNoteToDayTask(notePosition, dayDate, dayPosition) {
+    const destinationIndex = this.state.days.findIndex(day => dayDate === day.date);
+
+    const { date } = this.state.days[destinationIndex];
+    const { id, text } = this.state.notes[notePosition];
+
+    this.deleteNote(id);
+    this.addTask(text, date, destinationIndex, dayPosition);
   }
 
   // Removes gaps in position through modification
@@ -369,10 +438,11 @@ class Week extends React.Component {
     return [...firstPart, { ...newTask, position: newPos }, ...secondPart];
   }
 
-  addNote(text) {
+  addNote(text, position = undefined) {
+    const pos = position || this.state.notes.length;
     const newNote = {
       text,
-      position: this.state.notes.length,
+      position: pos
     };
 
     const requestOptions = {
@@ -381,10 +451,20 @@ class Week extends React.Component {
       body: JSON.stringify(newNote),
     };
 
+    let notesCopy = [ ...this.state.notes ];
+    if(position === undefined) {
+      notesCopy.push(newNote);
+    }
+    else {
+      notesCopy = this.insertAndShiftTask(notesCopy, newNote, pos);
+    }
+    this.setState({ notes: notesCopy });
+
     httpRequestJson(postNotesEndpoint, requestOptions)
       .then((data) => {
-        newNote.id = data[0];
-        this.setState({ notes: [...this.state.notes, newNote] });
+        const newNotesCopy = [ ...notesCopy ];
+        newNotesCopy[pos] = { ...newNotesCopy[pos], id: data[0] };
+        this.setState({ notes: newNotesCopy });
       })
       .catch(() => alert("Failed to create note"));
   }
@@ -405,29 +485,43 @@ class Week extends React.Component {
 
   dateToDayConverter = (iDate) => {
     let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
-    return date;
+    return parseInt(date);
   };
 
-  isTodaysDate(date){
-    if (date.substring(0,4) == this.getCurrentYear() &&
-    date.substring(4,6) == this.getCurrentYearMonthNumber() &&
-    (date.substring(6,8) == this.getCurrentDayNumber()) ){
+  isTodaysDate(date) {
+    if (date.substring(0, 4) == this.getCurrentYear() &&
+      date.substring(4, 6) == this.getCurrentYearMonthNumber() &&
+      (date.substring(6, 8) == this.getCurrentDayNumber())) {
       return true;
     }
     return false;
   }
 
   onChangeTaskState(taskId, i) {
-    let daysCopy = [...this.state.days];
-    const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
+    const daysCopy = [...this.state.days];
+    daysCopy[i] = { ...daysCopy[i] };
+    daysCopy[i].tasks = [...daysCopy[i].tasks];
+    const taskIndex = daysCopy[i].tasks.findIndex((x) => x.id === taskId);
+    daysCopy[i].tasks[taskIndex] = { ...daysCopy[i].tasks[taskIndex] };
+    const task = daysCopy[i].tasks[taskIndex];
+
     let newState;
-    if (state === 3) {
+    if (task.state === 3) {
       newState = 1;
     } else {
-      newState = state + 1;
+      newState = task.state + 1;
     }
 
-    daysCopy[i].tasks.find((x) => x.id === taskId).state = newState;
+    task.state = newState;
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify([task]),
+    };
+    httpRequestJson(patchTaskEndpoint, requestOptions).catch(() =>
+      alert("Failed to update state of task")
+    );
 
     this.setState({ days: daysCopy });
   }
@@ -461,7 +555,7 @@ class Week extends React.Component {
                   <Day
                     todaysDay={this.getCurrentWeekDay()}
                     dayDate={this.dateToDayConverter(this.state.days[i].date)}
-                    isToday = {this.isTodaysDate(this.state.days[i].date)}
+                    isToday={this.isTodaysDate(this.state.days[i].date)}
                     dayName={x}
                     tasks={tasks}
                     addTask={(text) => this.addTask(text, date, i)}

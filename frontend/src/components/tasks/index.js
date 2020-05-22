@@ -48,7 +48,6 @@ class Task extends React.Component {
               <button
                 onClick={this.props.changeTaskState}
                 className="done-button"
-                style={{ backgroundColor: doneButtonColor }}
               >
                 &#10004;
               </button>
@@ -79,9 +78,25 @@ const targetTypes = [ItemTypes.TASK, ItemTypes.NOTE];
 
 const taskTarget = {
   drop: (props, monitor, component) => {
+    if (monitor.didDrop()) return undefined;
+
+    let destinationPos = props.position;
+    if (
+      sourceType(props) === monitor.getItemType() &&
+      props.position > monitor.getItem().position
+    ) {
+      if (
+        (sourceType(props) === ItemTypes.TASK &&
+          monitor.getItem().timestamp === props.timestamp) ||
+        sourceType(props) === ItemTypes.NOTE
+      ) {
+        destinationPos--;
+      }
+    }
+
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
     const destination = {
-      item: { timestamp: props.timestamp, position: props.position },
+      item: { timestamp: props.timestamp, position: destinationPos },
       type: sourceType(props),
     };
 

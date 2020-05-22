@@ -35,6 +35,7 @@
   resize: vertical;
   display: flex;
   flex-direction: column;
+  z-index: 1001;
 }
 
 .text-area {
@@ -58,7 +59,7 @@ input:focus {
 
 .buttons-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 .day-box p {
   color: gray;
@@ -70,4 +71,23 @@ input:focus {
   border: solid black;
   border-width: 0px 0px 0.5px 0px;
   font-size: 1.2em;
+}
+
+.layerClick{
+  z-index: 1000;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+.submit-button {
+  background-color: hsl(205, 74%, 53%);
+  border-radius: 20px;
+  margin-top: 5px;
+  margin-right: 5px;
+  border-style: hidden;
+  font-size: 1.2em;
+  ;
 }
