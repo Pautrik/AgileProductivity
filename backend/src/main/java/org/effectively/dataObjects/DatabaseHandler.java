@@ -164,7 +164,6 @@ public class DatabaseHandler {
      */
     private void updateObject(String objects, String viewname){
         PreparedStatement stmt;
-        System.out.println(objects);
 
         try{
             if(viewname.equals("week")){
@@ -362,7 +361,7 @@ public class DatabaseHandler {
 
         try{
             for (String projectname : projectnames){
-                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) AND (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) OR (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
 
                 stmt.setInt(1, startDateValue);
                 stmt.setInt(2, endDateValue);
