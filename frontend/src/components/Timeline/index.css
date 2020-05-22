@@ -49,6 +49,15 @@
     background-color: hsl(0, 6%, 93%);
 }
 
+.task-holder {
+    flex: 1;
+    overflow-x: visible;
+    margin-top: 10%;
+
+}
+
+
+
 .day-Timeline{
     flex-grow: 1;
     flex-shrink: 0;
