@@ -3,13 +3,15 @@
   flex-direction: column;
   height: 100%;
   flex: 1;
-  border-left: solid black 1px;
-  border-bottom: solid black 1px;
+  border-left: solid rgba(0, 0, 0, 0.1) 2px;
+  border-bottom: solid rgba(0, 0, 0, 0.1) 2px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  
   border-top-style: none;
-  background: linear-gradient(180deg, white, hsl(0, 0%, 88%));
-  padding-left: 1px;
+  background: rbg(40,40,40);
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .form-area,
@@ -28,7 +30,7 @@
   font-size: 2em;
   opacity: 0.7;
   cursor: pointer;
-  background: linear-gradient(180deg, white, hsl(43, 100%, 67%));
+  background: #DE859C;
 }
 
 .form-area {
@@ -62,13 +64,13 @@ input:focus {
   justify-content: flex-end;
 }
 .day-box p {
-  color: gray;
+  color: rgba(255,255,255,0.8);
   margin: 0;
 }
 
 .day-box h2 {
   margin: 0;
-  border: solid black;
+  border: solid rgba(0, 0, 0, 0.2) 2px;
   border-width: 0px 0px 0.5px 0px;
   font-size: 1.2em;
 }
@@ -83,11 +85,15 @@ input:focus {
 }
 
 .submit-button {
-  background-color: hsl(205, 74%, 53%);
+  background-color: hsl(205, 69%, 73%);
   border-radius: 20px;
   margin-top: 5px;
   margin-right: 5px;
   border-style: hidden;
   font-size: 1.2em;
   ;
+}
+.submit-button:hover{
+  opacity: 0.7;
+  cursor: pointer;
 }

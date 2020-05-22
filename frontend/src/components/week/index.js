@@ -251,7 +251,7 @@ class Week extends React.Component {
     const daysCopy = [...this.state.days];
     daysCopy[dayIndex] = { ...daysCopy[dayIndex] };
     daysCopy[dayIndex].tasks = [...daysCopy[dayIndex].tasks];
-    if(position === undefined) {
+    if (position === undefined) {
       daysCopy[dayIndex].tasks.push(newTask);
     }
     else {
@@ -261,9 +261,9 @@ class Week extends React.Component {
 
     httpRequestJson(postTaskEndpoint(date), requestOptions)
       .then((data) => {
-        const newDaysCopy = [ ...daysCopy ];
+        const newDaysCopy = [...daysCopy];
         newDaysCopy[dayIndex] = { ...newDaysCopy[dayIndex] };
-        newDaysCopy[dayIndex].tasks = [ ...newDaysCopy[dayIndex].tasks ];
+        newDaysCopy[dayIndex].tasks = [...newDaysCopy[dayIndex].tasks];
         newDaysCopy[dayIndex].tasks[pos] = { ...newDaysCopy[dayIndex].tasks[pos], id: data[0] }
         this.setState({ days: newDaysCopy });
       })
@@ -302,10 +302,10 @@ class Week extends React.Component {
     ) {
       this.moveNote(source.item.position, destination.item.position);
     }
-    else if(source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
+    else if (source.type === ItemTypes.TASK && destination.type === ItemTypes.NOTE) {
       this.moveDayTaskToNote(source.item.timestamp, source.item.position, destination.item.position);
     }
-    else if(source.type === ItemTypes.NOTE && destination.type === ItemTypes.TASK) {
+    else if (source.type === ItemTypes.NOTE && destination.type === ItemTypes.TASK) {
       this.moveNoteToDayTask(source.item.position, destination.item.timestamp, destination.item.position);
     }
   }
@@ -346,15 +346,15 @@ class Week extends React.Component {
     this.setState({ days: daysCopy });
 
     let patchBody;
-    if(source.date === destination.date) {
-      patchBody = daysCopy[sourceIndex].tasks.filter((_, i) => 
+    if (source.date === destination.date) {
+      patchBody = daysCopy[sourceIndex].tasks.filter((_, i) =>
         i >= Math.min(source.position, destination.position));
 
-        // Weird backend specific clause
-        if(source.position < destination.position) {
-          const patchDestinationIndex = patchBody.findIndex(x => x.id === sourceTask.id);
-          patchBody[patchDestinationIndex] = { ...patchBody[patchDestinationIndex], position: patchBody[patchDestinationIndex].position+1 };
-        }
+      // Weird backend specific clause
+      if (source.position < destination.position) {
+        const patchDestinationIndex = patchBody.findIndex(x => x.id === sourceTask.id);
+        patchBody[patchDestinationIndex] = { ...patchBody[patchDestinationIndex], position: patchBody[patchDestinationIndex].position + 1 };
+      }
     }
     else {
       const sourcePatchBody = daysCopy[sourceIndex].tasks.filter((_, i) => i >= source.position);
@@ -386,12 +386,12 @@ class Week extends React.Component {
 
     this.setState({ notes: notesCopy });
 
-    const patchBody = notesCopy.filter((_, i) => 
+    const patchBody = notesCopy.filter((_, i) =>
       i >= Math.min(sourcePosition, destinationPosition));
-    
-    if(sourcePosition < destinationPosition) {
+
+    if (sourcePosition < destinationPosition) {
       const notesDestinationIndex = patchBody.findIndex(x => x.id === sourceNote.id);
-      patchBody[notesDestinationIndex] = { ...patchBody[notesDestinationIndex], position: patchBody[notesDestinationIndex].position+1 }
+      patchBody[notesDestinationIndex] = { ...patchBody[notesDestinationIndex], position: patchBody[notesDestinationIndex].position + 1 }
     }
 
     const requestOptions = {
@@ -451,8 +451,8 @@ class Week extends React.Component {
       body: JSON.stringify(newNote),
     };
 
-    let notesCopy = [ ...this.state.notes ];
-    if(position === undefined) {
+    let notesCopy = [...this.state.notes];
+    if (position === undefined) {
       notesCopy.push(newNote);
     }
     else {
@@ -462,7 +462,7 @@ class Week extends React.Component {
 
     httpRequestJson(postNotesEndpoint, requestOptions)
       .then((data) => {
-        const newNotesCopy = [ ...notesCopy ];
+        const newNotesCopy = [...notesCopy];
         newNotesCopy[pos] = { ...newNotesCopy[pos], id: data[0] };
         this.setState({ notes: newNotesCopy });
       })
@@ -540,7 +540,7 @@ class Week extends React.Component {
                 />
               </div>
               <div>
-                <h1 style={{ color: "grey" }}>{this.timeBlockDisplay()}</h1>
+                <h1 style={{ color: "rgba(255,255,255,0.8)" }}>{this.timeBlockDisplay()}</h1>
               </div>
               <div style={{ paddingRight: "15%" }}>
                 <Button handleClick={this.SetCurrentWeekState}>

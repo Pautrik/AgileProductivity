@@ -1,6 +1,8 @@
 .week-view {
   display: flex;
   height: 100%;
+  background-color: rgb(60, 60, 60);
+  color: white;
 }
 
 .week {
