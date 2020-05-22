@@ -80,8 +80,19 @@ const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
 
 const dayTarget = {
   drop: (props, monitor, component) => {
+    if(monitor.didDrop()) return undefined;
+
+    const type = props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE;
+    
+    let destinationPos = props.tasks.length;
+    if(type === monitor.getItemType()) {
+      if((type === ItemTypes.TASK && monitor.getItem().timestamp === props.timestamp) || type === ItemTypes.NOTE) {
+        destinationPos--;
+      }
+    }
+
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
-    const destination = { item: { timestamp: props.timestamp, position: props.tasks.length }, type: props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE };
+    const destination = { item: { timestamp: props.timestamp, position: destinationPos }, type };
 
     props.moveTask(source, destination);
   }
