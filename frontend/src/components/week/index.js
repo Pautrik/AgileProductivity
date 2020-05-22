@@ -457,7 +457,7 @@ class Week extends React.Component {
 
   dateToDayConverter = (iDate) => {
     let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
-    return date;
+    return parseInt(date);
   };
 
   isTodaysDate(date) {
