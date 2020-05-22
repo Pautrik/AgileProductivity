@@ -26,10 +26,10 @@ class Task extends React.Component {
       taskColor = "";
       doneButtonColor = "";
     } else if (status === 2) {
-      taskColor = "hsl(49, 69%, 73%)";
+      taskColor = "#FFC91A";
       doneButtonColor = "hsl(95, 70%, 90%)";
     } else if (status === 3) {
-      taskColor = "hsl(93, 69%, 73%)";
+      taskColor = "#76D384";
       doneButtonColor = "hsl(20, 70%, 90%)";
     }
 
