@@ -1,5 +1,5 @@
 .task {
-  background-color: hsl(205, 69%, 73%);
+  background-color: rgb(48, 48, 48);
   border: solid black;
   border-width: 0px 0px 1.5px 0px;
   border-radius: 10px;
@@ -11,19 +11,21 @@
 }
 
 .x-button {
-  background-color: transparent;
+  background-color: rgba(255,255,255,0.3);
   border-radius: 20px;
   align-self: flex-end;
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: 0.8em;
   margin-top: 5px;
   margin-right: 5px;
   border-style: hidden;
   visibility: hidden;
+  color:rgba(255,255,255,0.8); 
+
 }
 
 .done-button {
-  background-color: hsl(60, 100%, 50%);
+  background-color: rgba(255,255,255,0.3);
   border-radius: 20px;
   align-self: flex-end;
   font-weight: bold;
@@ -32,6 +34,7 @@
   margin-right: 5px;
   border-style: hidden;
   visibility: hidden;
+  color:rgba(255,255,255,0.8);
 }
 .task:hover .done-button,
 .task:hover .x-button {

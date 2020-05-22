@@ -26,11 +26,11 @@ class Task extends React.Component {
       taskColor = "";
       doneButtonColor = "";
     } else if (status === 2) {
-      taskColor = "#FFC91A";
-      doneButtonColor = "hsl(95, 70%, 90%)";
+      taskColor = "#D6A115";
+      doneButtonColor = "";
     } else if (status === 3) {
-      taskColor = "#76D384";
-      doneButtonColor = "hsl(20, 70%, 90%)";
+      taskColor = "#509B5A";
+      doneButtonColor = "";
     }
 
     return connectDropTarget(
@@ -40,7 +40,7 @@ class Task extends React.Component {
           <div className="task" style={{ backgroundColor: taskColor }}>
             {
               <button onClick={deleteTask} className="x-button">
-                X
+                &#9747;
               </button>
             }
             {taskText}
