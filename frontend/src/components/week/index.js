@@ -8,6 +8,7 @@ import { httpRequestJson } from "../../helpers/requests";
 import Backend from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
+
 import { ItemTypes } from "../../helpers/constants";
 
 const weekEndpoint = (year, week) => `/week?week=${year}${week}`;
@@ -61,6 +62,7 @@ class Week extends React.Component {
       notes: [],
 
       chosenWeek: this.getCurrentWeekNum(),
+      chosenYear: this.getCurrentYear()
     };
 
     this.addTask = this.addTask.bind(this);
@@ -71,7 +73,7 @@ class Week extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchWeekToState(2020, this.state.chosenWeek);
+    this.fetchWeekToState(this.state.chosenYear, this.state.chosenWeek);
     this.fetchNotesToState();
   }
 
@@ -111,7 +113,7 @@ class Week extends React.Component {
         ((yr2.getTime() - tdt.getTime()) / 86400000 -
           3 +
           ((tdt.getDay() + 6) % 7)) /
-          7
+        7
       )
     );
   }
@@ -124,7 +126,7 @@ class Week extends React.Component {
     return weekDays[day - 1];
   }
 
-  getCurrentDayNumber(){
+  getCurrentDayNumber() {
     let today = new Date().getDate();
     console.log(today);
     return today;
@@ -135,9 +137,9 @@ class Week extends React.Component {
     return yearMonths[month];
   }
 
-  getCurrentYearMonthNumber(){
+  getCurrentYearMonthNumber() {
     let month = new Date().getMonth() + 1;
-    if (month < 10){
+    if (month < 10) {
       var zero = '0';
       month = zero.concat(month);
     }
@@ -151,9 +153,9 @@ class Week extends React.Component {
 
   SetCurrentWeekState = () => {
     const newWeek = this.getCurrentWeekNum();
-    this.fetchWeekToState(2020, newWeek);
+    this.fetchWeekToState(this.getCurrentYear(), newWeek);
     this.setState({
-      chosenWeek: newWeek,
+      chosenYear: this.getCurrentYear(), chosenWeek: newWeek,
     });
   };
 
@@ -165,20 +167,69 @@ class Week extends React.Component {
     return yearMonths[month - 1] + " " + year;
   }
 
+  longYear(yearIn) {
+    let year = yearIn;
+    let yearSubOne = year - 1;
+    let weekVariable = ((year + Math.floor((year / 4)) - Math.floor((year / 100)) + Math.floor((year / 400))) % 7)
+    let weekVariable2 = ((yearSubOne + Math.floor((yearSubOne / 4)) - Math.floor((yearSubOne / 100)) + Math.floor((yearSubOne / 400))) % 7)
+    if (weekVariable === 4 || weekVariable2 === 3)
+      return true;
+    else return false;
+  }
+
   clickUp = () => {
-    const newWeek = this.state.chosenWeek + 1;
-    this.fetchWeekToState(2020, newWeek);
-    this.setState({
-      chosenWeek: newWeek,
-    });
+    let newWeek = this.state.chosenWeek + 1;
+
+    if (newWeek === 53 && (this.longYear(this.state.chosenYear) === false)) {
+      newWeek = 1;
+      this.fetchWeekToState(this.state.chosenYear + 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear + 1, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 53 && (this.longYear(this.state.chosenYear))) {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenWeek: newWeek, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 54) {
+      newWeek = 1
+      this.fetchWeekToState(this.state.chosenYear + 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear + 1, chosenWeek: newWeek
+      });
+    }
+    else {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear, chosenWeek: newWeek,
+      });
+    }
   };
 
   clickDown = () => {
-    const newWeek = this.state.chosenWeek - 1;
-    this.fetchWeekToState(2020, newWeek);
-    this.setState({
-      chosenWeek: newWeek,
-    });
+    let newWeek = this.state.chosenWeek - 1;
+    if (newWeek === 0 && this.longYear(this.state.chosenYear - 1)) {
+      newWeek = 53
+      this.fetchWeekToState(this.state.chosenYear - 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear - 1, chosenWeek: newWeek
+      });
+    }
+    else if (newWeek === 0 && !this.longYear(this.state.chosenYear - 1)) {
+      newWeek = 52
+      this.fetchWeekToState(this.state.chosenYear - 1, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear - 1, chosenWeek: newWeek
+      });
+    }
+    else {
+      this.fetchWeekToState(this.state.chosenYear, newWeek);
+      this.setState({
+        chosenYear: this.state.chosenYear, chosenWeek: newWeek
+      });
+    }
   };
 
   addTask(text, date, dayIndex, position = undefined) {
@@ -434,29 +485,43 @@ class Week extends React.Component {
 
   dateToDayConverter = (iDate) => {
     let date = typeof iDate === "string" ? iDate.substr(6, 7) : null;
-    return date;
+    return parseInt(date);
   };
 
-  isTodaysDate(date){
-    if (date.substring(0,4) == this.getCurrentYear() &&
-    date.substring(4,6) == this.getCurrentYearMonthNumber() &&
-    (date.substring(6,8) == this.getCurrentDayNumber()) ){
+  isTodaysDate(date) {
+    if (date.substring(0, 4) == this.getCurrentYear() &&
+      date.substring(4, 6) == this.getCurrentYearMonthNumber() &&
+      (date.substring(6, 8) == this.getCurrentDayNumber())) {
       return true;
     }
     return false;
   }
 
   onChangeTaskState(taskId, i) {
-    let daysCopy = [...this.state.days];
-    const state = daysCopy[i].tasks.find((x) => x.id === taskId).state;
+    const daysCopy = [...this.state.days];
+    daysCopy[i] = { ...daysCopy[i] };
+    daysCopy[i].tasks = [...daysCopy[i].tasks];
+    const taskIndex = daysCopy[i].tasks.findIndex((x) => x.id === taskId);
+    daysCopy[i].tasks[taskIndex] = { ...daysCopy[i].tasks[taskIndex] };
+    const task = daysCopy[i].tasks[taskIndex];
+
     let newState;
-    if (state === 3) {
+    if (task.state === 3) {
       newState = 1;
     } else {
-      newState = state + 1;
+      newState = task.state + 1;
     }
 
-    daysCopy[i].tasks.find((x) => x.id === taskId).state = newState;
+    task.state = newState;
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify([task]),
+    };
+    httpRequestJson(patchTaskEndpoint, requestOptions).catch(() =>
+      alert("Failed to update state of task")
+    );
 
     this.setState({ days: daysCopy });
   }
@@ -490,7 +555,7 @@ class Week extends React.Component {
                   <Day
                     todaysDay={this.getCurrentWeekDay()}
                     dayDate={this.dateToDayConverter(this.state.days[i].date)}
-                    isToday = {this.isTodaysDate(this.state.days[i].date)}
+                    isToday={this.isTodaysDate(this.state.days[i].date)}
                     dayName={x}
                     tasks={tasks}
                     addTask={(text) => this.addTask(text, date, i)}

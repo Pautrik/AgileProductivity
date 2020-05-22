@@ -27,22 +27,22 @@ class Task extends React.Component {
 
     return connectDropTarget(
       connectDragSource(
-      <div style={isDragging ? { display: "none" } : {}}>
-        {hovered && <div className="hovered"></div>}
-        <div className="task" style={{ backgroundColor: taskColor}}>
-          {
-            <button onClick={deleteTask} className="x-button">
-              X
+        <div style={isDragging ? { display: "none" } : {}}>
+          {hovered && <div className="hovered"></div>}
+          <div className="task" style={{ backgroundColor: taskColor }}>
+            {
+              <button onClick={deleteTask} className="x-button">
+                X
             </button>
-          }
-          {taskText}
-          {status && ( // is a note if no status is found
-            <button onClick={this.props.changeTaskState} className="done-button">
-              &#10004;
-            </button>
-          )}
+            }
+            {taskText}
+            {status && ( // is a note if no status is found
+              <button onClick={this.props.changeTaskState} className="done-button">
+                &#10004;
+              </button>
+            )}
+          </div>
         </div>
-      </div>
       )
     );
   }
@@ -63,7 +63,7 @@ const collectSource = (connect, monitor) => ({
   isDragging: monitor.isDragging(),
 })
 
-const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
+const targetTypes = [ItemTypes.TASK, ItemTypes.NOTE];
 
 const taskTarget = {
   drop: (props, monitor, component) => {
