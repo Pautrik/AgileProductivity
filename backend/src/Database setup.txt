@@ -4,7 +4,6 @@ CREATE TABLE Tasks (
 	description TEXT NOT NULL,
 	assignedDate VARCHAR(8) NOT NULL,
 	state INT NOT NULL,
-	UNIQUE(position,assignedDate),
 	CHECK (state>0 AND state<4)
 );
 
@@ -24,8 +23,7 @@ CREATE TABLE TimelineTasks (
 CREATE TABLE Notes (
 	ID SERIAL PRIMARY KEY,
 	position INT NOT NULL,
-	description TEXT NOT NULL,
-	UNIQUE(position)
+	description TEXT NOT NULL
 );
 
 CREATE TABLE Projects (
@@ -118,6 +116,48 @@ CREATE TRIGGER cascadeNotes BEFORE INSERT ON Notes
   FOR EACH ROW EXECUTE FUNCTION cascadeNotes();
 
 
+CREATE TRIGGER compactTasks AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compactTasks();
+
+CREATE OR REPLACE FUNCTION compactNotes() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Notes SET position = position-1 WHERE position>=OLD.position;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER compactNotes AFTER DELETE ON Notes
+  FOR EACH ROW EXECUTE FUNCTION compactNotes();
+
+
+-- A function to adjust positions after someone is added to the list
+CREATE OR REPLACE FUNCTION expandTasks() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Tasks SET position = position+1 WHERE assignedDate=NEW.assignedDate AND position >= NEW.position AND id != NEW.id;
+  UPDATE Tasks SET position = position-1 WHERE position>OLD.position AND assignedDate=OLD.assignedDate;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER expandTasks AFTER UPDATE ON Tasks
+  FOR EACH ROW WHEN (pg_trigger_depth() < 1)
+  EXECUTE FUNCTION expandTasks();
+
+
+CREATE OR REPLACE FUNCTION expandNotes() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Notes SET position = position+1 WHERE position >= NEW.position AND id != NEW.id;
+  UPDATE Notes SET position = position-1 WHERE position>OLD.position;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER expandNotes AFTER UPDATE ON Notes
+  FOR EACH ROW WHEN (pg_trigger_depth() < 1)
+  EXECUTE FUNCTION expand();
 
 
 CREATE OR REPLACE FUNCTION addproject()
@@ -134,5 +174,18 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER addproject AFTER INSERT ON TimelineTasks
 EXECUTE FUNCTION addproject();
+
+CREATE OR REPLACE FUNCTION removeproject()
+  RETURNS trigger AS
+$$
+BEGIN
+    DELETE FROM Projects WHERE (name NOT IN (SELECT project FROM TimelineTasks));
+    RETURN NULL;
+
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER removeproject AFTER DELETE ON TimelineTasks
+EXECUTE FUNCTION removeproject();
 
 
