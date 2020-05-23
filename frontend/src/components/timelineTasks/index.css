@@ -1,3 +1,6 @@
 .timeline-task {
-    height: 0px;
+    height: var(--timeline-task-height);
+    margin-bottom: var(--timeline-task-spacing);
+    background-color: lightcoral;
+    position: relative; /* Weird thing to make it task render on top of borders */
 }

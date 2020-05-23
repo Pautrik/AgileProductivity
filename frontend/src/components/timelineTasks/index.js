@@ -2,12 +2,15 @@ import "./index.css";
 import React from "react";
 
 
-class timelineTasks extends React.Component {
+class TimelineTasks extends React.Component {
   render() {
-    <div className="timeline-task">
-        
-    </div>
+    const { text, nrDays } = this.props;
+    return (
+      <div className="timeline-task" style={{ width: `calc(100% * ${nrDays})` }}>
+          {text}
+      </div>
+    );
   }
 }
 
-export default timelineTasks;
+export default TimelineTasks;

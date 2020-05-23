@@ -1,9 +1,14 @@
+body {
+    --timeline-task-height: 6em;
+    --timeline-task-spacing: 1.5em;
+    --project-header-height: 4em;
+}
+
 .Timeline {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-
 }
 .Timeline-header {
     width: 100%;
@@ -40,23 +45,17 @@
 }
 
 .Project-header{
-    height: 4em;
+    height: var(--project-header-height);
 }
 .day-holder {
     display: flex;
     overflow-x: auto;
     flex: 1;
-    background-color: hsl(0, 6%, 93%);
+    z-index: 2;
 }
-
-.task-holder {
-    flex: 1;
-    overflow-x: visible;
-    margin-top: 10%;
-
+.day-header {
+    height: var(--project-header-height);
 }
-
-
 
 .day-Timeline{
     flex-grow: 1;
@@ -64,5 +63,5 @@
     flex-basis: calc(100% / 21);
     flex-direction: column;
     border: solid rgb(170, 164, 164) 1px;
-    z-index: 2;
+    min-width: 1%;
 }
