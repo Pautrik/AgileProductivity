@@ -1,14 +1,31 @@
+.project-wrapper {
+  overflow-x: visible;
+  width: 100%;
+  margin-bottom: var(--timeline-task-spacing);
+  display: flex;
+  align-items: stretch;
+}
+
 .project-task {
     background-color: hsl(210, 69%, 73%);
     border: none;
     border-radius: 1px;
-    min-height: 60px;
+    height: var(--timeline-task-height);
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    flex: 0 0 100%;
   }
+
+  .project-line {
+    flex: 1 0 900%;
+    width: 300%;
+    z-index: 1;
+    background-color: grey;
+    opacity: 0.5;
+  }
+  
+
   .x-button {
     border-radius: 20px;
     align-self: flex-end;
@@ -20,7 +37,7 @@
   .done-button {
     border-radius: 20px;
     align-self: flex-end;
-    margin-top: 15px;
+    margin-top: 1px;
     margin-bottom: 5px;
     margin-right: 5px;
     border-style: hidden;

@@ -1,0 +1,17 @@
+.timeline-tasks {
+    height: var(--timeline-task-height);
+    margin-bottom: var(--timeline-task-spacing);
+}
+
+.timeline-task {
+    background-color: lightcoral;
+    position: relative; /* Weird thing to make it task render on top of borders */
+    border-top: solid black 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.timeline-task:first-of-type {
+    border-top-style: hidden;
+}
