@@ -67,7 +67,7 @@ class Day extends React.Component {
 
               ></div>
               <div className="buttons-container">
-                <button className="submit-button" onClick={this.onTaskSubmit}>&#10147;</button>
+                <button className="submit-button" onClick={this.onTaskSubmit}>&#10148;</button>
               </div>
 
             </div>
@@ -88,13 +88,13 @@ const targetTypes = [ItemTypes.TASK, ItemTypes.NOTE];
 
 const dayTarget = {
   drop: (props, monitor, component) => {
-    if(monitor.didDrop()) return undefined;
+    if (monitor.didDrop()) return undefined;
 
     const type = props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE;
-    
+
     let destinationPos = props.tasks.length;
-    if(type === monitor.getItemType()) {
-      if((type === ItemTypes.TASK && monitor.getItem().timestamp === props.timestamp) || type === ItemTypes.NOTE) {
+    if (type === monitor.getItemType()) {
+      if ((type === ItemTypes.TASK && monitor.getItem().timestamp === props.timestamp) || type === ItemTypes.NOTE) {
         destinationPos--;
       }
     }
