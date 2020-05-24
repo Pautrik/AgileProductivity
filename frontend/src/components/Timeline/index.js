@@ -91,7 +91,7 @@ class Timeline extends React.Component {
             const { projectFilter } = this.state;
             return await httpRequestJson(projectEndpoint(projectFilter));
         }
-        catch(e) {
+        catch (e) {
             alert("Failed to fetch timeline projects");
         }
     }
@@ -103,19 +103,19 @@ class Timeline extends React.Component {
             endDate.setDate(endDate.getDate() + rangeT);
             return await httpRequestJson(timelineTaskEndpoint(projects.map(x => x.name), this.dateToString(startDate), this.dateToString(endDate)));
         }
-        catch(e) {
+        catch (e) {
             alert("Failed to fetch timeline tasks");
         }
     }
 
     tasksToDays(tasks, projects) {
         const days = [];
-        for(let i = 0; i < this.state.rangeT; i++) {
+        for (let i = 0; i < this.state.rangeT; i++) {
             const dayDate = this.copyDate(this.state.startDate);
             dayDate.setDate(dayDate.getDate() + i);
             const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
             const orderedDayTasks = projects.map(p => dayTasks.filter(t => t.project.name === p.name));
-            
+
             days.push({
                 tasks: orderedDayTasks, // Array for each day containing array for all task for a project
                 date: this.copyDate(dayDate),
@@ -150,7 +150,7 @@ class Timeline extends React.Component {
                 }));
     }
     goForward() {
-        this.setState({ rangeT: this.state.rangeT + DAYS_TO_LOAD }, () => 
+        this.setState({ rangeT: this.state.rangeT + DAYS_TO_LOAD }, () =>
             this.fetchTransformTasksToState());
     }
 
@@ -161,17 +161,17 @@ class Timeline extends React.Component {
     }
 
     handleScroll() {
-        if(this.state.isLoading === false) {
+        if (this.state.isLoading === false) {
             const scrollLeft = this.scrollerRef.current.scrollLeft;
             const scrollWidth = this.scrollerRef.current.scrollWidth;
             const viewportWidth = this.scrollerRef.current.offsetWidth;
 
-            if(scrollLeft < 500) {
-                this.setState({isLoading: true});
+            if (scrollLeft < 500) {
+                this.setState({ isLoading: true });
                 this.goBack();
             }
-            else if(scrollWidth - scrollLeft - viewportWidth < 500) {
-                this.setState({isLoading: true});
+            else if (scrollWidth - scrollLeft - viewportWidth < 500) {
+                this.setState({ isLoading: true });
                 this.goForward();
             }
         }
@@ -192,7 +192,7 @@ class Timeline extends React.Component {
                     <div></div>
                     <h1>Timeline</h1>
                     <div>
-                        <select onChange={e => this.setState({ viewingRange: e.target.value })}>
+                        <select className="viewingRange" onChange={e => this.setState({ viewingRange: e.target.value })}>
                             <option value="week">Week</option>
                             <option selected value="month">Month</option>
                             <option value="two-months">2 Months</option>
@@ -206,25 +206,26 @@ class Timeline extends React.Component {
                             <div className="Project-header">
 
                             </div>
-                            {this.state.projects.map((x) => 
-                                <ProjectTask 
-                                    projectTaskText={x.name} 
+                            {this.state.projects.map((x) =>
+                                <ProjectTask
+                                    projectTaskText={x.name}
                                 />
                             )}
-                            <ProjectTask 
-                                projectTaskText={"Majblomman"} 
+                            <ProjectTask
+                                projectTaskText={"Majblomman"}
                             />
-                            <ProjectTask 
-                                projectTaskText={"Terminator 18"} 
+                            <ProjectTask
+                                projectTaskText={"Terminator 18"}
                             />
 
                         </div>
                         <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
                             {this.state.days.map(day => {
                                 const dayDate = day.date;
+                                const today = new Date();
                                 return (
-                                    <div  className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
-                                        <div className="day-header">
+                                    <div className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
+                                        <div className="day-header" style={this.isEqualDates(today, dayDate) ? { color: "red" } : {}}>
                                             {this.getWeekDay(dayDate)} <br />
                                             {this.getMonth(dayDate)} <br />
                                             {dayDate.getDate()}
@@ -248,7 +249,7 @@ class Timeline extends React.Component {
         this.fetchTransformDataToState()
             .then(() => {
                 const focusedDayComponent = this.scrollerRef.current.querySelector("#key");
-                if(focusedDayComponent) {
+                if (focusedDayComponent) {
                     this.scrollerRef.current.scrollLeft = focusedDayComponent.offsetLeft;
                 }
             });
@@ -257,7 +258,8 @@ class Timeline extends React.Component {
     setStatePromise = state => new Promise(resolve => this.setState(state, resolve));
     copyDate = date => new Date(date.getTime());
     isEqualDates = (firstDate, secondDate) => this.dateToString(firstDate) === this.dateToString(secondDate);
-    
+
+
 }
 
 
