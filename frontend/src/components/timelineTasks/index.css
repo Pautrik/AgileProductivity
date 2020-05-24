@@ -4,14 +4,15 @@
 }
 
 .timeline-task {
-    background-color: lightcoral;
+    background-color: var(--project-yellow);
     position: relative; /* Weird thing to make it task render on top of borders */
-    border-top: solid black 1px;
+    border: solid rgba(0,0,0,0.2) 2px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    
 }
 
 .timeline-task:first-of-type {
-    border-top-style: hidden;
+    border-bottom-style: hidden;
 }
