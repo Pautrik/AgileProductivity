@@ -18,6 +18,7 @@ class Task extends React.Component {
       connectDragSource,
       connectDropTarget,
       hovered,
+      isEditing,
     } = this.props; // DnD injected props
 
     let taskColor = "";
@@ -66,6 +67,7 @@ class Task extends React.Component {
 }
 
 const sourceType = (props) => (props.status ? ItemTypes.TASK : ItemTypes.NOTE);
+
 
 /* Stuff for DnD */
 const taskSource = {

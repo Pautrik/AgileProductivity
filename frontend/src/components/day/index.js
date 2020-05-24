@@ -67,7 +67,7 @@ class Day extends React.Component {
 
               ></div>
               <div className="buttons-container">
-                <button className="submit-button" onClick={this.onTaskSubmit}>&#10147;</button>
+                <button className="submit-button" onClick={this.onTaskSubmit}>&#10148;</button>
               </div>
 
             </div>
