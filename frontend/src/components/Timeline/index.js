@@ -7,6 +7,8 @@ import TimelineTask from "../timelineTasks";
 const projectEndpoint = activeState => `/projects?select=${activeState}`;
 const timelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 
+const DAYS_TO_LOAD = 14;
+
 const weekDays = [
     "Sun",
     "Mon",
@@ -57,7 +59,6 @@ class Timeline extends React.Component {
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
-        this.dayDistance = this.dayDistance.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -70,7 +71,6 @@ class Timeline extends React.Component {
 
     // Fetches tasks and transforms it to days before setting state
     async fetchTransformTasksToState() {
-        // this.setState({ isLoading: true });
         const { projects } = this.state;
         const tasks = await this.fetchTasks(projects);
         const days = this.tasksToDays(tasks, projects);
@@ -112,15 +112,13 @@ class Timeline extends React.Component {
         for(let i = 0; i < this.state.rangeT; i++) {
             const dayDate = this.copyDate(this.state.startDate);
             dayDate.setDate(dayDate.getDate() + i);
+            const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
+            const orderedDayTasks = projects.map(p => dayTasks.filter(t => t.project.name === p.name));
+            
             days.push({
-                tasks: [],
-                date: dayDate,
+                tasks: orderedDayTasks, // Array for each day containing array for all task for a project
+                date: this.copyDate(dayDate),
             });
-        }
-
-        for(let day of days) {
-            day.tasks = tasks.filter(task =>
-                task.date === this.dateToString(day.date));
         }
 
         return days;
@@ -137,20 +135,22 @@ class Timeline extends React.Component {
     }
 
     getMonth(date) {
-        return months[date.getMonth() - 1];
+        return months[date.getMonth()];
     }
 
     goBack() {
         const scrollWidth = this.scrollerRef.current.scrollWidth;
         const newDate = this.copyDate(this.state.startDate);
-        newDate.setDate(newDate.getDate() - 7)
-        this.setState({ startDate: newDate, rangeT: this.state.rangeT + 7 }, () =>
+        newDate.setDate(newDate.getDate() - DAYS_TO_LOAD)
+        this.setState({ startDate: newDate, rangeT: this.state.rangeT + DAYS_TO_LOAD }, () =>
             this.fetchTransformTasksToState()
-                .then(() => this.scrollerRef.current.scrollLeft += this.scrollerRef.current.scrollWidth - scrollWidth));
+                .then(() => {
+                    this.scrollerRef.current.scrollLeft += this.scrollerRef.current.scrollWidth - scrollWidth
+                }));
     }
     goForward() {
-        this.setState({ isLoading: true });
-        this.setState({ rangeT: this.state.rangeT + 7 }, () => this.fetchTransformTasksToState());
+        this.setState({ rangeT: this.state.rangeT + DAYS_TO_LOAD }, () => 
+            this.fetchTransformTasksToState());
     }
 
     isFocusedDate(date) {
@@ -166,9 +166,11 @@ class Timeline extends React.Component {
             const viewportWidth = this.scrollerRef.current.offsetWidth;
 
             if(scrollLeft < 500) {
+                this.setState({isLoading: true});
                 this.goBack();
             }
             else if(scrollWidth - scrollLeft - viewportWidth < 500) {
+                this.setState({isLoading: true});
                 this.goForward();
             }
         }
@@ -179,7 +181,7 @@ class Timeline extends React.Component {
     }
 
     dateToString(date) {
-        return date.toISOString().substr(0, 10).replace(/\-/g, "");
+        return date.toISOString().substr(0, 10).replace(/-/g, "");
     }
 
     render() {
@@ -200,20 +202,20 @@ class Timeline extends React.Component {
 
                         </div>
                         <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
-                            {this.state.days.map((day, i) => {
-                                const dayDate = this.dateOffsetFromStart(i);
+                            {this.state.days.map(day => {
+                                const dayDate = day.date;
                                 return (
-                                    <div key={JSON.stringify(day)} className="day-Timeline" {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
+                                    <div  className="day-Timeline" {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
                                         <div className="day-header">
                                             {this.getWeekDay(dayDate)} <br />
                                             {this.getMonth(dayDate)} <br />
                                             {dayDate.getDate()}
                                         </div>
-                                        {day.tasks.map(task => (
+                                        {day.tasks.map((tasks, i) => (
                                             <TimelineTask
-                                                key={JSON.stringify(task)}
-                                                nrDays={this.dayDistance(this.stringToDate(task.date), this.stringToDate(task.endDate))}
-                                                text={task.text}/>
+                                                /* nrDays={task && this.dayDistance(this.stringToDate(task.date), this.stringToDate(task.endDate))}
+                                                text={task && task.text} */
+                                                tasks={tasks} />
                                         ))}
                                     </div>
                                 )
@@ -235,9 +237,9 @@ class Timeline extends React.Component {
     }
 
     setStatePromise = state => new Promise(resolve => this.setState(state, resolve));
-    copyDate = date => this.stringToDate(this.dateToString(date));
+    copyDate = date => new Date(date.getTime());
     isEqualDates = (firstDate, secondDate) => this.dateToString(firstDate) === this.dateToString(secondDate);
-    dayDistance = (firstDate, secondDate) => Math.round(Math.abs(firstDate - secondDate) / (1000 * 60 * 60 * 24));
+    
 }
 
 

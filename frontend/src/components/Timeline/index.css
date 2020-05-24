@@ -4,6 +4,10 @@ body {
     --project-header-height: 4em;
 }
 
+.TimeLine, .Timeline * {
+    box-sizing: border-box;
+}
+
 .Timeline {
     width: 100%;
     height: 100%;
