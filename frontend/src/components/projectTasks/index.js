@@ -7,7 +7,7 @@ class ProjectTask extends React.Component {
       <div className="project-wrapper">
         <div className="project-task"> 
           <button className="x-button">X</button>
-          {this.props.projectTaskText} hej på dig linus, vad gör du?
+          {this.props.projectTaskText}
           <button className="done-button">Done</button>
         </div>
         <div className="project-line">

@@ -59,13 +59,30 @@ body {
 }
 .day-header {
     height: var(--project-header-height);
+    overflow-x: hidden;
 }
 
 .day-Timeline{
     flex-grow: 1;
     flex-shrink: 0;
-    flex-basis: calc(100% / 21);
+    flex-basis: calc(100% / 30);
     flex-direction: column;
     border: solid rgb(170, 164, 164) 1px;
     min-width: 1%;
+}
+
+.day-Timeline.week {
+    flex-basis: calc(100% / 7);
+}
+
+.day-Timeline.month {
+    flex-basis: calc(100% / 30);
+}
+
+.day-Timeline.two-months {
+    flex-basis: calc(100% / 60);
+}
+
+.day-Timeline.three-months {
+    flex-basis: calc(100% / 90);
 }

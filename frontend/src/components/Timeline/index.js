@@ -51,6 +51,7 @@ class Timeline extends React.Component {
             tasks: [],
             days: [],
             isLoading: false,
+            viewingRange: "month",
         }
 
         this.scrollerRef = React.createRef();
@@ -188,7 +189,16 @@ class Timeline extends React.Component {
         return (
             <div className="Timeline">
                 <div className="Timeline-header">
+                    <div></div>
                     <h1>Timeline</h1>
+                    <div>
+                        <select onChange={e => this.setState({ viewingRange: e.target.value })}>
+                            <option value="week">Week</option>
+                            <option selected value="month">Month</option>
+                            <option value="two-months">2 Months</option>
+                            <option value="three-months">3 Months</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="Timeline-holder">
                     <div className="project-day-container">
@@ -196,16 +206,24 @@ class Timeline extends React.Component {
                             <div className="Project-header">
 
                             </div>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
-                            <ProjectTask > </ProjectTask>
+                            {this.state.projects.map((x) => 
+                                <ProjectTask 
+                                    projectTaskText={x.name} 
+                                />
+                            )}
+                            <ProjectTask 
+                                projectTaskText={"Majblomman"} 
+                            />
+                            <ProjectTask 
+                                projectTaskText={"Terminator 18"} 
+                            />
 
                         </div>
                         <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
                             {this.state.days.map(day => {
                                 const dayDate = day.date;
                                 return (
-                                    <div  className="day-Timeline" {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
+                                    <div  className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
                                         <div className="day-header">
                                             {this.getWeekDay(dayDate)} <br />
                                             {this.getMonth(dayDate)} <br />
