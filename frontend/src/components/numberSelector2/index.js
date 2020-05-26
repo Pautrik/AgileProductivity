@@ -13,10 +13,10 @@ class NumberSelector2 extends React.Component {
         <span>Week</span>
         <div className={"numberSelectorBox"}>{this.props.value}</div>
         <div className="buttonBox">
-          <button onClick={this.props.handleClickUp} className="button">
+          <button onClick={this.props.handleClickUp} className="button2">
             <Arrow direction="up" />
           </button>
-          <button onClick={this.props.handleClickDown} className="button">
+          <button onClick={this.props.handleClickDown} className="button2">
             <Arrow direction="down" />
           </button>
         </div>

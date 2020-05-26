@@ -15,20 +15,20 @@ class App extends React.Component {
   }
 
   handleClick() {
-      if (this.state.active === 'FIRST')
-        this.setState({active: 'SECOND'});
-       else 
-        this.setState({active: 'FIRST'});
+    if (this.state.active === 'FIRST')
+      this.setState({ active: 'SECOND' });
+    else
+      this.setState({ active: 'FIRST' });
   }
 
   render() {
     return (
       <div className="App">
-          {this.state.active === 'FIRST' ? (
-            <Week />
-            ) : this.state.active === 'SECOND' ? (
-              <Timeline /> 
-            ) : null}
+        {this.state.active === 'FIRST' ? (
+          <Week />
+        ) : this.state.active === 'SECOND' ? (
+          <Timeline />
+        ) : null}
         <button className="view-togle" onClick={this.handleClick}>Change view</button>
       </div>
     );
