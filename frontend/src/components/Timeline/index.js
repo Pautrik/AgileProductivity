@@ -39,13 +39,12 @@ class Timeline extends React.Component {
         super(props);
 
         const startDate = new Date();
-        let rangeT = 56;
 
         startDate.setDate(startDate.getDate() - 28);
 
         this.state = {
             startDate,
-            rangeT,
+            rangeT: 70,
             projectFilter: "any", // "any", "active", "inactive"
             projects: [],
             tasks: [],
@@ -110,12 +109,29 @@ class Timeline extends React.Component {
 
     tasksToDays(tasks, projects) {
         const days = [];
+        let startedTasks = [];
+
         for (let i = 0; i < this.state.rangeT; i++) {
             const dayDate = this.copyDate(this.state.startDate);
             dayDate.setDate(dayDate.getDate() + i);
-            const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
-            const orderedDayTasks = projects.map(p => dayTasks.filter(t => t.project.name === p.name));
 
+            const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
+            
+            const orderedDayTasks = projects.map(p => {
+                const startedProjectTasks = startedTasks.filter(t => t.project.name === p.name);
+                const combinedTasks = [
+                    ...startedProjectTasks.map(() => undefined),
+                    ...dayTasks.filter(t => t.project.name === p.name)
+                ];
+                const heightSplit = combinedTasks.length;
+                startedProjectTasks.forEach(t => t.heightSplit = t.heightSplit > heightSplit ? t.heightSplit : heightSplit);
+
+                return combinedTasks;
+            });
+
+            startedTasks.push(...dayTasks);
+            startedTasks = startedTasks.filter(task => task.endDate !== this.dateToString(dayDate));
+                
             days.push({
                 tasks: orderedDayTasks, // Array for each day containing array for all task for a project
                 date: this.copyDate(dayDate),
