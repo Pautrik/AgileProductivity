@@ -211,13 +211,6 @@ class Timeline extends React.Component {
                                     projectTaskText={x.name}
                                 />
                             )}
-                            <ProjectTask
-                                projectTaskText={"Majblomman"}
-                            />
-                            <ProjectTask
-                                projectTaskText={"Terminator 18"}
-                            />
-
                         </div>
                         <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
                             {this.state.days.map(day => {
