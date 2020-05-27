@@ -190,7 +190,7 @@ class Week extends React.Component {
     else if (newWeek === 53 && (this.longYear(this.state.chosenYear))) {
       this.fetchWeekToState(this.state.chosenYear, newWeek);
       this.setState({
-        chosenWeek: newWeek, chosenWeek: newWeek
+        chosenWeek: newWeek,
       });
     }
     else if (newWeek === 54) {
@@ -489,9 +489,9 @@ class Week extends React.Component {
   };
 
   isTodaysDate(date) {
-    if (date.substring(0, 4) == this.getCurrentYear() &&
-      date.substring(4, 6) == this.getCurrentYearMonthNumber() &&
-      (date.substring(6, 8) == this.getCurrentDayNumber())) {
+    if (date.substring(0, 4) === this.getCurrentYear() &&
+      date.substring(4, 6) === this.getCurrentYearMonthNumber() &&
+      (date.substring(6, 8) === this.getCurrentDayNumber())) {
       return true;
     }
     return false;
