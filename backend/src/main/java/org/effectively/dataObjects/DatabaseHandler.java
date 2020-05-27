@@ -201,7 +201,16 @@ public class DatabaseHandler {
                     stmt.setString(2, note.getText());
                     stmt.setInt(3, note.getId());
 
-                    System.out.println(stmt);
+                    stmt.executeUpdate();
+                }
+            } else if(viewname.equals("projects")){
+                Project [] projects = gson.fromJson(objects, Project[].class);
+                for(Project project : projects){
+                    stmt = conn.prepareStatement("UPDATE Projects SET active = ? " +
+                            "WHERE name = ?");
+                    stmt.setBoolean(1, project.isActive());
+                    stmt.setString(2, project.getName());
+
                     stmt.executeUpdate();
                 }
             }
@@ -305,6 +314,14 @@ public class DatabaseHandler {
 
                 stmt.executeUpdate();
             }
+            else if(viewname.equals("projects")){
+                Project newProject = gson.fromJson(object, Project.class);
+                stmt = conn.prepareStatement("INSERT INTO Projects VALUES(DEFAULT,?,?)");
+                stmt.setString(1, newProject.getName());
+                stmt.setBoolean(2, newProject.isActive());
+
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
                 s.printStackTrace();
                 //TODO handle cases where task is already in database
@@ -314,7 +331,7 @@ public class DatabaseHandler {
 
     /**
      *
-     * @param object, the JSON of either a Week, Timeline or Note
+     * @param object, the JSON of either a Week, Timeline, Note or Project
      * @param viewname, the name of the view from which the task is to be removed
      */
 
@@ -340,6 +357,13 @@ public class DatabaseHandler {
 
                 stmt.executeUpdate();
             }
+            else if (viewname.equals("projects")){
+                Project newProject = gson.fromJson(object, Project.class);
+                stmt = conn.prepareStatement("DELETE FROM Projects WHERE NAME=?");
+                stmt.setString(1, newProject.getName());
+
+                stmt.executeUpdate();
+            }
         } catch (SQLException s) {
             s.printStackTrace();
         }
@@ -361,7 +385,7 @@ public class DatabaseHandler {
 
         try{
             for (String projectname : projectnames){
-                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE (CAST(startDate AS INT) BETWEEN ? AND ?) OR (CAST(endDate AS INT) BETWEEN ? AND ?) AND (project = ?)");
+                stmt = conn.prepareStatement("SELECT * FROM TimelineTasks WHERE ((CAST(startDate AS INT) BETWEEN ? AND ?) OR (CAST(endDate AS INT) BETWEEN ? AND ?)) AND (project = ?)");
 
                 stmt.setInt(1, startDateValue);
                 stmt.setInt(2, endDateValue);
