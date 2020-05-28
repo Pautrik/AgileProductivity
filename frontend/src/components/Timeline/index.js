@@ -3,9 +3,13 @@ import "./index.css";
 import ProjectTask from "../projectTasks"
 import { httpRequestJson } from "../../helpers/requests";
 import TimelineTask from "../timelineTasks";
+import AddTimelineTaskModal from "../addTimelineTaskModal";
+
+import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
 
 const projectEndpoint = activeState => `/projects?select=${activeState}`;
-const timelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
+const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
+const postTimelineTaskEndpoint = "/timeline?key=value";
 
 const DAYS_TO_LOAD = 14;
 
@@ -51,6 +55,7 @@ class Timeline extends React.Component {
             days: [],
             isLoading: false,
             viewingRange: "month",
+            inAddMode: false,
         }
 
         this.scrollerRef = React.createRef();
@@ -59,6 +64,7 @@ class Timeline extends React.Component {
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
+        this.sumbitTask = this.sumbitTask.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -98,9 +104,9 @@ class Timeline extends React.Component {
     async fetchTasks(projects) {
         try {
             const { startDate, rangeT } = this.state;
-            const endDate = this.copyDate(startDate);
+            const endDate = copyDate(startDate);
             endDate.setDate(endDate.getDate() + rangeT);
-            return await httpRequestJson(timelineTaskEndpoint(projects.map(x => x.name), this.dateToString(startDate), this.dateToString(endDate)));
+            return await httpRequestJson(getTimelineTaskEndpoint(projects.map(x => x.name), dateToString(startDate), dateToString(endDate)));
         }
         catch (e) {
             alert("Failed to fetch timeline tasks");
@@ -112,10 +118,10 @@ class Timeline extends React.Component {
         let startedTasks = [];
 
         for (let i = 0; i < this.state.rangeT; i++) {
-            const dayDate = this.copyDate(this.state.startDate);
+            const dayDate = copyDate(this.state.startDate);
             dayDate.setDate(dayDate.getDate() + i);
 
-            const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
+            const dayTasks = tasks.filter(task => task.date === dateToString(dayDate));
             
             const orderedDayTasks = projects.map(p => {
                 const startedProjectTasks = startedTasks.filter(t => t.project.name === p.name);
@@ -130,11 +136,11 @@ class Timeline extends React.Component {
             });
 
             startedTasks.push(...dayTasks);
-            startedTasks = startedTasks.filter(task => task.endDate !== this.dateToString(dayDate));
+            startedTasks = startedTasks.filter(task => task.endDate !== dateToString(dayDate));
                 
             days.push({
                 tasks: orderedDayTasks, // Array for each day containing array for all task for a project
-                date: this.copyDate(dayDate),
+                date: copyDate(dayDate),
             });
         }
 
@@ -142,7 +148,7 @@ class Timeline extends React.Component {
     }
 
     dateOffsetFromStart(offset) {
-        const date = this.copyDate(this.state.startDate);
+        const date = copyDate(this.state.startDate);
         date.setDate(date.getDate() + offset);
         return date;
     }
@@ -157,7 +163,7 @@ class Timeline extends React.Component {
 
     goBack() {
         const scrollWidth = this.scrollerRef.current.scrollWidth;
-        const newDate = this.copyDate(this.state.startDate);
+        const newDate = copyDate(this.state.startDate);
         newDate.setDate(newDate.getDate() - DAYS_TO_LOAD)
         this.setState({ startDate: newDate, rangeT: this.state.rangeT + DAYS_TO_LOAD }, () =>
             this.fetchTransformTasksToState()
@@ -173,7 +179,7 @@ class Timeline extends React.Component {
     isFocusedDate(date) {
         const todayDate = new Date();
         todayDate.setDate(todayDate.getDate() - 9);
-        return this.isEqualDates(date, todayDate);
+        return isEqualDates(date, todayDate);
     }
 
     handleScroll() {
@@ -193,67 +199,69 @@ class Timeline extends React.Component {
         }
     }
 
-    stringToDate(str) {
-        return new Date(`${str.substr(0, 4)}-${str.substr(4, 2)}-${str.substr(6, 2)}`);
-    }
-
-    dateToString(date) {
-        return date.toISOString().substr(0, 10).replace(/-/g, "");
-    }
-
     render() {
         return (
-            <div className="Timeline">
-                <div className="Timeline-header">
-                    <div></div>
-                    <h1>Timeline</h1>
-                    <div>
-                        <select className="viewingRange" onChange={e => this.setState({ viewingRange: e.target.value })}>
-                            <option value="week">Week</option>
-                            <option selected value="month">Month</option>
-                            <option value="two-months">2 Months</option>
-                            <option value="three-months">3 Months</option>
-                        </select>
+            <>
+                <div className="Timeline">
+                    <div className="Timeline-header">
+                        <div></div>
+                        <h1>Timeline</h1>
+                        <div className="right-part">
+                            <select value={this.state.viewingRange} className="viewingRange" onChange={e => this.setState({ viewingRange: e.target.value })}>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="two-months">2 Months</option>
+                                <option value="three-months">3 Months</option>
+                            </select>
+                            <button onClick={() => this.setState({ inAddMode: true })}>+ Add task</button>
+                        </div>
                     </div>
-                </div>
-                <div className="Timeline-holder">
-                    <div className="project-day-container">
-                        <div className="projects-container">
-                            <div className="Project-header">
+                    <div className="Timeline-holder">
+                        <div className="project-day-container">
+                            <div className="projects-container">
+                                <div className="Project-header">
 
+                                </div>
+                                {this.state.projects.map((x) =>
+                                    <ProjectTask
+                                        projectTaskText={x.name}
+                                    />
+                                )}
                             </div>
-                            {this.state.projects.map((x) =>
-                                <ProjectTask
-                                    projectTaskText={x.name}
-                                />
-                            )}
-                        </div>
-                        <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
-                            {this.state.days.map(day => {
-                                const dayDate = day.date;
-                                const today = new Date();
-                                return (
-                                    <div className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
-                                        <div className="day-header" style={this.isEqualDates(today, dayDate) ? { color: "red" } : {}}>
-                                            {this.getWeekDay(dayDate)} <br />
-                                            {this.getMonth(dayDate)} <br />
-                                            {dayDate.getDate()}
+                            <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
+                                {this.state.days.map(day => {
+                                    const dayDate = day.date;
+                                    const today = new Date();
+                                    return (
+                                        <div className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
+                                            <div className="day-header" style={isEqualDates(today, dayDate) ? { color: "red" } : {}}>
+                                                {this.getWeekDay(dayDate)} <br />
+                                                {this.getMonth(dayDate)} <br />
+                                                {dayDate.getDate()}
+                                            </div>
+                                            {day.tasks.map((tasks, i) => (
+                                                <TimelineTask tasks={tasks} />
+                                            ))}
                                         </div>
-                                        {day.tasks.map((tasks, i) => (
-                                            <TimelineTask
-                                                /* nrDays={task && this.dayDistance(this.stringToDate(task.date), this.stringToDate(task.endDate))}
-                                                text={task && task.text} */
-                                                tasks={tasks} />
-                                        ))}
-                                    </div>
-                                )
-                            })}
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                {this.state.inAddMode && (
+                    <AddTimelineTaskModal
+                        projects={this.state.projects}
+                        onSubmit={data => {
+                            this.sumbitTask(data);
+                            this.setState({ inAddMode: false });
+                        }}
+                        onClose={() => this.setState({ inAddMode: false })} />
+                )}
+            </>
         );
     }
+
     componentDidMount() {
         this.fetchTransformDataToState()
             .then(() => {
@@ -264,11 +272,19 @@ class Timeline extends React.Component {
             });
     }
 
+    sumbitTask(data) {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...data, ...{ state: 1, position: 0 } }),
+        };
+
+        httpRequestJson(postTimelineTaskEndpoint, requestOptions)
+            .then(data => this.fetchTransformTasksToState())
+            .catch(() => alert("Failed to post timeline task."))
+    }
+
     setStatePromise = state => new Promise(resolve => this.setState(state, resolve));
-    copyDate = date => new Date(date.getTime());
-    isEqualDates = (firstDate, secondDate) => this.dateToString(firstDate) === this.dateToString(secondDate);
-
-
 }
 
 

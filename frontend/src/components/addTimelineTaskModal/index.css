@@ -1,0 +1,61 @@
+.modal {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 4;
+    backdrop-filter: blur(1px) grayscale(50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal * {
+    box-sizing: border-box;
+}
+
+.add-task-modal {
+    padding: 20px;
+    background-color: white;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-title {
+    margin: 0px;
+}
+
+.modal .field-columns {
+    display: flex;
+    padding: 5%;
+}
+
+.modal .field-titles, .modal .field-inputs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+}
+
+.modal .field-titles {
+    align-items: flex-end;
+}
+
+.modal .field-inputs {
+    align-items: flex-start;
+}
+
+.modal .field-row {
+    height: 1.8em;
+}
+
+p.field-row {
+    margin: 0px;
+    white-space: nowrap;
+}
+
+.modal-submit-button {
+    align-self: flex-end;
+}

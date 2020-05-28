@@ -31,10 +31,19 @@ body {
     align-items: center;
 }
 
+.Timeline-header > * {
+    flex: 1;
+}
+
+.Timeline-header .right-part {
+    display: flex;
+    justify-content: space-around;
+    /* align-items: center; */
+}
+
 .Timeline-holder {
     height: 100%;
     width: 100%;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
@@ -103,4 +112,3 @@ body {
     padding:3px;
     color: var(--project-text-color);
 }
-

@@ -10,9 +10,16 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .timeline-task:first-of-type {
     border-bottom-style: hidden;
+}
+
+.timeline-tasks p {
+    margin: 0px;
+    vertical-align: center;
 }

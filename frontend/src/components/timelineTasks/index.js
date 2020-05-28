@@ -1,6 +1,8 @@
 import "./index.css";
 import React from "react";
 
+import { dayDistance, stringToDate } from "../../helpers/date"
+
 
 class TimelineTasks extends React.Component {
   render() {
@@ -14,22 +16,21 @@ class TimelineTasks extends React.Component {
           // const stylePrep = { width: `calc(100% * ${taskLength})`, height: `calc(100% / ${tasks.length})`};
           const stylePrep = { height: `calc(100% / ${heightSplit})`};
           if(task !== undefined) {
-            const taskWidth = this.dayDistance(this.stringToDate(task.date), this.stringToDate(task.endDate));
+            const taskWidth = dayDistance(stringToDate(task.date), stringToDate(task.endDate));
             stylePrep.width = `calc(100% * ${taskWidth + 1})`;
           }
           else {
             stylePrep.visibility = "hidden";
           }
 
-          return <div className="timeline-task" style={stylePrep}>{task && task.text}</div>
+          return (
+            <div className="timeline-task" style={stylePrep}>
+              {task && <p>{task.text}</p>}
+            </div>
+          )
         })}
       </div>
     );
-  }
-
-  dayDistance = (firstDate, secondDate) => Math.round(Math.abs(firstDate - secondDate) / (1000 * 60 * 60 * 24));
-  stringToDate(str) {
-    return new Date(`${str.substr(0, 4)}-${str.substr(4, 2)}-${str.substr(6, 2)}`);
   }
 }
 
