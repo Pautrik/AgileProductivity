@@ -25,7 +25,7 @@ class Task {
     private String date;
 
 
-    public Task(Integer id, String text, Integer state, Integer position, String date) {
+    Task(Integer id, String text, Integer state, Integer position, String date) {
         this.id = id;
         this.text = text;
         this.state = state;
@@ -33,22 +33,23 @@ class Task {
         this.date = date;
     }
 
-    public Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    public String getText() {
+    String getText() {
         return text;
     }
 
-    public Integer getState() {
+    Integer getState() {
         return state;
     }
 
-    public Integer getPosition() {
+    Integer getPosition() {
         return position;
     }
-    public String getDate() {
+
+    String getDate() {
         return date;
     }
 }

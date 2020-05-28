@@ -22,21 +22,21 @@ class Note{
     private String text;
 
 
-    public Note(Integer id, Integer position, String text) {
+    Note(Integer id, Integer position, String text) {
         this.id = id;
         this.position = position;
         this.text = text;//rename to text
     }
 
-    public Integer getId() {
+    Integer getId() {
         return id;
     }
 
-    public Integer getPosition() {
+    Integer getPosition() {
         return position;
     }
 
-    public String getText() {
+    String getText() {
         return text;
     }
 }

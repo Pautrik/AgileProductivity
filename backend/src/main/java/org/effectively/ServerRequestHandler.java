@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
     DatabaseHandler handler;
 
-    public ServerRequestHandler(String DBpassword, String context) throws AuthenticationException {
+    ServerRequestHandler(String DBpassword, String context) throws AuthenticationException {
        handler = new DatabaseHandler(DBpassword, context);
     }
 
