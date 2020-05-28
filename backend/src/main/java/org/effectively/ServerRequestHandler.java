@@ -115,7 +115,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
      * @throws IOException
      */
 
-    private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
+    private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
 
         //Request the wanted data from DatabaseHandler

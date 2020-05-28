@@ -2,26 +2,27 @@ package org.effectively.dataObjects;
 
 import com.google.gson.Gson;
 import org.effectively.Pair;
-import org.effectively.dataObjects.Day;
-import org.effectively.dataObjects.Task;
 
 import javax.naming.AuthenticationException;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.Date;
 
 public class DatabaseHandler {
     private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
     private final String user = "pi";
+    private String pass;
     private final Gson gson = new Gson();
     private Connection conn;
     private String context;
 
     public DatabaseHandler(String DBpassword, String context) throws AuthenticationException{
-        connectToDatabase(DBpassword);
+        this.pass = DBpassword;
+
+        //make sure password is correct
+        connectToDatabase();
+        disconnectFromDatabase();
+
         this.context= context;
     }
 
@@ -33,7 +34,13 @@ public class DatabaseHandler {
      *         If POST-request return ID as a JSON object
      *         If DELETE-request and empty array
      */
-    public String requestData(Pair<String, String> param){ //TODO send error reply if request could not be handled?
+    public String requestData(Pair<String, String> param){  //TODO send error reply if request could not be handled?
+        try{
+            connectToDatabase();
+        }
+        catch(AuthenticationException a){
+            a.printStackTrace();
+        }
 
         List <Object> reply = new ArrayList<>();
 
@@ -73,6 +80,9 @@ public class DatabaseHandler {
             String json = gson.toJson(object);
             jsonArray.add(json);
         }
+
+        disconnectFromDatabase();
+
         return jsonArray.toString();
     }
 
@@ -430,17 +440,27 @@ public class DatabaseHandler {
 
     /**
      *
-     * @param DBpassword, the password to the database
      * @throws AuthenticationException, if password is incorrect
      */
-    private void connectToDatabase(String DBpassword) throws AuthenticationException{
+    private void connectToDatabase() throws AuthenticationException {
         Properties props = new Properties();
         props.setProperty("user", user);
-        props.setProperty("password", DBpassword);
+        props.setProperty("password", pass);
+        //System.out.println("Connected");
         try {
             conn = DriverManager.getConnection(url, props);
         } catch (SQLException e){
             throw new AuthenticationException();
+        }
+    }
+
+    private void disconnectFromDatabase(){
+        try{
+            conn.close();
+            this.conn = null;
+        }
+        catch(SQLException s){
+            s.printStackTrace();
         }
     }
 }
