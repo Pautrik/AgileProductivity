@@ -358,9 +358,14 @@ public class DatabaseHandler {
                 stmt.executeUpdate();
             }
             else if (viewname.equals("projects")){
-                Project newProject = gson.fromJson(object, Project.class);
+                //Project newProject = gson.fromJson(object, Project.class);
                 stmt = conn.prepareStatement("DELETE FROM Projects WHERE NAME=?");
-                stmt.setString(1, newProject.getName());
+                stmt.setString(1, object);
+
+                stmt.executeUpdate();
+
+                stmt = conn.prepareStatement("DELETE FROM Timelinetasks WHERE PROJECT=?");
+                stmt.setString(1, object);
 
                 stmt.executeUpdate();
             }
