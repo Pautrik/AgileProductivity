@@ -2,7 +2,7 @@ import React from "react";
 import "./index.css";
 import ProjectTask from "../projectTasks"
 import { httpRequestJson } from "../../helpers/requests";
-import TimelineTask from "../timelineTasks";
+import TimelineTasks from "../timelineTasks";
 import AddTimelineTaskModal from "../addTimelineTaskModal";
 
 import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
@@ -10,6 +10,7 @@ import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
 const projectEndpoint = activeState => `/projects?select=${activeState}`;
 const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 const postTimelineTaskEndpoint = "/timeline?key=value";
+const deleteTimelineTaskEndpoint = id => `/timeline?id=${id}`;
 
 const DAYS_TO_LOAD = 14;
 
@@ -65,6 +66,7 @@ class Timeline extends React.Component {
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
         this.sumbitTask = this.sumbitTask.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -240,7 +242,9 @@ class Timeline extends React.Component {
                                                 {dayDate.getDate()}
                                             </div>
                                             {day.tasks.map((tasks, i) => (
-                                                <TimelineTask tasks={tasks} />
+                                                <TimelineTasks 
+                                                    tasks={tasks}
+                                                    deleteTask={this.deleteTask} />
                                             ))}
                                         </div>
                                     )
@@ -280,8 +284,14 @@ class Timeline extends React.Component {
         };
 
         httpRequestJson(postTimelineTaskEndpoint, requestOptions)
-            .then(data => this.fetchTransformTasksToState())
-            .catch(() => alert("Failed to post timeline task."))
+            .then(() => this.fetchTransformTasksToState())
+            .catch(() => alert("Failed to post timeline task"))
+    }
+
+    deleteTask(id) {
+        httpRequestJson(deleteTimelineTaskEndpoint(id), { method: "DELETE" })
+            .then(() => this.fetchTransformTasksToState())
+            .catch(() => alert("Failed to delete timeline task"))
     }
 
     setStatePromise = state => new Promise(resolve => this.setState(state, resolve));

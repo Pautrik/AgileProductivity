@@ -8,8 +8,6 @@
     position: relative; /* Weird thing to make it task render on top of borders */
     border: solid rgba(0,0,0,0.2) 2px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,7 +17,15 @@
     border-bottom-style: hidden;
 }
 
-.timeline-tasks p {
+.timeline-task p {
     margin: 0px;
-    vertical-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.timeline-task button {
+    position: absolute;
+    top: 0px;
+    right: 0px;
 }
