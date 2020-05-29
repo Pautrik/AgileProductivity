@@ -2,26 +2,27 @@ package org.effectively.dataObjects;
 
 import com.google.gson.Gson;
 import org.effectively.Pair;
-import org.effectively.dataObjects.Day;
-import org.effectively.dataObjects.Task;
 
 import javax.naming.AuthenticationException;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.Date;
 
 public class DatabaseHandler {
     private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
     private final String user = "pi";
+    private String pass;
     private final Gson gson = new Gson();
     private Connection conn;
     private String context;
 
     public DatabaseHandler(String DBpassword, String context) throws AuthenticationException{
-        connectToDatabase(DBpassword);
+        this.pass = DBpassword;
+
+        //make sure password is correct
+        connectToDatabase();
+        disconnectFromDatabase();
+
         this.context= context;
     }
 
@@ -33,7 +34,14 @@ public class DatabaseHandler {
      *         If POST-request return ID as a JSON object
      *         If DELETE-request and empty array
      */
-    public String requestData(Pair<String, String> param){ //TODO send error reply if request could not be handled?
+
+    public String requestData(Pair<String, String> param){
+        try{
+            connectToDatabase();
+        }
+        catch(AuthenticationException a){
+            a.printStackTrace();
+        }
 
         List <Object> reply = new ArrayList<>();
 
@@ -73,6 +81,9 @@ public class DatabaseHandler {
             String json = gson.toJson(object);
             jsonArray.add(json);
         }
+
+        disconnectFromDatabase();
+
         return jsonArray.toString();
     }
 
@@ -81,6 +92,7 @@ public class DatabaseHandler {
      * @param YearAndWeek, the year and week on format yyyyww
      * @return A list of 7 Day objects in the given year and week
      */
+
     private List<Object> getWeekByNumber(String YearAndWeek){
         List<Day> week = new ArrayList<>();
         try {
@@ -117,51 +129,12 @@ public class DatabaseHandler {
         return asObjectArray(week);
     }
 
-    /*private List<Object> getWeekByDate(String date){ //TODO use later when needed or for timeline
-        List<Day> week = new ArrayList<>();
-
-        try{
-            String startDate = date;
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
-            Calendar c = Calendar.getInstance();
-            c.setTime(sdf.parse(startDate));
-
-            for (int i = 0; i<7; i++){
-                week.add(new Day(sdf.format(c.getTime()), new ArrayList<>()));
-                c.add(Calendar.DATE, 1);  // number of days to add
-            }
-
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Tasks WHERE assignedDate BETWEEN ? and ?");
-            stmt.setString(1, week.get(0).getDate());
-            stmt.setString(2, week.get(6).getDate());
-            ResultSet task = stmt.executeQuery();
-
-            while(task.next()){
-                Task newTask = new Task(task.getInt(1),task.getString(3),task.getInt(5), task.getInt(2),task.getString(4));//using position right now
-                for (int i = 0; i<7; i++){
-                    Day thisDay = week.get(i);
-                    if (thisDay.getDate().equals(task.getString(4))){
-                        thisDay.addTask(newTask);
-                    }
-                }
-            }
-        }
-        catch(SQLException | ParseException s){
-            s.printStackTrace();
-        }
-
-        List<Object> returnData = new ArrayList<>();
-        Collections.addAll(returnData,week);
-
-        return returnData;
-    }*/
-
     /**
      *
      * @param objects, the JSON of either a Week, Timeline or Note
      * @param viewname, the name of the view from which the task is to be removed
      */
+
     private void updateObject(String objects, String viewname){
         PreparedStatement stmt;
 
@@ -182,7 +155,7 @@ public class DatabaseHandler {
                 TimelineTask[] timelineTasks = gson.fromJson(objects, TimelineTask[].class);
                 for(TimelineTask timelineTask : timelineTasks){
                     stmt = conn.prepareStatement("UPDATE Timelinetasks SET position = ? , description = ? , startDate = ? , endDate = ? " +
-                            ", state = ? , project = ? WhHERE id = ?");
+                            ", state = ? , project = ? WHERE id = ?");
                     stmt.setInt(1, timelineTask.getPosition());
                     stmt.setString(2, timelineTask.getText());
                     stmt.setString(3, timelineTask.getDate());
@@ -224,6 +197,7 @@ public class DatabaseHandler {
      *
      * @return an Object list of all the Notes in the database
      */
+
     private List<Object> getNotes(){
         PreparedStatement stmt;
         List<Note> notes = new ArrayList<>();
@@ -248,6 +222,7 @@ public class DatabaseHandler {
      * @param viewname, the name of the view from which the ID should be returned
      * @return The ID of the item with highest ID in the selected view
      */
+
     private Integer getLastID (String viewname){
         PreparedStatement stmt =null;
         Integer ID = null;
@@ -324,7 +299,6 @@ public class DatabaseHandler {
             }
         } catch (SQLException s) {
                 s.printStackTrace();
-                //TODO handle cases where task is already in database
         }
 
     }
@@ -377,7 +351,8 @@ public class DatabaseHandler {
      * @param endDate, latest end date of returned TimelineTask
      * @return An Object list of TimelineTasks included in projectnames in the span startdate-enddate
      */
-    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){ //TODO allow to query by active or inactive
+
+    private List<Object> getTimeLine(String [] projectnames, String startDate, String endDate){
         PreparedStatement stmt;
         List<TimelineTask> timeline = new ArrayList<>();
         int startDateValue = Integer.valueOf(startDate);
@@ -453,18 +428,32 @@ public class DatabaseHandler {
     }
 
     /**
+     * Connects the handler to the database
      *
-     * @param DBpassword, the password to the database
      * @throws AuthenticationException, if password is incorrect
      */
-    private void connectToDatabase(String DBpassword) throws AuthenticationException{
+    private void connectToDatabase() throws AuthenticationException {
         Properties props = new Properties();
         props.setProperty("user", user);
-        props.setProperty("password", DBpassword);
+        props.setProperty("password", pass);
         try {
             conn = DriverManager.getConnection(url, props);
         } catch (SQLException e){
             throw new AuthenticationException();
+        }
+    }
+
+    /**
+     * Disconnects the handler from the database
+     */
+
+    private void disconnectFromDatabase(){
+        try{
+            conn.close();
+            this.conn = null;
+        }
+        catch(SQLException s){
+            s.printStackTrace();
         }
     }
 }
