@@ -7,7 +7,8 @@ import AddTimelineTaskModal from "../addTimelineTaskModal";
 
 import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
 
-const projectEndpoint = activeState => `/projects?select=${activeState}`;
+const getProjectEndpoint = activeState => `/projects?select=${activeState}`;
+const postProjectEndpoint = "/projects?key=value";
 const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 const postTimelineTaskEndpoint = "/timeline?key=value";
 const deleteTimelineTaskEndpoint = id => `/timeline?id=${id}`;
@@ -57,16 +58,20 @@ class Timeline extends React.Component {
             isLoading: false,
             viewingRange: "month",
             inAddMode: false,
+            isEditingProject: false,
         }
 
         this.scrollerRef = React.createRef();
+        this.projectTextRef = React.createRef();
 
         this.dateOffsetFromStart = this.dateOffsetFromStart.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
-        this.sumbitTask = this.sumbitTask.bind(this);
+        this.submitTask = this.submitTask.bind(this);
         this.deleteTask = this.deleteTask.bind(this);
+        this.enterProjectEditMode = this.enterProjectEditMode.bind(this);
+        this.onProjectSumbit = this.onProjectSumbit.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -96,7 +101,7 @@ class Timeline extends React.Component {
     async fetchProjects() {
         try {
             const { projectFilter } = this.state;
-            return await httpRequestJson(projectEndpoint(projectFilter));
+            return await httpRequestJson(getProjectEndpoint(projectFilter));
         }
         catch (e) {
             alert("Failed to fetch timeline projects");
@@ -124,7 +129,7 @@ class Timeline extends React.Component {
             dayDate.setDate(dayDate.getDate() + i);
 
             const dayTasks = tasks.filter(task => task.date === dateToString(dayDate));
-            
+
             const orderedDayTasks = projects.map(p => {
                 const startedProjectTasks = startedTasks.filter(t => t.project.name === p.name);
                 const combinedTasks = [
@@ -139,7 +144,7 @@ class Timeline extends React.Component {
 
             startedTasks.push(...dayTasks);
             startedTasks = startedTasks.filter(task => task.endDate !== dateToString(dayDate));
-                
+
             days.push({
                 tasks: orderedDayTasks, // Array for each day containing array for all task for a project
                 date: copyDate(dayDate),
@@ -221,14 +226,11 @@ class Timeline extends React.Component {
                     <div className="Timeline-holder">
                         <div className="project-day-container">
                             <div className="projects-container">
-                                <div className="Project-header">
-
-                                </div>
+                                <div className="Project-header"></div>
                                 {this.state.projects.map((x) =>
-                                    <ProjectTask
-                                        projectTaskText={x.name}
-                                    />
+                                    <ProjectTask projectTaskText={x.name} />
                                 )}
+                                {this.renderAddProject()}
                             </div>
                             <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
                                 {this.state.days.map(day => {
@@ -242,7 +244,7 @@ class Timeline extends React.Component {
                                                 {dayDate.getDate()}
                                             </div>
                                             {day.tasks.map((tasks, i) => (
-                                                <TimelineTasks 
+                                                <TimelineTasks
                                                     tasks={tasks}
                                                     deleteTask={this.deleteTask} />
                                             ))}
@@ -257,13 +259,73 @@ class Timeline extends React.Component {
                     <AddTimelineTaskModal
                         projects={this.state.projects}
                         onSubmit={data => {
-                            this.sumbitTask(data);
+                            this.submitTask(data);
                             this.setState({ inAddMode: false });
                         }}
                         onClose={() => this.setState({ inAddMode: false })} />
                 )}
             </>
         );
+    }
+
+    onProjectSumbit() {
+        const projectName = this.projectTextRef.current.innerText.trim();
+
+        if(projectName === "")
+            return;
+
+        const body = {
+            name: projectName,
+            active: true,
+        };
+
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        }
+
+        httpRequestJson(postProjectEndpoint, requestOptions)
+            .then(() => this.fetchTransformDataToState())
+            .then(this.setStatePromise({ isEditingProject: false }))
+            .catch(() => alert("Failed to create project"));
+    }
+
+    enterProjectEditMode() {
+        this.setState({ isEditingProject: true }, () => this.projectTextRef.current.focus());
+    }
+
+    renderAddProject() {
+        if (this.state.isEditingProject) {
+            return (
+                <>
+                    <div className="form-area">
+                        <div
+                            className="text-area"
+                            contentEditable
+                            ref={this.projectTextRef}
+                            placeholder="Enter project text"
+                            onKeyDown={(event) => {
+                                if (event.keyCode === 13)
+                                    this.onProjectSumbit()
+                                else if (event.keyCode === 27) this.setState({ isEditingProject: false })
+                            }}></div>
+                        <div className="buttons-container">
+                            <button className="submit-button" onClick={this.onProjectSumbit}>&#10148;</button>
+                        </div>
+
+                    </div>
+                    <div onClick={() => this.setState({ isEditingProject: false })} className="layerClick"></div>
+                </>
+            )
+        }
+        else {
+            return (
+                <button onClick={this.enterProjectEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
+                    +
+                </button>
+            )
+        }
     }
 
     componentDidMount() {
@@ -276,7 +338,7 @@ class Timeline extends React.Component {
             });
     }
 
-    sumbitTask(data) {
+    submitTask(data) {
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
