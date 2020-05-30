@@ -28,8 +28,6 @@ class TimelineTasks extends React.Component {
       stylePrep.visibility = "hidden";
     }
 
-    console.log(this.props);
-
     return (
       <div className="timeline-task" style={stylePrep}>
         {task && <p>{task.text}</p>}
