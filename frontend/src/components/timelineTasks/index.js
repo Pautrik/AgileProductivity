@@ -22,7 +22,7 @@ class TimelineTasks extends React.Component {
 
     if(task !== undefined) {
       const taskWidth = dayDistance(stringToDate(task.date), stringToDate(task.endDate));
-      stylePrep.width = `calc(100% * ${taskWidth + 1})`;
+      stylePrep.width = `calc((${taskWidth + 1} * (100% + 2px)) - 2px)`; /* Accounts for day borders */
     }
     else {
       stylePrep.visibility = "hidden";
