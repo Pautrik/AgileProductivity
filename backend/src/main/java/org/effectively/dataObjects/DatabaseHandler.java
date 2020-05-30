@@ -59,7 +59,12 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("Post")){
             addObject(param.getSecond(), context);
             //returning ID after POST
-            reply.add(getLastID(context));
+            if(context.equals("projects")){
+                reply = getProjects("inactive");
+            }else{
+                reply.add(getLastID(context));
+            }
+
         }
         else if(param.getFirst().equals("Delete")){
             removeObject(param.getSecond(), context);
@@ -206,8 +211,7 @@ public class DatabaseHandler {
             } else if(viewname.equals("projects")){
                 Project [] projects = gson.fromJson(objects, Project[].class);
                 for(Project project : projects){
-                    stmt = conn.prepareStatement("UPDATE Projects SET active = ? " +
-                            "WHERE name = ?");
+                    stmt = conn.prepareStatement("UPDATE Projects SET active = ? WHERE name = ?");
                     stmt.setBoolean(1, project.isActive());
                     stmt.setString(2, project.getName());
 
@@ -261,6 +265,7 @@ public class DatabaseHandler {
             else if (viewname.equals("note")){
                 stmt = conn.prepareStatement("SELECT ID FROM Notes ORDER BY ID DESC LIMIT 1");
             }
+
 
             assert stmt != null;
             ResultSet rs = stmt.executeQuery();
@@ -316,7 +321,7 @@ public class DatabaseHandler {
             }
             else if(viewname.equals("projects")){
                 Project newProject = gson.fromJson(object, Project.class);
-                stmt = conn.prepareStatement("INSERT INTO Projects VALUES(DEFAULT,?,?)");
+                stmt = conn.prepareStatement("INSERT INTO Projects VALUES(?,?)");
                 stmt.setString(1, newProject.getName());
                 stmt.setBoolean(2, newProject.isActive());
 
