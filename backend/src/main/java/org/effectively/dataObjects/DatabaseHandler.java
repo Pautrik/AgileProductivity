@@ -59,12 +59,9 @@ public class DatabaseHandler {
         else if(param.getFirst().equals("Post")){
             addObject(param.getSecond(), context);
             //returning ID after POST
-            if(context.equals("projects")){
-                reply = getProjects("inactive");
-            }else{
+            if(!context.equals("projects")){
                 reply.add(getLastID(context));
             }
-
         }
         else if(param.getFirst().equals("Delete")){
             removeObject(param.getSecond(), context);
