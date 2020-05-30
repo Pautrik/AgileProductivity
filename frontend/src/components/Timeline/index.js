@@ -9,6 +9,7 @@ import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
 
 const getProjectEndpoint = activeState => `/projects?select=${activeState}`;
 const postProjectEndpoint = "/projects?key=value";
+const deleteProjectEndpoint = name => `/projects?name=${name}`;
 const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 const postTimelineTaskEndpoint = "/timeline?key=value";
 const deleteTimelineTaskEndpoint = id => `/timeline?id=${id}`;
@@ -72,6 +73,7 @@ class Timeline extends React.Component {
         this.deleteTask = this.deleteTask.bind(this);
         this.enterProjectEditMode = this.enterProjectEditMode.bind(this);
         this.onProjectSumbit = this.onProjectSumbit.bind(this);
+        this.deleteProject = this.deleteProject.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -228,7 +230,7 @@ class Timeline extends React.Component {
                             <div className="projects-container">
                                 <div className="Project-header"></div>
                                 {this.state.projects.map((x) =>
-                                    <ProjectTask projectTaskText={x.name} />
+                                    <ProjectTask onDelete={this.deleteProject} projectName={x.name} />
                                 )}
                                 {this.renderAddProject()}
                             </div>
@@ -295,6 +297,12 @@ class Timeline extends React.Component {
         this.setState({ isEditingProject: true }, () => this.projectTextRef.current.focus());
     }
 
+    deleteProject(name) {
+        httpRequestJson(deleteProjectEndpoint(name), { method: "DELETE" })
+            .then(() => this.fetchTransformDataToState())
+            .catch(() => alert("Failed to delete project"));
+    }
+
     renderAddProject() {
         if (this.state.isEditingProject) {
             return (
@@ -352,7 +360,8 @@ class Timeline extends React.Component {
 
     deleteTask(id) {
         httpRequestJson(deleteTimelineTaskEndpoint(id), { method: "DELETE" })
-            .then(() => this.fetchTransformTasksToState())
+            .then(() => this.fetchProjects())
+            .then(projects => this.setStatePromise({ projects }))
             .catch(() => alert("Failed to delete timeline task"))
     }
 
