@@ -26,6 +26,11 @@ DELETE: key=Any value=id
 
 example: http://localhost:8000/week?id=19
 
+//update tasks in weekview, JSON is the array of updated tasks ordered by ascending position in JSON-format
+PATCH: body=JSON
+
+example: http://localhost:8000/week (attach JSON as body)
+
 
 Note:
 
@@ -43,6 +48,11 @@ example: http://localhost:8000/note (attach JSON as body)
 DELETE: key=Any value=id
 
 example: http://localhost:8000/note?id=19
+
+//update notes in weekview, JSON is the array of updated tasks ordered by ascending position in JSON-format
+PATCH: body=JSON
+
+example: http://localhost:8000/note (attach JSON as body)
 
 timeline:
 
@@ -62,7 +72,32 @@ DELETE: key=Any value=id
 
 example: http://localhost:8000/timeline?id=5
 
+//update tasks in timelineview, JSON is the array of updated tasks ordered by ascending position in JSON-format
+PATCH: body=JSON
+
+example: http://localhost:8000/timeline (attach JSON as body)
+
 projects:
 
 //get all/active/inactive projects in database
 GET: key=Any value=active OR inactive OR Any
+
+example: http://localhost:8000/timeline?parameters=active
+
+//add a new project to timelineview, JSON is the project in JSON-format
+POST: body=JSON
+
+example: http://localhost:8000/projects (attach JSON as body)
+
+//remove the project with name from timelineview
+DELETE: key=Any value=projectname1
+
+example: http://localhost:8000/projects?name=projectname1
+
+//update projects in timelineview, JSON is the array of updated tasks ordered by ascending position in JSON-format
+PATCH: body=JSON
+
+example: http://localhost:8000/projects (attach JSON as body)
+
+
+
