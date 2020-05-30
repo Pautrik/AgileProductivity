@@ -8,6 +8,10 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Class that handles connecting, disconnecting and querying of a database, returning the database replies in JSON-format
+ */
+
 public class DatabaseHandler {
     private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
     private final String user = "pi";
