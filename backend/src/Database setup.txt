@@ -15,7 +15,6 @@ CREATE TABLE TimelineTasks (
     endDate VARCHAR(8) NOT NULL,
 	state INT NOT NULL,
 	project TEXT NOT NULL,
-	UNIQUE(position),
 	CHECK (state>0 AND state<4)
 );
 

@@ -8,16 +8,16 @@ class Project {
     private String name;
     private boolean active;
 
-    public Project(String name, boolean active){
+    Project(String name, boolean active){
         this.name = name;
         this.active = active;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public boolean isActive() {
+    boolean isActive() {
         return active;
     }
 }

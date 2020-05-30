@@ -7,10 +7,15 @@ import javax.naming.AuthenticationException;
 import java.io.*;
 import java.util.stream.Collectors;
 
+/**
+ * Class that handles incoming httprequests for clients. This class extracts and sends the needed parameters in
+ * httprequest to a DatabaseHandler waiting for response before sending to client
+ */
+
 public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler {
     DatabaseHandler handler;
 
-    public ServerRequestHandler(String DBpassword, String context) throws AuthenticationException {
+    ServerRequestHandler(String DBpassword, String context) throws AuthenticationException {
        handler = new DatabaseHandler(DBpassword, context);
     }
 
@@ -115,7 +120,7 @@ public class ServerRequestHandler implements com.sun.net.httpserver.HttpHandler 
      * @throws IOException
      */
 
-    private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws  IOException {
+    private void handleResponse(HttpExchange httpExchange, Pair requestParamValue)  throws IOException {
         OutputStream outputStream = httpExchange.getResponseBody();
 
         //Request the wanted data from DatabaseHandler
