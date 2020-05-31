@@ -316,7 +316,8 @@ class Timeline extends React.Component {
 
     deleteProject(name) {
         httpRequestJson(deleteProjectEndpoint(name), { method: "DELETE" })
-            .then(() => this.fetchTransformDataToState())
+            .then(() => this.fetchProjects())
+            .then(projects => this.setStatePromise({ projects }))
             .catch(() => alert("Failed to delete project"));
     }
 
@@ -395,8 +396,7 @@ class Timeline extends React.Component {
 
     deleteTask(id) {
         httpRequestJson(deleteTimelineTaskEndpoint(id), { method: "DELETE" })
-            .then(() => this.fetchProjects())
-            .then(projects => this.setStatePromise({ projects }))
+            .then(() => this.fetchTransformTasksToState())
             .catch(() => alert("Failed to delete timeline task"))
     }
 
