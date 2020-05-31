@@ -10,6 +10,7 @@ import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
 const getProjectEndpoint = activeState => `/projects?select=${activeState}`;
 const postProjectEndpoint = "/projects?key=value";
 const deleteProjectEndpoint = name => `/projects?name=${name}`;
+const patchProjectEndpoint = "/projects?key=value";
 const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
 const postTimelineTaskEndpoint = "/timeline?key=value";
 const deleteTimelineTaskEndpoint = id => `/timeline?id=${id}`;
@@ -74,6 +75,7 @@ class Timeline extends React.Component {
         this.enterProjectEditMode = this.enterProjectEditMode.bind(this);
         this.onProjectSumbit = this.onProjectSumbit.bind(this);
         this.deleteProject = this.deleteProject.bind(this);
+        this.editProjectActive = this.editProjectActive.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -228,9 +230,24 @@ class Timeline extends React.Component {
                     <div className="Timeline-holder">
                         <div className="project-day-container">
                             <div className="projects-container">
-                                <div className="Project-header"></div>
+                                <div className="Project-header">
+                                    <select
+                                        value={this.state.projectFilter}
+                                        onChange={e => {
+                                            this.setState({ projectFilter: e.target.value }, () =>
+                                                this.fetchTransformDataToState());
+                                        }}>
+                                        <option value="any">Any activity</option>
+                                        <option value="active">Only active</option>
+                                        <option value="inactive">Only inactive</option>
+                                    </select>
+                                </div>
                                 {this.state.projects.map((x) =>
-                                    <ProjectTask onDelete={this.deleteProject} projectName={x.name} />
+                                    <ProjectTask 
+                                        projectName={x.name}
+                                        active={x.active}
+                                        onDelete={this.deleteProject}
+                                        onToggleActive={() => this.editProjectActive(x.name, !x.active)}/>
                                 )}
                                 {this.renderAddProject()}
                             </div>
@@ -303,6 +320,24 @@ class Timeline extends React.Component {
             .catch(() => alert("Failed to delete project"));
     }
 
+    editProjectActive(name, isActive) {
+        const requestOptions = {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify([{ name, active: isActive }]),
+        }
+
+        httpRequestJson(patchProjectEndpoint, requestOptions)
+            .catch(() => alert("Failed to change project active state"));
+
+        const projectsCopy = [ ...this.state.projects ];
+        const projectIndex = projectsCopy.findIndex(p => p.name === name);
+        if(projectIndex === -1) this.fetchTransformDataToState(); // Refetches if project wasn't found
+        projectsCopy[projectIndex] = { ...projectsCopy[projectIndex] };
+        projectsCopy[projectIndex].active = isActive;
+
+        this.setState({ projects: projectsCopy });
+    }
     renderAddProject() {
         if (this.state.isEditingProject) {
             return (
