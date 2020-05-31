@@ -230,7 +230,18 @@ class Timeline extends React.Component {
                     <div className="Timeline-holder">
                         <div className="project-day-container">
                             <div className="projects-container">
-                                <div className="Project-header"></div>
+                                <div className="Project-header">
+                                    <select
+                                        value={this.state.projectFilter}
+                                        onChange={e => {
+                                            this.setState({ projectFilter: e.target.value }, () =>
+                                                this.fetchTransformDataToState());
+                                        }}>
+                                        <option value="any">Any activity</option>
+                                        <option value="active">Only active</option>
+                                        <option value="inactive">Only inactive</option>
+                                    </select>
+                                </div>
                                 {this.state.projects.map((x) =>
                                     <ProjectTask 
                                         projectName={x.name}

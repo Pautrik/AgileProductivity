@@ -66,6 +66,8 @@ body {
 
 .Project-header{
     height: var(--project-header-height);
+    display: flex;
+    align-items: center;
 }
 .day-holder {
     display: flex;
