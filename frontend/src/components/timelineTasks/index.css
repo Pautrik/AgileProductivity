@@ -29,3 +29,15 @@
     top: 0px;
     right: 0px;
 }
+.delete-timeline-task{
+    background-color: rgb(48,48,48);
+    border: solid rgba(0,0,0,0.2) 2px;
+    color: rgba(255,255,255,0.8);
+    border-radius: 4px;
+    font-size: 10px;
+}
+.delete-timeline-task:hover{
+    cursor: pointer;
+    opacity: 0.9;
+
+}
