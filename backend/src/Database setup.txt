@@ -156,7 +156,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER expandNotes AFTER UPDATE ON Notes
   FOR EACH ROW WHEN (pg_trigger_depth() < 1)
-  EXECUTE FUNCTION expand();
+  EXECUTE FUNCTION expandNotes();
 
 
 CREATE OR REPLACE FUNCTION addproject()
