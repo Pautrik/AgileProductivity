@@ -415,11 +415,11 @@ public class DatabaseHandler {
 
         try{
             if (active != null){
-                stmt = conn.prepareStatement("SELECT * FROM Projects WHERE active=?");
+                stmt = conn.prepareStatement("SELECT * FROM Projects WHERE active=? ORDER BY name");
                 stmt.setBoolean(1,active);
             }
             else{
-                stmt = conn.prepareStatement("SELECT * FROM Projects");
+                stmt = conn.prepareStatement("SELECT * FROM Projects ORDER BY active DESC, name");
             }
             ResultSet project = stmt.executeQuery();
 
