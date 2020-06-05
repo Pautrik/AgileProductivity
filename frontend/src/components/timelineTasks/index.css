@@ -8,11 +8,36 @@
     position: relative; /* Weird thing to make it task render on top of borders */
     border: solid rgba(0,0,0,0.2) 2px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .timeline-task:first-of-type {
     border-bottom-style: hidden;
+}
+
+.timeline-task p {
+    margin: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.timeline-task button {
+    position: absolute;
+    background-color: transparent;
+    border-color: transparent;
+    color: rgba(255,255,255,0.8);
+    border-radius: 4px;
+    font-size: 10px;
+    top: 0px;
+    right: 0px;
+}
+
+.delete-timeline-task:hover{
+    cursor: pointer;
+    background-color: rgb(48,48,48);
+    border: solid rgba(0,0,0,0.2) 2px;
+
 }
