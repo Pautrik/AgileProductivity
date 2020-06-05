@@ -14,9 +14,9 @@ The setup of the database will vary depending depending on what OS you're runnin
 For installation on Windows you can follow [this](https://www.postgresqltutorial.com/install-postgresql) tutorial.
 For [mac](https://www.postgresql.org/download/macosx/) and for other POSIX based system you'll just have to google for it.
 
-The database is required to have the name 'kangaroo' and the user of the database needs to have the name 'postgres' and a password of your own choosing.
+The database is required to have the name 'kangaroo' and the user of the database needs to have the name 'pguser' and a password of your own choosing.
 
-To actually setup the required tables and triggers, run the command `psql -f Database\ Setup.txt kangaroo postgres`.
+To actually setup the required tables and triggers, run the command `psql -f Database\ Setup.txt kangaroo pguser`.
 
 #### Backend
 To start the backend run the command `./backend-1.0/bin/backend` if you're on MAC OS or linux and `.\backend-1.0\bin\backend.bat` if you're running Windows. 
