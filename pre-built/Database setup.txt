@@ -1,0 +1,190 @@
+CREATE TABLE Tasks (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	assignedDate VARCHAR(8) NOT NULL,
+	state INT NOT NULL,
+	CHECK (state>0 AND state<4)
+);
+
+CREATE TABLE TimelineTasks (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL,
+	startDate VARCHAR(8) NOT NULL,
+    endDate VARCHAR(8) NOT NULL,
+	state INT NOT NULL,
+	project TEXT NOT NULL,
+	CHECK (state>0 AND state<4)
+);
+
+
+CREATE TABLE Notes (
+	ID SERIAL PRIMARY KEY,
+	position INT NOT NULL,
+	description TEXT NOT NULL
+);
+
+CREATE TABLE Projects (
+	name TEXT PRIMARY KEY,
+	active BOOLEAN NOT NULL
+);
+
+
+
+----------------------------TASKS-----------------------------------
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION compactTasks() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Tasks WHERE position>=OLD.position AND assignedDate=OLD.assignedDate);
+BEGIN
+	FOR VAR2 IN 0..i LOOP
+		UPDATE Tasks SET position = position-1
+		WHERE position = OLD.position+VAR2 AND assignedDate=OLD.assignedDate;
+	END LOOP;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER compactTasks AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compactTasks();
+
+
+
+--calls procedure to be able to change table wihout breaking unique contraint
+CREATE OR REPLACE FUNCTION cascadeTasks() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Tasks WHERE position>=NEW.position AND assignedDate=NEW.assignedDate);
+BEGIN
+	IF(EXISTS(SELECT * FROM Tasks WHERE NEW.position = position AND assignedDate=NEW.assignedDate))
+	THEN
+		FOR VAR2 IN 0..i LOOP
+			UPDATE Tasks SET position = position+1
+			WHERE position = NEW.position+i-VAR2 AND assignedDate=NEW.assignedDate;
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER cascadeTasks BEFORE INSERT ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION cascadeTasks();
+
+
+---------------------------------NOTES---------------------------
+
+-- A function to adjust positions after someone is removed from the list
+CREATE OR REPLACE FUNCTION compactNotes() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Notes WHERE position>=OLD.position);
+BEGIN
+	FOR VAR2 IN 0..i LOOP
+		UPDATE Notes SET position = position-1
+		WHERE position = OLD.position+VAR2;
+	END LOOP;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER compactNotes AFTER DELETE ON Notes
+  FOR EACH ROW EXECUTE FUNCTION compactNotes();
+
+--to cascade note if a note is inserted in the middle of a list
+--loops through all bigger positions and increments them by 1
+CREATE OR REPLACE FUNCTION cascadeNotes() RETURNS TRIGGER AS $$
+DECLARE
+	i int := (SELECT COUNT(*) FROM Notes WHERE position>=NEW.position);
+BEGIN
+	IF(EXISTS(SELECT * FROM notes WHERE NEW.position = position))
+		THEN
+		FOR VAR2 IN 0..i LOOP
+			UPDATE Notes SET position = position+1
+			WHERE position = NEW.position+i-VAR2;
+		END LOOP;
+	END IF;
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+--calls function to move bigger positions
+CREATE TRIGGER cascadeNotes BEFORE INSERT ON Notes
+  FOR EACH ROW EXECUTE FUNCTION cascadeNotes();
+
+
+CREATE TRIGGER compactTasks AFTER DELETE ON Tasks
+  FOR EACH ROW EXECUTE FUNCTION compactTasks();
+
+CREATE OR REPLACE FUNCTION compactNotes() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Notes SET position = position-1 WHERE position>=OLD.position;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER compactNotes AFTER DELETE ON Notes
+  FOR EACH ROW EXECUTE FUNCTION compactNotes();
+
+
+-- A function to adjust positions after someone is added to the list
+CREATE OR REPLACE FUNCTION expandTasks() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Tasks SET position = position+1 WHERE assignedDate=NEW.assignedDate AND position >= NEW.position AND id != NEW.id;
+  UPDATE Tasks SET position = position-1 WHERE position>OLD.position AND assignedDate=OLD.assignedDate;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER expandTasks AFTER UPDATE ON Tasks
+  FOR EACH ROW WHEN (pg_trigger_depth() < 1)
+  EXECUTE FUNCTION expandTasks();
+
+
+CREATE OR REPLACE FUNCTION expandNotes() RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE Notes SET position = position+1 WHERE position >= NEW.position AND id != NEW.id;
+  UPDATE Notes SET position = position-1 WHERE position>OLD.position;
+  RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER expandNotes AFTER UPDATE ON Notes
+  FOR EACH ROW WHEN (pg_trigger_depth() < 1)
+  EXECUTE FUNCTION expandNotes();
+
+
+CREATE OR REPLACE FUNCTION addproject()
+  RETURNS trigger AS
+$$
+BEGIN
+	INSERT INTO Projects
+    SELECT project, true
+    FROM TimelineTasks
+    WHERE project NOT IN(SELECT name FROM Projects);
+    RETURN NULL;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER addproject AFTER INSERT ON TimelineTasks
+EXECUTE FUNCTION addproject();
+
+CREATE OR REPLACE FUNCTION removeproject()
+  RETURNS trigger AS
+$$
+BEGIN
+    DELETE FROM Projects WHERE (name NOT IN (SELECT project FROM TimelineTasks));
+    RETURN NULL;
+
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER removeproject AFTER DELETE ON TimelineTasks
+EXECUTE FUNCTION removeproject();
+
+
