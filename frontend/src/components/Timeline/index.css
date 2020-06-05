@@ -1,15 +1,31 @@
+body {
+    --timeline-task-height: 6em;
+    --timeline-task-spacing: 1.5em;
+    --project-header-height: 4em;
+    --project-background-color: rgb(40, 40, 40);
+    --project-task-color: rgb(48,48,48);
+    --project-text-color: rgba(255,255,255,0.8);
+    --text-hover-color: rgba(255,255,255,0.5);
+    --project-yellow:#D6A115;
+    --project-green: #509B5A;
+}
+
+.TimeLine, .Timeline * {
+    box-sizing: border-box;
+}
+
 .Timeline {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-
+    background-color: var(--project-background-color);
+    color: var(--project-text-color);
 }
 .Timeline-header {
     width: 100%;
     height: 10%;
     display: flex;
-    background-color:  hsl(197, 79%, 85%);
     flex: 0;
     justify-content: space-around;
     align-items: center;
@@ -24,7 +40,9 @@
 }
 
 .project-day-container{
+    flex-grow: 1;
     display: flex;
+    flex: 1;
     flex-direction: row;
     align-items: stretch;
     flex: 1;
@@ -33,22 +51,56 @@
 .projects-container {
     display: flex;
     width: 10%;
-    background-color: darkgray;
+    background-color: var(--project-task-color);
     flex-direction: column;
+}
+
+.Project-header{
+    height: var(--project-header-height);
 }
 .day-holder {
     display: flex;
     overflow-x: auto;
     flex: 1;
+    z-index: 2;
+}
+.day-header {
+    height: var(--project-header-height);
+    overflow-x: hidden;
 }
 
 .day-Timeline{
     flex-grow: 1;
     flex-shrink: 0;
-    flex-basis: calc(100% / 21);
+    flex-basis: calc(100% / 30);
     flex-direction: column;
-    background-color: hsl(0, 6%, 93%);
-    border: solid rgb(170, 164, 164) 1px;
+    border: solid rgba(0, 0, 0,0.2) 1px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+    min-width: 1%;
 }
+
+.day-Timeline.week {
+    flex-basis: calc(100% / 7);
+}
+
+.day-Timeline.month {
+    flex-basis: calc(100% / 30);
+}
+
+.day-Timeline.two-months {
+    flex-basis: calc(100% / 60);
+}
+
+.day-Timeline.three-months {
+    flex-basis: calc(100% / 90);
+}
+.viewingRange{
+    background-color: var(--project-task-color);
+    fill: black;
+    border-color: transparent;
+    border-radius: 5px;
+    padding:3px;
+    color: var(--project-text-color);
+}
+

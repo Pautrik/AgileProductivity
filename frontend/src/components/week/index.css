@@ -1,6 +1,8 @@
 .week-view {
   display: flex;
   height: 100%;
+  background-color: rgb(40, 40, 40);
+  color: rgba(255,255,255,0.8);
 }
 
 .week {
@@ -13,9 +15,8 @@
 
 .week-header {
   display: flex;
-  background-color: hsl(197, 79%, 85%);
   flex: 0;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -23,6 +24,7 @@
   display: flex;
   flex: 1;
   position: relative;
+  min-height: 1%;
 }
 
 .previous-week,
@@ -31,7 +33,9 @@
   top: 50%;
   visibility: hidden;
   border-radius: 50%;
-  box-shadow: 2px 2px 5px grey;
+  border-color: rgb(70, 70, 70);
+  box-shadow: 2px 2px 5px black;
+  background-color: rgb(100, 100, 100);
 }
 
 .days:hover .previous-week,
@@ -40,16 +44,22 @@
 }
 
 .previous-week {
-  left: 10px;
+  left: 15px;
 }
 
 .next-week {
-  right: 10px;
+  right: 15px;
 }
 
 .note-container {
   display: flex;
   flex: 3;
-  background-color: rgb(142, 167, 221);
+  background-color: transparent;
   flex-direction: column;
+}
+
+.previous-week:hover,
+.next-week:hover {
+  transform: scale(1.5);
+  cursor: pointer;
 }

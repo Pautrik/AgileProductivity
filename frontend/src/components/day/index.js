@@ -31,11 +31,11 @@ class Day extends React.Component {
       <div className="day-box">
         <h2>
           {this.props.dayName}
-          {this.props.dayDate && this.props.dayName === this.props.todaysDay ? (
-            <p style={{color: "red"}}>{this.props.dayDate}</p>
+          {this.props.isToday ? (
+            <p style={{ color: "red" }}>{this.props.dayDate}</p>
           ) : (
-            <p>{this.props.dayDate}</p>
-          )}
+              <p>{this.props.dayDate}</p>
+            )}
         </h2>
         {this.props.tasks.map((x) => (
           <Task
@@ -51,37 +51,56 @@ class Day extends React.Component {
           />
         ))}
         {this.state.isEditing ? (
-          <div className="form-area" style={this.props.hovered ? { marginTop: "80px" } : {}}>
-            <div
-              className="text-area"
-              contentEditable
-              ref={this.taskTextRef}
-              placeholder="Enter task text"
-              onKeyDown={(event) => event.keyCode === 13 && this.onTaskSubmit()}
-            ></div>
-            <div className="buttons-container">
-              <button onClick={() => this.setState({ isEditing: false })}>
-                Cancel
-              </button>
-              <button onClick={this.onTaskSubmit}>Submit</button>
+          <>
+            <div className="form-area" style={this.props.hovered ? { marginTop: "80px" } : {}}>
+              <div
+                className="text-area"
+                contentEditable
+                ref={this.taskTextRef}
+                placeholder="Enter task text"
+                onKeyDown={(event) => {
+                  if (event.keyCode === 13)
+                    this.onTaskSubmit()
+                  else if (event.keyCode === 27) this.setState({ isEditing: false })
+                }}
+
+
+              ></div>
+              <div className="buttons-container">
+                <button className="submit-button" onClick={this.onTaskSubmit}>&#10148;</button>
+              </div>
+
             </div>
-          </div>
+            <div onClick={() => this.setState({ isEditing: false })} className="layerClick"></div>
+          </>
         ) : (
-          <button onClick={this.enterEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
-            +
-          </button>
-        )}
+            <button onClick={this.enterEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
+              +
+            </button>
+          )
+        }
       </div>
     );
   }
 }
 
-const targetTypes = [ ItemTypes.TASK, ItemTypes.NOTE ];
+const targetTypes = [ItemTypes.TASK, ItemTypes.NOTE];
 
 const dayTarget = {
   drop: (props, monitor, component) => {
+    if (monitor.didDrop()) return undefined;
+
+    const type = props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE;
+
+    let destinationPos = props.tasks.length;
+    if (type === monitor.getItemType()) {
+      if ((type === ItemTypes.TASK && monitor.getItem().timestamp === props.timestamp) || type === ItemTypes.NOTE) {
+        destinationPos--;
+      }
+    }
+
     const source = { item: monitor.getItem(), type: monitor.getItemType() };
-    const destination = { item: { timestamp: props.timestamp, position: props.tasks.length }, type: props.timestamp ? ItemTypes.TASK : ItemTypes.NOTE };
+    const destination = { item: { timestamp: props.timestamp, position: destinationPos }, type };
 
     props.moveTask(source, destination);
   }
