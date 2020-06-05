@@ -12,7 +12,7 @@ class AddTimelineTaskModal extends React.Component {
         super(props);
 
         registerLocale("sv", sv);
-        
+
         const startDate = new Date();
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 1)
@@ -30,7 +30,7 @@ class AddTimelineTaskModal extends React.Component {
     render() {
         return (
             <div className="modal" onClick={e => {
-                if(e.target === e.currentTarget) // Prevents firing onClick from child elements
+                if (e.target === e.currentTarget) // Prevents firing onClick from child elements
                     this.props.onClose();
             }}>
                 <div className="add-task-modal">
@@ -54,7 +54,7 @@ class AddTimelineTaskModal extends React.Component {
                                     onChange={date => this.setState({ startDate: date })}
                                     locale="sv"
                                     dateFormat="dd/MM/yyyy"
-                                    />
+                                />
                             </div>
                             <div className="field-row">
                                 <DatePicker
@@ -62,7 +62,7 @@ class AddTimelineTaskModal extends React.Component {
                                     onChange={date => this.setState({ endDate: date })}
                                     locale="sv"
                                     dateFormat="dd/MM/yyyy"
-                                    />
+                                />
                             </div>
                             <div className="field-row">
                                 <input

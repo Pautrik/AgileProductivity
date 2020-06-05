@@ -20,7 +20,7 @@ class TimelineTasks extends React.Component {
   renderTask(heightSplit, task) {
     const stylePrep = { height: `calc(100% / ${heightSplit})` };
 
-    if(task !== undefined) {
+    if (task !== undefined) {
       const taskWidth = dayDistance(stringToDate(task.date), stringToDate(task.endDate));
       stylePrep.width = `calc((${taskWidth + 1} * (100% + 2px)) - 2px)`; /* Accounts for day borders */
     }
@@ -31,7 +31,7 @@ class TimelineTasks extends React.Component {
     return (
       <div className="timeline-task" style={stylePrep}>
         {task && <p>{task.text}</p>}
-        <button onClick={() => this.props.deleteTask(task.id)}>&#128465;</button>
+        <button className="delete-timeline-task" onClick={() => this.props.deleteTask(task.id)}>&#x292B;</button>
       </div>
     )
   }
