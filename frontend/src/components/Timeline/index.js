@@ -2,10 +2,18 @@ import React from "react";
 import "./index.css";
 import ProjectTask from "../projectTasks"
 import { httpRequestJson } from "../../helpers/requests";
-import TimelineTask from "../timelineTasks";
+import TimelineTasks from "../timelineTasks";
+import AddTimelineTaskModal from "../addTimelineTaskModal";
 
-const projectEndpoint = activeState => `/projects?select=${activeState}`;
-const timelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
+import { copyDate, isEqualDates, dateToString } from "../../helpers/date";
+
+const getProjectEndpoint = activeState => `/projects?select=${activeState}`;
+const postProjectEndpoint = "/projects?key=value";
+const deleteProjectEndpoint = name => `/projects?name=${name}`;
+const patchProjectEndpoint = "/projects?key=value";
+const getTimelineTaskEndpoint = (projects, startDate, endDate) => `/timeline?parameters=${projects.join("&")}&${startDate}&${endDate}`;
+const postTimelineTaskEndpoint = "/timeline?key=value";
+const deleteTimelineTaskEndpoint = id => `/timeline?id=${id}`;
 
 const DAYS_TO_LOAD = 14;
 
@@ -39,27 +47,35 @@ class Timeline extends React.Component {
         super(props);
 
         const startDate = new Date();
-        let rangeT = 56;
 
         startDate.setDate(startDate.getDate() - 28);
 
         this.state = {
             startDate,
-            rangeT,
+            rangeT: 70,
             projectFilter: "any", // "any", "active", "inactive"
             projects: [],
             tasks: [],
             days: [],
             isLoading: false,
             viewingRange: "month",
+            inAddMode: false,
+            isEditingProject: false,
         }
 
         this.scrollerRef = React.createRef();
+        this.projectTextRef = React.createRef();
 
         this.dateOffsetFromStart = this.dateOffsetFromStart.bind(this);
         this.getWeekDay = this.getWeekDay.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.getMonth = this.getMonth.bind(this);
+        this.submitTask = this.submitTask.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
+        this.enterProjectEditMode = this.enterProjectEditMode.bind(this);
+        this.onProjectSumbit = this.onProjectSumbit.bind(this);
+        this.deleteProject = this.deleteProject.bind(this);
+        this.editProjectActive = this.editProjectActive.bind(this);
     }
 
     // Fetches projects and tasks and transforms it to days before setting state
@@ -89,7 +105,7 @@ class Timeline extends React.Component {
     async fetchProjects() {
         try {
             const { projectFilter } = this.state;
-            return await httpRequestJson(projectEndpoint(projectFilter));
+            return await httpRequestJson(getProjectEndpoint(projectFilter));
         }
         catch (e) {
             alert("Failed to fetch timeline projects");
@@ -99,9 +115,9 @@ class Timeline extends React.Component {
     async fetchTasks(projects) {
         try {
             const { startDate, rangeT } = this.state;
-            const endDate = this.copyDate(startDate);
+            const endDate = copyDate(startDate);
             endDate.setDate(endDate.getDate() + rangeT);
-            return await httpRequestJson(timelineTaskEndpoint(projects.map(x => x.name), this.dateToString(startDate), this.dateToString(endDate)));
+            return await httpRequestJson(getTimelineTaskEndpoint(projects.map(x => x.name), dateToString(startDate), dateToString(endDate)));
         }
         catch (e) {
             alert("Failed to fetch timeline tasks");
@@ -110,15 +126,32 @@ class Timeline extends React.Component {
 
     tasksToDays(tasks, projects) {
         const days = [];
+        let startedTasks = [];
+
         for (let i = 0; i < this.state.rangeT; i++) {
-            const dayDate = this.copyDate(this.state.startDate);
+            const dayDate = copyDate(this.state.startDate);
             dayDate.setDate(dayDate.getDate() + i);
-            const dayTasks = tasks.filter(task => task.date === this.dateToString(dayDate));
-            const orderedDayTasks = projects.map(p => dayTasks.filter(t => t.project.name === p.name));
+
+            const dayTasks = tasks.filter(task => task.date === dateToString(dayDate));
+
+            const orderedDayTasks = projects.map(p => {
+                const startedProjectTasks = startedTasks.filter(t => t.project.name === p.name);
+                const combinedTasks = [
+                    ...startedProjectTasks.map(() => undefined),
+                    ...dayTasks.filter(t => t.project.name === p.name)
+                ];
+                const heightSplit = combinedTasks.length;
+                startedProjectTasks.forEach(t => t.heightSplit = t.heightSplit > heightSplit ? t.heightSplit : heightSplit);
+
+                return combinedTasks;
+            });
+
+            startedTasks.push(...dayTasks);
+            startedTasks = startedTasks.filter(task => task.endDate !== dateToString(dayDate));
 
             days.push({
                 tasks: orderedDayTasks, // Array for each day containing array for all task for a project
-                date: this.copyDate(dayDate),
+                date: copyDate(dayDate),
             });
         }
 
@@ -126,7 +159,7 @@ class Timeline extends React.Component {
     }
 
     dateOffsetFromStart(offset) {
-        const date = this.copyDate(this.state.startDate);
+        const date = copyDate(this.state.startDate);
         date.setDate(date.getDate() + offset);
         return date;
     }
@@ -141,7 +174,7 @@ class Timeline extends React.Component {
 
     goBack() {
         const scrollWidth = this.scrollerRef.current.scrollWidth;
-        const newDate = this.copyDate(this.state.startDate);
+        const newDate = copyDate(this.state.startDate);
         newDate.setDate(newDate.getDate() - DAYS_TO_LOAD)
         this.setState({ startDate: newDate, rangeT: this.state.rangeT + DAYS_TO_LOAD }, () =>
             this.fetchTransformTasksToState()
@@ -157,7 +190,7 @@ class Timeline extends React.Component {
     isFocusedDate(date) {
         const todayDate = new Date();
         todayDate.setDate(todayDate.getDate() - 9);
-        return this.isEqualDates(date, todayDate);
+        return isEqualDates(date, todayDate);
     }
 
     handleScroll() {
@@ -177,67 +210,171 @@ class Timeline extends React.Component {
         }
     }
 
-    stringToDate(str) {
-        return new Date(`${str.substr(0, 4)}-${str.substr(4, 2)}-${str.substr(6, 2)}`);
-    }
-
-    dateToString(date) {
-        return date.toISOString().substr(0, 10).replace(/-/g, "");
-    }
-
     render() {
         return (
-            <div className="Timeline">
-                <div className="Timeline-header">
-                    <div></div>
-                    <h1>Timeline</h1>
-                    <div>
-                        <select className="viewingRange" onChange={e => this.setState({ viewingRange: e.target.value })}>
-                            <option value="week">Week</option>
-                            <option selected value="month">Month</option>
-                            <option value="two-months">2 Months</option>
-                            <option value="three-months">3 Months</option>
-                        </select>
+            <>
+                <div className="Timeline">
+                    <div className="Timeline-header">
+                        <div></div>
+                        <h1>Timeline</h1>
+                        <div className="right-part">
+                            <select value={this.state.viewingRange} className="viewingRange" onChange={e => this.setState({ viewingRange: e.target.value })}>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="two-months">2 Months</option>
+                                <option value="three-months">3 Months</option>
+                            </select>
+                            <button className="addTimlineTaskButton" style={{ backgroundColor: "rgb(48,48,48)", color: "rgba(255,255,255,0.8)", border: "none" }}
+                                onClick={() => this.setState({ inAddMode: true })} > + Add task</button>
+                        </div>
                     </div>
-                </div>
-                <div className="Timeline-holder">
-                    <div className="project-day-container">
-                        <div className="projects-container">
-                            <div className="Project-header">
-
+                    <div className="Timeline-holder">
+                        <div className="project-day-container">
+                            <div className="projects-container">
+                                <div className="Project-header">
+                                    <select
+                                        className="projectFilter"
+                                        value={this.state.projectFilter}
+                                        onChange={e => {
+                                            this.setState({ projectFilter: e.target.value }, () =>
+                                                this.fetchTransformDataToState());
+                                        }}>
+                                        <option value="any">Any activity</option>
+                                        <option value="active">Only active</option>
+                                        <option value="inactive">Only inactive</option>
+                                    </select>
+                                </div>
+                                {this.state.projects.map((x) =>
+                                    <ProjectTask
+                                        projectName={x.name}
+                                        active={x.active}
+                                        onDelete={this.deleteProject}
+                                        onToggleActive={() => this.editProjectActive(x.name, !x.active)} />
+                                )}
+                                {this.renderAddProject()}
                             </div>
-                            {this.state.projects.map((x) =>
-                                <ProjectTask
-                                    projectTaskText={x.name}
-                                />
-                            )}
-                        </div>
-                        <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
-                            {this.state.days.map(day => {
-                                const dayDate = day.date;
-                                const today = new Date();
-                                return (
-                                    <div className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
-                                        <div className="day-header" style={this.isEqualDates(today, dayDate) ? { color: "red" } : {}}>
-                                            {this.getWeekDay(dayDate)} <br />
-                                            {this.getMonth(dayDate)} <br />
-                                            {dayDate.getDate()}
+                            <div ref={this.scrollerRef} className="day-holder" onScroll={this.handleScroll}>
+                                {this.state.days.map(day => {
+                                    const dayDate = day.date;
+                                    const today = new Date();
+                                    return (
+                                        <div className={`day-Timeline ${this.state.viewingRange}`} {...(this.isFocusedDate(dayDate) ? { id: "key" } : {})}>
+                                            <div className="day-header" style={isEqualDates(today, dayDate) ? { color: "red" } : {}}>
+                                                {this.getWeekDay(dayDate)} <br />
+                                                {this.getMonth(dayDate)} <br />
+                                                {dayDate.getDate()}
+                                            </div>
+                                            {day.tasks.map((tasks, i) => (
+                                                <TimelineTasks
+                                                    tasks={tasks}
+                                                    deleteTask={this.deleteTask} />
+                                            ))}
                                         </div>
-                                        {day.tasks.map((tasks, i) => (
-                                            <TimelineTask
-                                                /* nrDays={task && this.dayDistance(this.stringToDate(task.date), this.stringToDate(task.endDate))}
-                                                text={task && task.text} */
-                                                tasks={tasks} />
-                                        ))}
-                                    </div>
-                                )
-                            })}
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                {this.state.inAddMode && (
+                    <AddTimelineTaskModal
+                        className="addTimelineTask"
+                        projects={this.state.projects}
+                        onSubmit={data => {
+                            this.submitTask(data);
+                            this.setState({ inAddMode: false });
+                        }}
+                        onClose={() => this.setState({ inAddMode: false })} />
+                )}
+            </>
         );
     }
+
+    onProjectSumbit() {
+        const projectName = this.projectTextRef.current.innerText.trim();
+
+        if (projectName === "")
+            return;
+
+        const body = {
+            name: projectName,
+            active: true,
+        };
+
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        }
+
+        httpRequestJson(postProjectEndpoint, requestOptions)
+            .then(() => this.fetchTransformDataToState())
+            .then(this.setStatePromise({ isEditingProject: false }))
+            .catch(() => alert("Failed to create project"));
+    }
+
+    enterProjectEditMode() {
+        this.setState({ isEditingProject: true }, () => this.projectTextRef.current.focus());
+    }
+
+    deleteProject(name) {
+        httpRequestJson(deleteProjectEndpoint(name), { method: "DELETE" })
+            .then(() => this.fetchProjects())
+            .then(projects => this.setStatePromise({ projects }))
+            .catch(() => alert("Failed to delete project"));
+    }
+
+    editProjectActive(name, isActive) {
+        const requestOptions = {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify([{ name, active: isActive }]),
+        }
+
+        httpRequestJson(patchProjectEndpoint, requestOptions)
+            .catch(() => alert("Failed to change project active state"));
+
+        const projectsCopy = [...this.state.projects];
+        const projectIndex = projectsCopy.findIndex(p => p.name === name);
+        if (projectIndex === -1) this.fetchTransformDataToState(); // Refetches if project wasn't found
+        projectsCopy[projectIndex] = { ...projectsCopy[projectIndex] };
+        projectsCopy[projectIndex].active = isActive;
+
+        this.setState({ projects: projectsCopy });
+    }
+    renderAddProject() {
+        if (this.state.isEditingProject) {
+            return (
+                <>
+                    <div className="form-area">
+                        <div
+                            className="text-area"
+                            contentEditable
+                            ref={this.projectTextRef}
+                            placeholder="Enter project text"
+                            onKeyDown={(event) => {
+                                if (event.keyCode === 13)
+                                    this.onProjectSumbit()
+                                else if (event.keyCode === 27) this.setState({ isEditingProject: false })
+                            }}></div>
+                        <div className="buttons-container">
+                            <button className="submit-button" onClick={this.onProjectSumbit}>&#10148;</button>
+                        </div>
+
+                    </div>
+                    <div onClick={() => this.setState({ isEditingProject: false })} className="layerClick"></div>
+                </>
+            )
+        }
+        else {
+            return (
+                <button onClick={this.enterProjectEditMode} className="add-task-button" style={this.props.hovered ? { marginTop: "80px" } : {}}>
+                    +
+                </button>
+            )
+        }
+    }
+
     componentDidMount() {
         this.fetchTransformDataToState()
             .then(() => {
@@ -248,11 +385,25 @@ class Timeline extends React.Component {
             });
     }
 
+    submitTask(data) {
+        const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...data, ...{ state: 1, position: 0 } }),
+        };
+
+        httpRequestJson(postTimelineTaskEndpoint, requestOptions)
+            .then(() => this.fetchTransformTasksToState())
+            .catch(() => alert("Failed to post timeline task"))
+    }
+
+    deleteTask(id) {
+        httpRequestJson(deleteTimelineTaskEndpoint(id), { method: "DELETE" })
+            .then(() => this.fetchTransformTasksToState())
+            .catch(() => alert("Failed to delete timeline task"))
+    }
+
     setStatePromise = state => new Promise(resolve => this.setState(state, resolve));
-    copyDate = date => new Date(date.getTime());
-    isEqualDates = (firstDate, secondDate) => this.dateToString(firstDate) === this.dateToString(secondDate);
-
-
 }
 
 
