@@ -13,8 +13,8 @@ import java.util.*;
  */
 
 public class DatabaseHandler {
-    private final String url = "jdbc:postgresql://pautrik.ddns.net/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
-    private final String user = "pi";
+    private final String url = "jdbc:postgresql://localhost/kangaroo?useUnicode=yes&characterEncoding=UTF-8";
+    private final String user = "postgres";
     private String pass;
     private final Gson gson = new Gson();
     private Connection conn;
