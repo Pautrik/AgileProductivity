@@ -71,6 +71,6 @@ To build the frontend run this series of commands:
 * `cd ..`
 
 ### Copy the database configurations
-`cp backend/src/Database\ Setup.txt pre-built/`
+`cp backend/src/Database\ setup.txt pre-built/`
 
 Now all of the resources required to run the server can be found within the `pre-built` directory in the root of the project.
