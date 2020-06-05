@@ -7,7 +7,6 @@
 }
 
 .project-task {
-    background-color: var(--project-green);
     border:solid rgba(0,0,0,0.2) 2px;
     height: var(--timeline-task-height);
     display: flex;
