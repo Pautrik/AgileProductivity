@@ -26,18 +26,18 @@
 
 .timeline-task button {
     position: absolute;
-    top: 0px;
-    right: 0px;
-}
-.delete-timeline-task{
-    background-color: rgb(48,48,48);
-    border: solid rgba(0,0,0,0.2) 2px;
+    background-color: transparent;
+    border-color: transparent;
     color: rgba(255,255,255,0.8);
     border-radius: 4px;
     font-size: 10px;
+    top: 0px;
+    right: 0px;
 }
+
 .delete-timeline-task:hover{
     cursor: pointer;
-    opacity: 0.9;
+    background-color: rgb(48,48,48);
+    border: solid rgba(0,0,0,0.2) 2px;
 
 }

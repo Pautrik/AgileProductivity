@@ -224,7 +224,8 @@ class Timeline extends React.Component {
                                 <option value="two-months">2 Months</option>
                                 <option value="three-months">3 Months</option>
                             </select>
-                            <button onClick={() => this.setState({ inAddMode: true })}>+ Add task</button>
+                            <button className="addTimlineTaskButton" style={{ backgroundColor: "rgb(48,48,48)", color: "rgba(255,255,255,0.8)", border: "none" }}
+                                onClick={() => this.setState({ inAddMode: true })} > + Add task</button>
                         </div>
                     </div>
                     <div className="Timeline-holder">
@@ -232,6 +233,7 @@ class Timeline extends React.Component {
                             <div className="projects-container">
                                 <div className="Project-header">
                                     <select
+                                        className="projectFilter"
                                         value={this.state.projectFilter}
                                         onChange={e => {
                                             this.setState({ projectFilter: e.target.value }, () =>
@@ -243,11 +245,11 @@ class Timeline extends React.Component {
                                     </select>
                                 </div>
                                 {this.state.projects.map((x) =>
-                                    <ProjectTask 
+                                    <ProjectTask
                                         projectName={x.name}
                                         active={x.active}
                                         onDelete={this.deleteProject}
-                                        onToggleActive={() => this.editProjectActive(x.name, !x.active)}/>
+                                        onToggleActive={() => this.editProjectActive(x.name, !x.active)} />
                                 )}
                                 {this.renderAddProject()}
                             </div>
@@ -276,6 +278,7 @@ class Timeline extends React.Component {
                 </div>
                 {this.state.inAddMode && (
                     <AddTimelineTaskModal
+                        className="addTimelineTask"
                         projects={this.state.projects}
                         onSubmit={data => {
                             this.submitTask(data);
@@ -290,7 +293,7 @@ class Timeline extends React.Component {
     onProjectSumbit() {
         const projectName = this.projectTextRef.current.innerText.trim();
 
-        if(projectName === "")
+        if (projectName === "")
             return;
 
         const body = {
@@ -331,9 +334,9 @@ class Timeline extends React.Component {
         httpRequestJson(patchProjectEndpoint, requestOptions)
             .catch(() => alert("Failed to change project active state"));
 
-        const projectsCopy = [ ...this.state.projects ];
+        const projectsCopy = [...this.state.projects];
         const projectIndex = projectsCopy.findIndex(p => p.name === name);
-        if(projectIndex === -1) this.fetchTransformDataToState(); // Refetches if project wasn't found
+        if (projectIndex === -1) this.fetchTransformDataToState(); // Refetches if project wasn't found
         projectsCopy[projectIndex] = { ...projectsCopy[projectIndex] };
         projectsCopy[projectIndex].active = isActive;
 

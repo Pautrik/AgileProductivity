@@ -114,3 +114,22 @@ body {
     padding:3px;
     color: var(--project-text-color);
 }
+.viewingRange:hover{
+    cursor: pointer;
+}
+.projectFilter{
+    background-color: rgb(48,48,48);
+    border: solid rgba(0,0,0,0.2) 2px;
+    color: rgba(255,255,255,0.8);
+    border-radius: 4px;
+    justify-content: center;
+}
+.projectFilter:hover{
+    cursor:pointer;
+}
+.addTimlineTaskButton{
+    border-radius: 5px;
+}
+.addTimlineTaskButton:hover{
+    cursor: pointer;
+}
