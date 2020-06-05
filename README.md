@@ -1,7 +1,7 @@
 # Effectively
 A website for project and time schedule management.
 ## Setting up project with pre-built resources
-Clone this repository and navigate to the root of the project.
+Clone this repository and navigate to the directory called `pre-built` found within the root of the project.
 
 To host the the effectively website one needs to have the following programs installed:
 * Java Runtime Environment (version 11 or above)
@@ -23,7 +23,7 @@ To start the backend run the command `./backend-1.0/bin/backend` if you're on MA
 
 The password needed for the backend to connect to database can either be passed in as a command line argument (i.e. `./backend-1.0/bin/backend password` or `.\backend-1.0\bin\backend.bat password`). If no password is passed in, then the program will ask you to enter it.
 
-THe backend should now be able to serve API calls on localhost:8000
+The backend should now be able to serve API calls on localhost:8000
 
 #### Nginx
 Now that you got the backend up and running we need to setup Nginx to handle the serving of the static frontend files and the proxying of the API related routes to the backend server.
