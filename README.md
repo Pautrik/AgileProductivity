@@ -16,7 +16,7 @@ For [mac](https://www.postgresql.org/download/macosx/) and for other POSIX based
 
 The database is required to have the name 'kangaroo' and the user of the database needs to have the name 'pguser' and a password of your own choosing.
 
-To actually setup the required tables and triggers, run the command `psql -f Database\ Setup.txt kangaroo pguser`.
+To actually setup the required tables and triggers, run the command `psql -f Database\ setup.txt kangaroo pguser`.
 
 #### Backend
 To start the backend run the command `./backend-1.0/bin/backend` if you're on MAC OS or linux and `.\backend-1.0\bin\backend.bat` if you're running Windows. 
